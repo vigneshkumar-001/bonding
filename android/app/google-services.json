@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "226303495126",
+    "project_id": "bonding-bdf7a",
+    "storage_bucket": "bonding-bdf7a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226303495126:android:0cbca5b8f635013a7af277",
+        "android_client_info": {
+          "package_name": "com.solla.bonding_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvXJkJWq671ER6BhZDp0mrdPBugaI71o8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
