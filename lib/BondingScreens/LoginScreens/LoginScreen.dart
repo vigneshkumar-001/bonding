@@ -5,6 +5,7 @@ import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart'; // ← add provider to pubspec.yaml
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -96,6 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       style: const TextStyle(color: Colors.white),
+                      maxLength: 10,
+
                       decoration: InputDecoration(
                         hintText: "Enter mobile number",
                         hintStyle: const TextStyle(color: Colors.white70),

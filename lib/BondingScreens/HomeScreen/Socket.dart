@@ -10,9 +10,9 @@ class SocketService {
   SocketService._internal();
 
   void connectStaff(String staffMemberId) {
-
     socket = IO.io(
-      "https://bondingbackend.onrender.com",
+      // "https://bondingbackend.onrender.com",
+      "https://bondinig-ca63248fdb11.herokuapp.com",
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -25,9 +25,7 @@ class SocketService {
       print("✅ Socket connected: ${socket.id}");
 
       // 🔥 EMIT STAFF ONLINE
-      socket.emit("staff_online", {
-        "memberID": staffMemberId,
-      });
+      socket.emit("staff_online", {"memberID": staffMemberId});
 
       print("🟢 staff_online emitted → $staffMemberId");
     });

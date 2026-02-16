@@ -5,6 +5,8 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
 
+import '../../Reusable_Widgets/under_development_widgets.dart';
+
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
 
@@ -69,6 +71,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.privacy_tip_outlined,
                         title: "privacy policy",
                         onTap: () {
+                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
                           // Navigate to privacy policy
                         },
                       ),
@@ -77,7 +80,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.block_outlined,
                         title: "Blocked users",
                         onTap: () {
-                          bondNavigator.newPage(context, page: BlockedUsersScreen());
+                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                          // bondNavigator.newPage(context, page: BlockedUsersScreen());
                           // Navigate to blocked users
                         },
                       ),
@@ -86,7 +90,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.report_outlined,
                         title: "Report overview",
                         onTap: () {
-                          bondNavigator.newPage(context, page: ReportOverviewScreen());
+                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                          // bondNavigator.newPage(context, page: ReportOverviewScreen());
                           // Navigate to report overview
                         },
                       ),

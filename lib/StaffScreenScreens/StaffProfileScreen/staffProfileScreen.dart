@@ -4,6 +4,7 @@ import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Reusable_Widgets/under_development_widgets.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/WalletFlow/WalletScreen/WalletScreen.dart';
@@ -11,6 +12,9 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.da
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '../../BondingScreens/AuthService.dart';
+import '../../BondingScreens/Splash/SplashScreen2.dart';
 
 class StaffProfileScreen extends StatefulWidget {
   final bool backPage;
@@ -42,7 +46,10 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("No staff profile data available", style: TextStyle(color: Colors.white70)),
+                  const Text(
+                    "No staff profile data available",
+                    style: TextStyle(color: Colors.white70),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: staffVM.fetchStaffSingleData,
@@ -70,38 +77,49 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                        widget.backPage?  GestureDetector(
-                            onTap: () => bondNavigator.backPage(context),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF35272d),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.arrow_back, color: Colors.white),
-                              ),
-                            ),
-                          ):GestureDetector(
-                          onTap: () => bondNavigator.newPageRemoveUntil(context, page: StaffBottomBar(index: 0,)),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF35272d),
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(Icons.arrow_back, color: Colors.white),
-                            ),
-                          ),
-                        ),
+                          widget.backPage
+                              ? GestureDetector(
+                                  onTap: () => bondNavigator.backPage(context),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF35272d),
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: () => bondNavigator.newPageRemoveUntil(
+                                    context,
+                                    page: StaffBottomBar(index: 0),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF35272d),
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                           AppText(
                             "Profile",
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
-                      SizedBox(width: 20,)
+                          SizedBox(width: 20),
                         ],
                       ),
                     ),
@@ -114,19 +132,26 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFcc529f), width: 3),
+                        border: Border.all(
+                          color: const Color(0xFFcc529f),
+                          width: 3,
+                        ),
                       ),
                       child: ClipOval(
                         child: staff.image != null && staff.image!.isNotEmpty
                             ? Image.network(
-                          staff.image!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            "assets/Images/profileimg.png",
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                            : Image.asset("assets/Images/profileimg.png", fit: BoxFit.cover),
+                                staff.image!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.asset(
+                                      "assets/Images/profileimg.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                              )
+                            : Image.asset(
+                                "assets/Images/profileimg.png",
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
 
@@ -147,10 +172,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                     // Staff ID
                     Text(
                       "ID: ${staff.memberID}",
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 14),
                     ),
 
                     const SizedBox(height: 30),
@@ -169,13 +191,17 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               svg: "assets/Images/walleticon.svg",
                               title: "Wallet",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const StaffWalletScreen());
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const StaffWalletScreen(),
+                                );
                               },
                             ),
                             _buildMenuRow(
                               svg: "assets/Images/helpicon.svg",
                               title: "Help & support",
                               onTap: () {
+                                UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
                                 // TODO: Navigate to staff help/support screen
                               },
                             ),
@@ -183,14 +209,20 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               svg: "assets/Images/supporticon.svg",
                               title: "Withdraw History",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const WithdrawHistory(backPage: true,)); // or staff-specific
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const WithdrawHistory(backPage: true),
+                                ); // or staff-specific
                               },
                             ),
                             _buildMenuRow(
                               svg: "assets/Images/accounticon.svg",
                               title: "Account settings",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const AccountSettingsScreen());
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const AccountSettingsScreen(),
+                                );
                               },
                             ),
                           ],
@@ -212,10 +244,69 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                           svg: "assets/Images/logouticon.svg",
                           title: "Logout",
                           titleColor: const Color(0xFFFF083D),
-                          onTap: () {
-                            // TODO: Staff logout logic (clear token, navigate to login)
+                          onTap: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (ctx) {
+                                return AlertDialog(
+                                  backgroundColor: const Color(0xFF231d1d),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: const Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  content: const Text(
+                                    "Do you want to log out?",
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(ctx, false),
+                                      child: const Text(
+                                        "Cancel",
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFFF083D,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: const Text("Logout"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirm != true) return;
+
+                            await AuthService.logout(); // clear token/session here
+                            if (!context.mounted) return;
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SplashScreen2(),
+                              ),
+                            );
+
                             Utils.snackBar("Logged out successfully");
-                            // bondNavigator.replaceAll(context, page: const LoginScreen());
                           },
                         ),
                       ),
@@ -230,7 +321,10 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                         children: [
                           RichText(
                             text: const TextSpan(
-                              style: TextStyle(color: Colors.grey, fontSize: 14),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
                               children: [
                                 TextSpan(text: "Need Help? please contact "),
                                 TextSpan(
@@ -282,11 +376,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey[400],
-              size: 18,
-            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 18),
           ],
         ),
       ),

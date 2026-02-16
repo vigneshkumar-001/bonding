@@ -8,6 +8,7 @@ import 'package:bonding_app/BondingScreens/AuthService.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Model/StaffDataModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/Model/ProfileModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/Model/InterestModel.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/Model/ProfileIdModel.dart';
 import 'package:bonding_app/StaffScreenScreens/RecentCallScreen/Model/recentCallModel.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffDashBoardScreen/Model/CallGraphModel.dart';
@@ -65,10 +66,7 @@ class StaffRepository {
     required String idNumber,
   }) async {
     try {
-      final body = {
-        "IDtype": idType,
-        "IDnumber": idNumber,
-      };
+      final body = {"IDtype": idType, "IDnumber": idNumber};
 
       final response = await _apiService.postResponseV3(
         ApiEndPoints().staffIdVerify, // → "/api/v1/auth/user/staffIdVerify"
@@ -120,11 +118,9 @@ class StaffRepository {
     }
   }
 
-
   Future<AreaOfInterestResponse> updateStaffAreaOfInterest({
     required List<String> interests,
-  }) async
-  {
+  }) async {
     try {
       final body = {
         "areaOfInterest": interests.map((title) => {"title": title}).toList(),
@@ -151,6 +147,7 @@ class StaffRepository {
       throw Exception("AuthRepository updateAreaOfInterest error: $e");
     }
   }
+
   Future<StaffDetailsResponse> getStaffDetails() async {
     try {
       final response = await _apiService.getResponseV2(
@@ -160,6 +157,7 @@ class StaffRepository {
       );
 
       print("Get Staff Details Raw Response: $response");
+      AppLogger.log.i("Get Staff Details Raw Response: $response");
 
       final staffResp = StaffDetailsResponse.fromJson(response);
 
@@ -173,13 +171,13 @@ class StaffRepository {
     }
   }
 
-
   // lib/repositories/staff_repository.dart  (or auth_repository.dart)
 
   Future<StaffSingleDataResponse> getStaffSingleData() async {
     try {
       final response = await _apiService.getResponseV2(
-        ApiEndPoints().getStaffSingleData, // "/api/v1/auth/user/getstaffSingleData"
+        ApiEndPoints()
+            .getStaffSingleData, // "/api/v1/auth/user/getstaffSingleData"
         // Add auth header if required
         // headers: {'Authorization': 'Bearer ${await AuthService.getToken()}'},
       );

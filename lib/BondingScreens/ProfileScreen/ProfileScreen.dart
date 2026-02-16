@@ -1,7 +1,9 @@
 import 'package:bonding_app/BondingScreens/AccountSettingScreen/AccountSetting.dart';
+import 'package:bonding_app/BondingScreens/AuthService.dart';
 import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/EditProfile/EditProfileScreen.dart';
+import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
 import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
@@ -10,6 +12,8 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '../../Reusable_Widgets/under_development_widgets.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool backPage;
@@ -40,7 +44,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("No user data available", style: TextStyle(color: Colors.white70)),
+                  const Text(
+                    "No user data available",
+                    style: TextStyle(color: Colors.white70),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: userVM.fetchUserDetails,
@@ -67,31 +74,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                         widget.backPage? GestureDetector(
-                            onTap: () => bondNavigator.backPage(context),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF35272d),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.arrow_back, color: Colors.white),
-                              ),
-                            ),
-                          ):GestureDetector(
-                           onTap: () => bondNavigator.newPageRemoveUntil(context, page: MainBottomBar(index: 0,)),
-                           child: Container(
-                             decoration: BoxDecoration(
-                               color: const Color(0xFF35272d),
-                               borderRadius: BorderRadius.circular(40),
-                             ),
-                             child: const Padding(
-                               padding: EdgeInsets.all(8.0),
-                               child: Icon(Icons.arrow_back, color: Colors.white),
-                             ),
-                           ),
-                         ),
+                          widget.backPage
+                              ? GestureDetector(
+                                  onTap: () => bondNavigator.backPage(context),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF35272d),
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: () => bondNavigator.newPageRemoveUntil(
+                                    context,
+                                    page: MainBottomBar(index: 0),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF35272d),
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                           AppText(
                             "Profile",
                             fontSize: 18,
@@ -100,7 +118,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              bondNavigator.newPage(context, page: const EditProfileScreen());
+                              bondNavigator.newPage(
+                                context,
+                                page: const EditProfileScreen(),
+                              );
                             },
                             child: const Icon(Icons.edit, color: Colors.white),
                           ),
@@ -116,19 +137,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFcc529f), width: 3),
+                        border: Border.all(
+                          color: const Color(0xFFcc529f),
+                          width: 3,
+                        ),
                       ),
                       child: ClipOval(
                         child: user.image != null && user.image!.isNotEmpty
                             ? Image.network(
-                          user.image!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            "assets/Images/profileimg.png",
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                            : Image.asset("assets/Images/profileimg.png", fit: BoxFit.cover),
+                                user.image!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.asset(
+                                      "assets/Images/profileimg.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                              )
+                            : Image.asset(
+                                "assets/Images/profileimg.png",
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
 
@@ -149,10 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // User ID (dynamic)
                     Text(
                       "ID: ${user.memberID}",
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 14),
                     ),
 
                     const SizedBox(height: 30),
@@ -171,13 +196,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               svg: "assets/Images/walleticon.svg",
                               title: "Wallet",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const WalletScreen());
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const WalletScreen(),
+                                );
                               },
                             ),
                             _buildMenuRow(
                               svg: "assets/Images/helpicon.svg",
                               title: "Help & support",
                               onTap: () {
+                                UnderDevelopmentWidgets.buildUnderDevelopmentDialog(
+                                  context,
+                                );
                                 // TODO: Navigate to help screen
                               },
                             ),
@@ -185,14 +216,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               svg: "assets/Images/supporticon.svg",
                               title: "Transactions",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const TransactionsScreen(backPage: true,));
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const TransactionsScreen(
+                                    backPage: true,
+                                  ),
+                                );
                               },
                             ),
                             _buildMenuRow(
                               svg: "assets/Images/accounticon.svg",
                               title: "Account settings",
                               onTap: () {
-                                bondNavigator.newPage(context, page: const AccountSettingsScreen());
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const AccountSettingsScreen(),
+                                );
                               },
                             ),
                           ],
@@ -202,7 +241,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Logout Container
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
@@ -214,14 +252,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           svg: "assets/Images/logouticon.svg",
                           title: "Logout",
                           titleColor: const Color(0xFFFF083D),
-                          onTap: () {
-                            // TODO: Handle logout (clear token, navigate to login)
+                          onTap: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (ctx) {
+                                return AlertDialog(
+                                  backgroundColor: const Color(0xFF231d1d),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: const Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  content: const Text(
+                                    "Do you want to log out?",
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(ctx, false),
+                                      child: const Text(
+                                        "Cancel",
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFFF083D,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: const Text("Logout"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirm != true) return;
+
+                            await AuthService.logout(); // clear token/session here
+                            if (!context.mounted) return;
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SplashScreen2(),
+                              ),
+                            );
+
                             Utils.snackBar("Logged out successfully");
                           },
                         ),
                       ),
                     ),
 
+                    // Logout Container
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       color: const Color(0xFF231d1d),
+                    //       borderRadius: BorderRadius.circular(16),
+                    //     ),
+                    //     child: _buildMenuRow(
+                    //       svg: "assets/Images/logouticon.svg",
+                    //       title: "Logout",
+                    //       titleColor: const Color(0xFFFF083D),
+                    //       onTap: () async {
+                    //         Navigator.pushReplacement(
+                    //           context,
+                    //           MaterialPageRoute(builder: (_) => const SplashScreen2()),
+                    //         );
+                    //         await AuthService.logout();
+                    //         // TODO: Handle logout (clear token, navigate to login)
+                    //         Utils.snackBar("Logged out successfully");
+                    //       },
+                    //     ),
+                    //   ),
+                    // ),
                     const SizedBox(height: 20),
 
                     // Support Text
@@ -231,7 +353,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           RichText(
                             text: const TextSpan(
-                              style: TextStyle(color: Colors.grey, fontSize: 14),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
                               children: [
                                 TextSpan(text: "Need Help? please contact "),
                                 TextSpan(
@@ -283,11 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey[400],
-              size: 18,
-            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 18),
           ],
         ),
       ),

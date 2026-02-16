@@ -60,7 +60,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _nameController.text = user.name ?? '';
         _bioController.text = user.bio ?? '';
         _currentImageUrl = user.image;
-        _selectedLanguage = user.language ?? "English"; // Default to English if null
+        _selectedLanguage =
+            user.language ?? "English"; // Default to English if null
       }
     });
   }
@@ -84,7 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  // Upload image with auth token
+  // Upload image with auth token (TEMP: form-data/file attach hidden)
   Future<String?> _uploadImage(File imageFile) async {
     try {
       final token = await AuthService.getToken() ?? "";
@@ -96,20 +97,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       final uri = Uri.parse('${ApiEndPoints().baseUrl}auth/user/editProfile');
 
-      var request = http.MultipartRequest('POST', uri);
+      final request = http.MultipartRequest('POST', uri);
 
       // Add auth header
       request.headers['Authorization'] = 'Bearer $token';
 
-      final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
-      final extension = mimeType.split('/').last;
-
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        imageFile.path,
-        filename: 'profile.$extension',
-        contentType: http_parser.MediaType('image', extension),
-      ));
+      // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
+      // final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      // final extension = mimeType.split('/').last;
+      //
+      // request.files.add(await http.MultipartFile.fromPath(
+      //   'image',
+      //   imageFile.path,
+      //   filename: 'profile.$extension',
+      //   contentType: http_parser.MediaType('image', extension),
+      // ));
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
@@ -124,14 +126,65 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       }
 
-      Utils.snackBarErrorMessage("Image upload failed: ${response.statusCode} - ${response.body}");
+      Utils.snackBarErrorMessage(
+        "Request failed: ${response.statusCode} - ${response.body}",
+      );
       return null;
     } catch (e) {
-      Utils.snackBarErrorMessage("Image upload error: $e");
-      print("Upload error: $e");
+      Utils.snackBarErrorMessage("Request error: $e");
       return null;
     }
   }
+
+  //
+  // // Upload image with auth token
+  // Future<String?> _uploadImage(File imageFile) async {
+  //   try {
+  //     final token = await AuthService.getToken() ?? "";
+  //
+  //     if (token.isEmpty) {
+  //       Utils.snackBarErrorMessage("Authentication token not found");
+  //       return null;
+  //     }
+  //
+  //     final uri = Uri.parse('${ApiEndPoints().baseUrl}auth/user/editProfile');
+  //
+  //     var request = http.MultipartRequest('POST', uri);
+  //
+  //     // Add auth header
+  //     request.headers['Authorization'] = 'Bearer $token';
+  //
+  //     final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+  //     final extension = mimeType.split('/').last;
+  //
+  //     request.files.add(await http.MultipartFile.fromPath(
+  //       'image',
+  //       imageFile.path,
+  //       filename: 'profile.$extension',
+  //       contentType: http_parser.MediaType('image', extension),
+  //     ));
+  //
+  //     final streamedResponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (response.statusCode == 200) {
+  //       final json = jsonDecode(response.body);
+  //       if (json['status'] == true && json['data'] != null) {
+  //         final newImageUrl = json['data']['image'] as String?;
+  //         if (newImageUrl != null && newImageUrl.isNotEmpty) {
+  //           return newImageUrl;
+  //         }
+  //       }
+  //     }
+  //
+  //     Utils.snackBarErrorMessage("Image upload failed: ${response.statusCode} - ${response.body}");
+  //     return null;
+  //   } catch (e) {
+  //     Utils.snackBarErrorMessage("Image upload error: $e");
+  //     print("Upload error: $e");
+  //     return null;
+  //   }
+  // }
 
   // Update full profile
   Future<void> _updateProfile() async {
@@ -213,7 +266,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ),
                               child: const Padding(
                                 padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.arrow_back, color: Colors.white),
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -223,7 +279,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
-                          SizedBox()
+                          SizedBox(),
                         ],
                       ),
                     ),
@@ -240,18 +296,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: const Color(0xFFcc529f), width: 3),
+                            border: Border.all(
+                              color: const Color(0xFFcc529f),
+                              width: 3,
+                            ),
                           ),
                           child: ClipOval(
                             child: _selectedImage != null
                                 ? Image.file(_selectedImage!, fit: BoxFit.cover)
                                 : (user.image != null && user.image!.isNotEmpty
-                                ? Image.network(
-                              user.image!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset("assets/Images/profileimg.png", fit: BoxFit.cover),
-                            )
-                                : Image.asset("assets/Images/profileimg.png", fit: BoxFit.cover)),
+                                      ? Image.network(
+                                          user.image!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              Image.asset(
+                                                "assets/Images/profileimg.png",
+                                                fit: BoxFit.cover,
+                                              ),
+                                        )
+                                      : Image.asset(
+                                          "assets/Images/profileimg.png",
+                                          fit: BoxFit.cover,
+                                        )),
                           ),
                         ),
                       ),
@@ -292,12 +358,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               hintText: "Enter the name",
                               hintStyle: TextStyle(color: Color(0XFFb6b6ba)),
                               filled: true,
-                              fillColor: const Color(0xFF35272d).withOpacity(0.6),
+                              fillColor: const Color(
+                                0xFF35272d,
+                              ).withOpacity(0.6),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
                               ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -332,12 +403,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               hintText: "Text here",
                               hintStyle: TextStyle(color: Color(0XFFb6b6ba)),
                               filled: true,
-                              fillColor: const Color(0xFF35272d).withOpacity(0.6),
+                              fillColor: const Color(
+                                0xFF35272d,
+                              ).withOpacity(0.6),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
                               ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
                               counterStyle: const TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -359,18 +435,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF35272d).withOpacity(0.6),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: DropdownButton<String>(
-                              value: _selectedLanguage ?? user.language ?? "English",
+                              value:
+                                  _selectedLanguage ??
+                                  user.language ??
+                                  "English",
                               isExpanded: true,
                               underline: const SizedBox(),
                               dropdownColor: const Color(0xFF35272d),
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-                              style: const TextStyle(color: Colors.white70, fontSize: 16),
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.white70,
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
                               items: languages.map((String lang) {
                                 return DropdownMenuItem<String>(
                                   value: lang,
@@ -402,7 +490,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           Text(
                             user.gender ?? "Not specified",
-                            style: const TextStyle(color: Colors.grey, fontSize: 16),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -419,7 +510,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: GestureDetector(
-                  onTap: userVM.isLoading || _isUpdating ? null : _updateProfile,
+                  onTap: userVM.isLoading || _isUpdating
+                      ? null
+                      : _updateProfile,
                   child: Container(
                     height: 45,
                     width: MediaQuery.of(context).size.width * 0.55,
@@ -432,18 +525,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     alignment: Alignment.center,
                     child: _isUpdating || userVM.isLoading
                         ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Text(
-                      "Update",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                            "Update",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
               ),

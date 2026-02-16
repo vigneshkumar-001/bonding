@@ -11,24 +11,22 @@ import 'package:bonding_app/BondingScreens/LoginScreens/InterestLanguage/Model/L
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/Model/InterestModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/Model/LoginModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/Model/VerifyOtpModel.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-
 
 class AuthRepository {
   final NetworkApiService _apiService = NetworkApiService();
 
-
-
-
   Future<SignupResponse> sendOtp(String phoneNumber) async {
     try {
       final body = {
-        "phone": phoneNumber,     // adjust key if backend expects "mobile", "number", etc.
+        "phone":
+            phoneNumber, // adjust key if backend expects "mobile", "number", etc.
       };
 
       final response = await _apiService.postResponseV2(
-        ApiEndPoints().login,    // → "/api/v1/auth/user/signup"
+        ApiEndPoints().login, // → "/api/v1/auth/user/signup"
         body: body,
       );
 
@@ -41,34 +39,37 @@ class AuthRepository {
       if (signupResp.status == true) {
         return signupResp;
       } else {
-        throw Exception(signupResp.message.isNotEmpty
-            ? signupResp.message
-            : "Failed to send OTP");
+        throw Exception(
+          signupResp.message.isNotEmpty
+              ? signupResp.message
+              : "Failed to send OTP",
+        );
       }
     } catch (e) {
+      AppLogger.log.e("AuthRepository sendOtp error: $e");
       throw Exception("AuthRepository sendOtp error: $e");
     }
   }
+
   Future<VerifyOtpResponse> verifyOtp({
     required String phone,
     required String otp,
-  }) async
-
-  {
-
+  }) async {
     try {
       final body = {
-        "user": phone,     // backend expects "user" key for phone
+        "user": phone, // backend expects "user" key for phone
         "otp": otp,
       };
 
       final response = await _apiService.postResponseV2(
-        ApiEndPoints().verifyOtp,    // should return "/api/v1/auth/user/verify-otp"
+        ApiEndPoints()
+            .verifyOtp, // should return "/api/v1/auth/user/verify-otp"
         body: body,
       );
 
       if (kDebugMode) {
         print("Verify OTP Response: $response");
+        AppLogger.log.i("Verify OTP Response: ${response.toString()}");
       }
 
       final verifyResp = VerifyOtpResponse.fromJson(response);
@@ -88,18 +89,16 @@ class AuthRepository {
   Future<VerifyOtpResponse> StaffVerifyOtp({
     required String phone,
     required String otp,
-  }) async
-
-  {
-
+  }) async {
     try {
       final body = {
-        "user": phone,     // backend expects "user" key for phone
+        "user": phone, // backend expects "user" key for phone
         "otp": otp,
       };
 
       final response = await _apiService.postResponseV2(
-        ApiEndPoints().staffVerifyOtp,    // should return "/api/v1/auth/user/verify-otp"
+        ApiEndPoints()
+            .staffVerifyOtp, // should return "/api/v1/auth/user/verify-otp"
         body: body,
       );
 
@@ -121,7 +120,7 @@ class AuthRepository {
     }
   }
 
-// lib/repositories/auth_repository.dart
+  // lib/repositories/auth_repository.dart
 
   Future<UpdateProfileResponse> updateProfileImage(File imageFile) async {
     try {
@@ -151,6 +150,7 @@ class AuthRepository {
       throw Exception("AuthRepository updateProfileImage error: $e");
     }
   }
+
   Future<UpdateProfileResponse> uploadStaffSelfie(File imageFile) async {
     try {
       // Optional: get token
@@ -185,19 +185,14 @@ class AuthRepository {
   Future<BioProfileResponse> updateBioData({
     required String name,
     required String gender,
-    required String dob,   // format: DD/MM/YYYY as per your UI
+    required String dob, // format: DD/MM/YYYY as per your UI
     required String bio,
   }) async {
     try {
-      final body = {
-        "name": name,
-        "gender": gender,
-        "DOB": dob,
-        "bio": bio,
-      };
+      final body = {"name": name, "gender": gender, "DOB": dob, "bio": bio};
 
       final response = await _apiService.postResponseV3(
-        ApiEndPoints().updateBioData,   // → "/api/v1/auth/user/user-Bio-Data"
+        ApiEndPoints().updateBioData, // → "/api/v1/auth/user/user-Bio-Data"
         body: body,
       );
 
@@ -213,6 +208,7 @@ class AuthRepository {
         throw Exception(bioResp.message);
       }
     } catch (e) {
+      AppLogger.log.e(e);
       throw Exception("AuthRepository updateBioData error: $e");
     }
   }
@@ -221,9 +217,7 @@ class AuthRepository {
 
   Future<AreaOfInterestResponse> updateAreaOfInterest({
     required List<String> interests,
-  }) async
-
-  {
+  }) async {
     try {
       final body = {
         "areaOfInterest": interests.map((title) => {"title": title}).toList(),
@@ -257,9 +251,7 @@ class AuthRepository {
     required String language,
   }) async {
     try {
-      final body = {
-        "Language": language,
-      };
+      final body = {"Language": language};
 
       final response = await _apiService.postResponseV3(
         ApiEndPoints().updateLanguage,
@@ -283,5 +275,4 @@ class AuthRepository {
   }
 
   // lib/repositories/staff_repository.dart (or auth_repository.dart)
-
 }

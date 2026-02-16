@@ -7,6 +7,7 @@ import 'package:bonding_app/BondingScreens/LoginScreens/IdentityScreen/IdentityS
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestLanguage/InterestedLanguage.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/InterestScreen.dart';
 import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/StaffScreenScreens/LiveSeflieVerificationScreen/LiveVerificationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
@@ -26,7 +27,8 @@ class Splashscreen extends StatefulWidget {
   State<Splashscreen> createState() => _SplashscreenState();
 }
 
-class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderStateMixin {
+class _SplashscreenState extends State<Splashscreen>
+    with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
@@ -86,8 +88,8 @@ class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderSt
       formStatusStr = user.formStatus;
     }
 
-    print("Role detected: $role");
-    print("Form Status raw: ${formStatusStr ?? 'NULL'}");
+    AppLogger.log.w("Role detected: $role");
+    AppLogger.log.w("Form Status raw: ${formStatusStr ?? 'NULL'}");
 
     final status = int.tryParse(formStatusStr ?? '0') ?? 0;
     print("Parsed status: $status");
@@ -100,17 +102,17 @@ class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderSt
         // Not even basic registration completed
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const AddProfile()), // or your starting screen
+          MaterialPageRoute(
+            builder: (_) => const AddProfile(),
+          ), // or your starting screen
         );
-      }
-      else if (status == 1) {
+      } else if (status == 1) {
         // Basic profile done → verification step
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const LiveVerificationScreen()),
         );
-      }
-      else if (status == 2) {
+      } else if (status == 2) {
         // Documents submitted → now check approval status
         final approval = staff!.isApproved?.toLowerCase().trim() ?? 'pending';
 
@@ -120,30 +122,32 @@ class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderSt
             context,
             MaterialPageRoute(builder: (_) => const ApprovedScreen()),
           );
-        }
-        else if (approval.contains('2') || approval == 'declined' || approval == 'not approved') {
+        } else if (approval.contains('2') ||
+            approval == 'declined' ||
+            approval == 'not approved') {
           // Rejected
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const VerificationUnsuccessScreen()),
+            MaterialPageRoute(
+              builder: (_) => const VerificationUnsuccessScreen(),
+            ),
           );
-        }
-        else {
+        } else {
           // pending / under review / null / empty / anything else
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const VerificationInprogressScreen()),
+            MaterialPageRoute(
+              builder: (_) => const VerificationInprogressScreen(),
+            ),
           );
         }
-      }
-      else if (status >= 3) {
+      } else if (status >= 3) {
         // Verification completed → main dashboard
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const StaffBottomBar()),
         );
-      }
-      else {
+      } else {
         // Unknown / fallback
         Navigator.pushReplacement(
           context,
@@ -151,7 +155,6 @@ class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderSt
         );
       }
     }
-
     // ────────────────────────────────────────────────
     // USER FLOW (no isApproved needed)
     // ────────────────────────────────────────────────
@@ -191,11 +194,7 @@ class _SplashscreenState extends State<Splashscreen> with SingleTickerProviderSt
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF5A1F3F),
-              Color(0xFF3A152A),
-              Color(0xFF140810),
-            ],
+            colors: [Color(0xFF5A1F3F), Color(0xFF3A152A), Color(0xFF140810)],
           ),
         ),
         child: Center(

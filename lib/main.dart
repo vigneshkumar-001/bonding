@@ -20,19 +20,20 @@ import 'package:zego_zimkit/zego_zimkit.dart';
 import 'BondingScreens/Transactions/ViewModel/TransactionHistoryVM.dart';
 import 'BondingScreens/WalletScreen/razorPayFlow/Repository/PaymentRepo.dart';
 import 'BondingScreens/WalletScreen/razorPayFlow/ViewModel/PaymentVM.dart'; // Add this import
+
 final navigatorKey = GlobalKey<NavigatorState>();
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-
-// Critical: Set navigator key BEFORE init()
+  // Critical: Set navigator key BEFORE init()
   ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
 
   // Optional: init logs for debugging
   ZegoUIKit().initLog();
   ZIMKit().init(
-    appID: 467997506,                  // ← your real AppID
-    appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",  // ← your real AppSign
+    appID: 467997506, // ← your real AppID
+    appSign:
+        "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252", // ← your real AppSign
   );
   runApp(const MyApp());
 }
@@ -46,14 +47,12 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ...getAllProviders(), // Your custom provider list
-
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
         home: const Splashscreen(),
@@ -61,7 +60,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 getAllProviders() {
   return [
@@ -72,37 +70,26 @@ getAllProviders() {
       ),
     ),
     ChangeNotifierProvider<LoginViewModel>(
-      create: (context) => LoginViewModel(
-        context.read<AuthRepository>(),
-      ),
+      create: (context) => LoginViewModel(context.read<AuthRepository>()),
     ),
-    ChangeNotifierProvider(
-      create: (_) => WalletViewModel(WalletRepository()),
-    ),
+    ChangeNotifierProvider(create: (_) => WalletViewModel(WalletRepository())),
     ChangeNotifierProvider(
       create: (_) => DepositHistoryViewModel(WalletRepository()),
-      child: TransactionsScreen(backPage: true,),
+      child: TransactionsScreen(backPage: true),
     ),
     Provider<UserRepository>(
       create: (context) => UserRepository(
-        NetworkApiService(),           // or however you create it
+        NetworkApiService(), // or however you create it
       ),
     ),
 
     // 2. Then provide the ViewModel and inject repository using context.read
     ChangeNotifierProvider<UserViewModel>(
-      create: (context) => UserViewModel(
-        context.read<UserRepository>(),
-      ),
+      create: (context) => UserViewModel(context.read<UserRepository>()),
       lazy: true, // recommended
     ),
 
-
-
-
-
     //////Staff Flow////////
-
     Provider<StaffRepository>(
       create: (context) => StaffRepository(NetworkApiService()),
     ),
@@ -110,6 +97,5 @@ getAllProviders() {
     ChangeNotifierProvider<StaffViewModel>(
       create: (context) => StaffViewModel(context.read<StaffRepository>()),
     ),
-
   ];
 }

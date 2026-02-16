@@ -19,7 +19,8 @@ class AreaOfInterestResponse {
     );
   }
 
-  bool get isSuccess => status && data != null;
+  // bool get isSuccess => status && data != null;
+  bool get isSuccess => status;
 }
 
 class UserProfileWithInterests {

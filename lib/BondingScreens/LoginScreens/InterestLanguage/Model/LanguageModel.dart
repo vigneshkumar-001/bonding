@@ -19,7 +19,9 @@ class LanguageUpdateResponse {
     );
   }
 
-  bool get isSuccess => status && data != null;
+  // bool get isSuccess => status && data != null;
+  bool get isSuccess => status;
+
 }
 
 class UserProfileWithLanguage {

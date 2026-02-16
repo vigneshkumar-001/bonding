@@ -28,6 +28,7 @@ class UserData {
   final String id;
   final String phone;
   final bool isVerified;
+  final bool isLogin;
   final String memberID;
   final String role;
   final String affiliateStatus;
@@ -40,6 +41,7 @@ class UserData {
     required this.id,
     required this.phone,
     required this.isVerified,
+    required this.isLogin,
     required this.memberID,
     required this.role,
     required this.affiliateStatus,
@@ -52,6 +54,7 @@ class UserData {
       id: json['_id']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
       isVerified: json['isVerified'] == true,
+      isLogin: json['isLogin'] == true,
       memberID: json['memberID']?.toString() ?? '',
       role: json['role']?.toString() ?? '',
       affiliateStatus: json['affiliateStatus']?.toString() ?? '',

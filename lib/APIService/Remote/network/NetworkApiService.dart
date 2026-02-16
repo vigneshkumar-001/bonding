@@ -74,7 +74,6 @@ class NetworkApiService extends BaseApiService {
       throw Exception("HTTP ${response.statusCode}: ${response.body}");
     }
   }
-
   Future<Map<String, dynamic>> uploadImageMultipart({
     required String endpoint,
     required File imageFile,
@@ -86,62 +85,107 @@ class NetworkApiService extends BaseApiService {
 
     final request = http.MultipartRequest('POST', uri);
 
-    // Headers (NEVER set 'Content-Type' manually for MultipartRequest — http does it)
     request.headers.addAll({
       'Accept': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     });
 
-    // Add the image file
-    final multipartFile = await http.MultipartFile.fromPath(
-      fieldName,
-      imageFile.path,
-      filename: imageFile.path.split(Platform.pathSeparator).last,
-      // contentType: MediaType('image', 'jpeg'), // optional — backend usually detects
-    );
-    request.files.add(multipartFile);
+    // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
+    // final multipartFile = await http.MultipartFile.fromPath(
+    //   fieldName,
+    //   imageFile.path,
+    //   filename: imageFile.path.split(Platform.pathSeparator).last,
+    // );
+    // request.files.add(multipartFile);
 
-    // Add any extra text fields (if needed in future)
-    if (additionalFields != null) {
-      request.fields.addAll(additionalFields);
-    }
-
-    // ─── Debug print request summary ───────────────────────────────
-    print('\n' + '=' * 60);
-    print('📤 MULTIPART UPLOAD REQUEST');
-    print('📤 URL: $uri');
-    print('📤 Headers: ${request.headers}');
-    print('📤 Fields: ${request.fields}');
-    print('📤 Files: ${request.files.map((f) => f.filename).toList()}');
-    print('-' * 60);
+    // ❌ TEMP DISABLE: extra fields attach (HIDE form-data)
+    // if (additionalFields != null && additionalFields.isNotEmpty) {
+    //   request.fields.addAll(additionalFields);
+    // }
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('📥 Status Code: ${response.statusCode}');
-      print('📥 Response Body:');
-      print(response.body);
-      print('=' * 60 + '\n');
-
       if (response.statusCode == 200) {
-        try {
-          return json.decode(response.body) as Map<String, dynamic>;
-        } catch (e) {
-          throw Exception("Failed to parse JSON: $e\nBody: ${response.body}");
-        }
+        return json.decode(response.body) as Map<String, dynamic>;
       } else {
-        throw Exception(
-          "Upload failed - HTTP ${response.statusCode}: ${response.body}",
-        );
+        throw Exception("Upload failed - HTTP ${response.statusCode}: ${response.body}");
       }
     } on SocketException {
       throw FetchDataException('No Internet Connection');
     } catch (e) {
-      print('🔴 UPLOAD ERROR: $e');
       rethrow;
     }
   }
+
+  // Future<Map<String, dynamic>> uploadImageMultipart({
+  //   required String endpoint,
+  //   required File imageFile,
+  //   String fieldName = 'image',
+  //   String? token,
+  //   Map<String, String>? additionalFields,
+  // }) async {
+  //   final uri = Uri.parse(baseUrl + endpoint);
+  //
+  //   final request = http.MultipartRequest('POST', uri);
+  //
+  //   // Headers (NEVER set 'Content-Type' manually for MultipartRequest — http does it)
+  //   request.headers.addAll({
+  //     'Accept': 'application/json',
+  //     if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+  //   });
+  //
+  //   // Add the image file
+  //   final multipartFile = await http.MultipartFile.fromPath(
+  //     fieldName,
+  //     imageFile.path,
+  //     filename: imageFile.path.split(Platform.pathSeparator).last,
+  //     // contentType: MediaType('image', 'jpeg'), // optional — backend usually detects
+  //   );
+  //   request.files.add(multipartFile);
+  //
+  //   // Add any extra text fields (if needed in future)
+  //   if (additionalFields != null) {
+  //     request.fields.addAll(additionalFields);
+  //   }
+  //
+  //   // ─── Debug print request summary ───────────────────────────────
+  //   print('\n' + '=' * 60);
+  //   print('📤 MULTIPART UPLOAD REQUEST');
+  //   print('📤 URL: $uri');
+  //   print('📤 Headers: ${request.headers}');
+  //   print('📤 Fields: ${request.fields}');
+  //   print('📤 Files: ${request.files.map((f) => f.filename).toList()}');
+  //   print('-' * 60);
+  //
+  //   try {
+  //     final streamedResponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedResponse);
+  //
+  //     print('📥 Status Code: ${response.statusCode}');
+  //     print('📥 Response Body:');
+  //     print(response.body);
+  //     print('=' * 60 + '\n');
+  //
+  //     if (response.statusCode == 200) {
+  //       try {
+  //         return json.decode(response.body) as Map<String, dynamic>;
+  //       } catch (e) {
+  //         throw Exception("Failed to parse JSON: $e\nBody: ${response.body}");
+  //       }
+  //     } else {
+  //       throw Exception(
+  //         "Upload failed - HTTP ${response.statusCode}: ${response.body}",
+  //       );
+  //     }
+  //   } on SocketException {
+  //     throw FetchDataException('No Internet Connection');
+  //   } catch (e) {
+  //     print('🔴 UPLOAD ERROR: $e');
+  //     rethrow;
+  //   }
+  // }
 
   Future<Map<String, dynamic>> getResponseV4(
     String endpoint, {

@@ -46,15 +46,14 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       // Fetch staff data
       // Existing fetches
       await staffVM.fetchStaffSingleData();
-      await staffVM.fetchStaffCallStats();      // from previous
+      await staffVM.fetchStaffCallStats(); // from previous
       await staffVM.fetchWeeklyCallGraph();
 
       final staff = staffVM.currentStaff;
 
-
       if (staff != null && staff.memberID.isNotEmpty) {
         debugPrint("Staff fetched → memberID: ${staff.memberID}");
-        print("staff:::::::::${staff.memberID??""}");
+        print("staff:::::::::${staff.memberID ?? ""}");
 
         socketService.connectStaff(staff.memberID);
 
@@ -99,7 +98,8 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
 
     ZegoUIKitPrebuiltCallInvitationService().init(
       appID: 467997506,
-      appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+      appSign:
+          "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
       userID: staff.memberID,
       userName: staff.name ?? "Staff",
       plugins: [ZegoUIKitSignalingPlugin()],
@@ -126,12 +126,14 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
     _zegoInitialized = true;
     debugPrint("Zego initialized for staff: ${staff.memberID}");
   }
+
   Future<void> _refreshAllData() async {
     final staffVM = context.read<StaffViewModel>();
 
     try {
       await Future.wait([
-        staffVM.fetchStaffSingleData(),     // updates earnings, balance, pending, etc.
+        staffVM
+            .fetchStaffSingleData(), // updates earnings, balance, pending, etc.
         // staffVM.fetchStaffCallStats(),      // updates call stats
         // staffVM.fetchWeeklyCallGraph(),     // updates weekly graph
         // Add any other fetches you have (e.g. notifications, messages count, etc.)
@@ -142,7 +144,9 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
           SnackBar(content: Text("Refresh failed: ${e.toString()}")),
         );
       }
-    }}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
@@ -160,55 +164,74 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
-                  colors: [Color(0xFF5A1F3F), Color(0xFF3A152A), Color(0xFF140810)],
+                  colors: [
+                    Color(0xFF5A1F3F),
+                    Color(0xFF3A152A),
+                    Color(0xFF140810),
+                  ],
                 ),
               ),
               child: SafeArea(
                 child: vm.isFetchingSingleStaff
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                    ? const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
                     : vm.singleStaffError != null
                     ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(vm.singleStaffError!, style: const TextStyle(color: Colors.redAccent)),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: vm.fetchStaffSingleData,
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
-                )
-                    : staff == null
-                    ? const Center(child: Text("No profile data", style: TextStyle(color: Colors.white70)))
-                    : SingleChildScrollView(
-                      child: Column(
-                                      children: [
-                      _topBar(staff),
-                      const SizedBox(height: 16),
-                      earningsCard(staff),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _actionButton('Withdraw'),
-                            const SizedBox(width: 12),
-                            _actionButton('View transactions →', outlined: true),
+                            Text(
+                              vm.singleStaffError!,
+                              style: const TextStyle(color: Colors.redAccent),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: vm.fetchStaffSingleData,
+                              child: const Text("Retry"),
+                            ),
+                          ],
+                        ),
+                      )
+                    : staff == null
+                    ? const Center(
+                        child: Text(
+                          "No profile data",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _topBar(staff),
+                            const SizedBox(height: 16),
+                            earningsCard(staff),
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  _actionButton('Withdraw'),
+                                  const SizedBox(width: 12),
+                                  _actionButton(
+                                    'View transactions →',
+                                    outlined: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            _callsSection(),
+                            const SizedBox(height: 16),
+                            _quickLinks(),
+                            const SizedBox(height: 16),
+                            _quickChatAccess(), // ← Chat entry point
+                            SizedBox(height: 100),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      _callsSection(),
-                      const SizedBox(height: 16),
-                      _quickLinks(),
-                      const SizedBox(height: 16),
-                      _quickChatAccess(), // ← Chat entry point
-            SizedBox(height: 100,)
-                                      ],
-                                    ),
-                    ),
               ),
             ),
           ),
@@ -248,13 +271,17 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
           const SizedBox(width: 12),
           GestureDetector(
             onTap: () {
-bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
+              bondNavigator.newPage(
+                context,
+                page: StaffProfileScreen(backPage: true),
+              );
             },
             child: CircleAvatar(
               radius: 20,
               backgroundImage: (staff.image != null && staff.image!.isNotEmpty)
                   ? NetworkImage(staff.image!)
-                  : const AssetImage("assets/Images/videocallprofile.png") as ImageProvider,
+                  : const AssetImage("assets/Images/videocallprofile.png")
+                        as ImageProvider,
             ),
           ),
         ],
@@ -283,7 +310,7 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
+                  Text(
                     "Total earnings",
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
@@ -296,8 +323,16 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      AppText("Withdrawal Amount: ", color: Colors.white60, fontSize: 16),
-                      AppText("₹${staff.pendingBalance!.toStringAsFixed(2)}", color: Color(0xFFFFC107), fontSize: 16),
+                      AppText(
+                        "Withdrawal Amount: ",
+                        color: Colors.white60,
+                        fontSize: 16,
+                      ),
+                      AppText(
+                        "₹${staff.pendingBalance!.toStringAsFixed(2)}",
+                        color: Color(0xFFFFC107),
+                        fontSize: 16,
+                      ),
                     ],
                   ),
                 ],
@@ -338,9 +373,15 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
       child: GestureDetector(
         onTap: () {
           if (text == 'Withdraw') {
-            bondNavigator.newPage(context, page: const WithdrawalRequestScreen());
+            bondNavigator.newPage(
+              context,
+              page: const WithdrawalRequestScreen(),
+            );
           } else if (text == 'View transactions →') {
-            bondNavigator.newPage(context, page: const WithdrawHistory(backPage: true,)); // ← your history page
+            bondNavigator.newPage(
+              context,
+              page: const WithdrawHistory(backPage: true),
+            ); // ← your history page
             // or any other page: const TransactionHistoryScreen(), etc.
           }
         },
@@ -351,8 +392,12 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
             borderRadius: BorderRadius.circular(12),
             gradient: outlined
                 ? null
-                : const LinearGradient(colors: [Color(0xFFB35CF6), Color(0xFFFF6F61)]),
-            border: outlined ? Border.all(color: Colors.white.withOpacity(0.3)) : null,
+                : const LinearGradient(
+                    colors: [Color(0xFFB35CF6), Color(0xFFFF6F61)],
+                  ),
+            border: outlined
+                ? Border.all(color: Colors.white.withOpacity(0.3))
+                : null,
             color: outlined ? Colors.transparent : null,
           ),
           child: Text(
@@ -374,21 +419,30 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
       child: Consumer<StaffViewModel>(
         builder: (context, vm, child) {
           if (vm.isFetchingWeeklyGraph || vm.isFetchingCallStats) {
-            return const Center(child: CircularProgressIndicator(color: Colors.white70));
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white70),
+            );
           }
 
           if (vm.weeklyGraphError != null || vm.callStatsError != null) {
             return Column(
               children: [
-                Text(vm.weeklyGraphError ?? vm.callStatsError ?? "Error loading stats",
-                    style: const TextStyle(color: Colors.redAccent)),
+                Text(
+                  vm.weeklyGraphError ??
+                      vm.callStatsError ??
+                      "Error loading stats",
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () {
                     vm.fetchWeeklyCallGraph();
                     vm.fetchStaffCallStats();
                   },
-                  child: const Text("Retry", style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "Retry",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             );
@@ -399,10 +453,14 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
           final callMap = {for (var d in vm.weeklyCallGraph) d.day: d.calls};
 
           // Get calls in correct order (fill missing days with 0)
-          final orderedCalls = dayOrder.map((day) => callMap[day] ?? 0).toList();
+          final orderedCalls = dayOrder
+              .map((day) => callMap[day] ?? 0)
+              .toList();
 
           // Find max calls for scaling bar heights
-          final maxCalls = orderedCalls.isEmpty ? 1 : orderedCalls.reduce((a, b) => a > b ? a : b);
+          final maxCalls = orderedCalls.isEmpty
+              ? 1
+              : orderedCalls.reduce((a, b) => a > b ? a : b);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,14 +493,18 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: List.generate(7, (index) {
                     final calls = orderedCalls[index];
-                    final double barHeight = maxCalls == 0 ? 0.0 : (calls / maxCalls.toDouble()) * 80.0;
+                    final double barHeight = maxCalls == 0
+                        ? 0.0
+                        : (calls / maxCalls.toDouble()) * 80.0;
                     return Expanded(
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         height: barHeight.clamp(4.0, 80.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          gradient: const LinearGradient(colors: [Color(0xFFB35CF6), Color(0xFFFF6F61)]),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFB35CF6), Color(0xFFFF6F61)],
+                          ),
                         ),
                       ),
                     );
@@ -472,13 +534,24 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                     ],
                   ),
                   GestureDetector(
-                    onTap: (){
-                      bondNavigator.newPage(context, page: RecentCallsPage(backPage: true,));
+                    onTap: () {
+                      bondNavigator.newPage(
+                        context,
+                        page: RecentCallsPage(backPage: true),
+                      );
                     },
                     child: Row(
                       children: [
-                        AppText("view history", color: Colors.white60, fontSize: 16),
-                        Icon(Icons.arrow_forward_ios, color: Colors.white60, size: 16),
+                        AppText(
+                          "view history",
+                          color: Colors.white60,
+                          fontSize: 16,
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white60,
+                          size: 16,
+                        ),
                       ],
                     ),
                   ),
@@ -502,7 +575,10 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
         child: Column(
           children: [
             ListTile(
-              onTap: () => bondNavigator.newPage(context, page: const StaffWalletScreen()),
+              onTap: () => bondNavigator.newPage(
+                context,
+                page: const StaffWalletScreen(),
+              ),
               leading: Container(
                 decoration: BoxDecoration(
                   color: Color(0xFF393434),
@@ -510,10 +586,16 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                 ),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.account_balance_wallet, color: Colors.white),
+                  child: Icon(
+                    Icons.account_balance_wallet,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              title: const Text('Wallet', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Wallet',
+                style: TextStyle(color: Colors.white),
+              ),
               trailing: const Icon(Icons.chevron_right, color: Colors.white54),
             ),
             const Divider(color: Colors.white24, height: 1),
@@ -528,7 +610,10 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                   child: Icon(Icons.support_agent, color: Colors.white),
                 ),
               ),
-              title: const Text('Help & support', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Help & support',
+                style: TextStyle(color: Colors.white),
+              ),
               trailing: const Icon(Icons.chevron_right, color: Colors.white54),
             ),
           ],
@@ -542,7 +627,10 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GestureDetector(
         onTap: () {
-          bondNavigator.newPage(context, page: const StaffChatListScreen(backPage: true,));
+          bondNavigator.newPage(
+            context,
+            page: const StaffChatListScreen(backPage: true),
+          );
         },
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -560,7 +648,11 @@ bondNavigator.newPage(context, page: StaffProfileScreen(backPage: true,));
                   children: [
                     Text(
                       "Open Messages",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     SizedBox(height: 4),
                     Text(

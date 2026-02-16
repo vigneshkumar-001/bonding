@@ -9,13 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../StaffBottomNavBar/StaffBottomNavBar.dart';
+
 class LoginOtpStaffScreen extends StatefulWidget {
   final String phoneNumber;
 
-  const LoginOtpStaffScreen({
-    super.key,
-    required this.phoneNumber,
-  });
+  const LoginOtpStaffScreen({super.key, required this.phoneNumber});
 
   @override
   State<LoginOtpStaffScreen> createState() => _LoginOtpStaffScreenState();
@@ -41,16 +40,15 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
       _focusNode.requestFocus();
     });
   }
+
   void _handleOtpFill() {
     final vm = Provider.of<LoginViewModel>(context, listen: false);
 
-    if (vm.autoOtp != null &&
-        _otpController.text != vm.autoOtp) {
+    if (vm.autoOtp != null && _otpController.text != vm.autoOtp) {
       _otpController.text = vm.autoOtp!;
       setState(() {});
     }
   }
-
 
   @override
   void dispose() {
@@ -61,8 +59,6 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
     _focusNode.dispose();
     super.dispose();
   }
-
-
 
   bool _isValidOtp(String otp) => RegExp(r'^\d{4}$').hasMatch(otp);
 
@@ -75,11 +71,8 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Consumer<LoginViewModel>(
-
       builder: (context, vm, child) {
-
         return Scaffold(
           resizeToAvoidBottomInset: true,
           body: Container(
@@ -104,15 +97,32 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35, width: 35),
+                    SvgPicture.asset(
+                      "assets/Images/bonding.svg",
+                      height: 35,
+                      width: 35,
+                    ),
                     const SizedBox(height: 30),
-                    Center(child: Image.asset("assets/Images/phone1.png", width: 280)),
+                    Center(
+                      child: Image.asset(
+                        "assets/Images/phone1.png",
+                        width: 280,
+                      ),
+                    ),
                     const SizedBox(height: 30),
 
-                    AppText("Enter your code", fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
+                    AppText(
+                      "Enter your code",
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                     const SizedBox(height: 16),
 
-                    const Text("Enter OTP:", style: TextStyle(color: Colors.white, fontSize: 16)),
+                    const Text(
+                      "Enter OTP:",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                     const SizedBox(height: 12),
 
                     // OTP Input Section
@@ -167,7 +177,6 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                     //     textAlign: TextAlign.center,
                     //   ),
                     // ],
-
                     const SizedBox(height: 40),
 
                     // Login Button
@@ -175,60 +184,85 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                       onTap: vm.isVerifying
                           ? null
                           : () async {
-                        final otp = _otpController.text.trim();
+                              final otp = _otpController.text.trim();
 
-                        if (otp.isEmpty) {
-                          Utils.snackBarErrorMessage("Please enter the OTP");
-                          return;
-                        }
-                        if (!_isValidOtp(otp)) {
-                          Utils.snackBarErrorMessage("Please enter all 4 digits");
-                          return;
-                        }
+                              if (otp.isEmpty) {
+                                Utils.snackBarErrorMessage(
+                                  "Please enter the OTP",
+                                );
+                                return;
+                              }
+                              if (!_isValidOtp(otp)) {
+                                Utils.snackBarErrorMessage(
+                                  "Please enter all 4 digits",
+                                );
+                                return;
+                              }
 
-                        final success = await vm.staffVerifyOtp(
-                          widget.phoneNumber,
-                          otp,
-                        );
+                          await vm.staffVerifyOtp(
+                                widget.phoneNumber,
+                                otp,
+                              );
+                              final response = vm.verifyResponse;
 
-                        if (success) {
-                          bondNavigator.newPageRemoveUntil(
-                            context,
-                            page: const ProfileVerficationScreen(),
-                          );
-                        } else {
-                          Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
-                        }
-                      },
+                              if (response != null && response.isSuccess) {
+                                final isLogin = response.user?.isLogin ?? false;
+
+                                if (isLogin) {
+                                  bondNavigator.newPageRemoveUntil(
+                                    context,
+                                    page: const StaffBottomBar(),
+                                  );
+                                } else {
+                                  bondNavigator.newPageRemoveUntil(
+                                    context,
+                                    page: const ProfileVerficationScreen(),
+                                  );
+                                }
+                              }
+                              // if (success) {
+                              //   bondNavigator.newPageRemoveUntil(
+                              //     context,
+                              //     page: const ProfileVerficationScreen(),
+                              //   );
+                              // } else {
+                              //   Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
+                              // }
+                            },
                       child: Container(
                         height: 50,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isVerifying
-                              ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
+                              ? const LinearGradient(
+                                  colors: [Colors.grey, Colors.blueGrey],
+                                )
                               : const LinearGradient(
-                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                          ),
+                                  colors: [
+                                    Color(0xFFB86AF6),
+                                    Color(0xFFFF6A6A),
+                                  ],
+                                ),
                         ),
                         child: Center(
                           child: vm.isVerifying
                               ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
                               : const Text(
-                            "Login  →",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                                  "Login  →",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -283,11 +317,7 @@ class HeartOtpDisplay extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              const Icon(
-                Icons.favorite,
-                color: Color(0xFF322129),
-                size: 70,
-              ),
+              const Icon(Icons.favorite, color: Color(0xFF322129), size: 70),
               Text(
                 char,
                 style: const TextStyle(

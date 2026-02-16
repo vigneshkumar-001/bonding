@@ -7,13 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../BottomNavBar/BottomNavBar.dart';
+
 class LoginOtpScreen extends StatefulWidget {
   final String phoneNumber;
 
-  const LoginOtpScreen({
-    super.key,
-    required this.phoneNumber,
-  });
+  const LoginOtpScreen({super.key, required this.phoneNumber});
 
   @override
   State<LoginOtpScreen> createState() => _LoginOtpScreenState();
@@ -75,15 +74,32 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35, width: 35),
+                    SvgPicture.asset(
+                      "assets/Images/bonding.svg",
+                      height: 35,
+                      width: 35,
+                    ),
                     const SizedBox(height: 30),
-                    Center(child: Image.asset("assets/Images/phone1.png", width: 280)),
+                    Center(
+                      child: Image.asset(
+                        "assets/Images/phone1.png",
+                        width: 280,
+                      ),
+                    ),
                     const SizedBox(height: 30),
 
-                    AppText("Enter your code", fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
+                    AppText(
+                      "Enter your code",
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                     const SizedBox(height: 16),
 
-                    const Text("Enter OTP:", style: TextStyle(color: Colors.white, fontSize: 16)),
+                    const Text(
+                      "Enter OTP:",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                     const SizedBox(height: 12),
 
                     // This is the key part: A transparent TextField positioned over the hearts
@@ -140,11 +156,44 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     //     textAlign: TextAlign.center,
                     //   ),
                     // ],
-
                     const SizedBox(height: 40),
 
                     GestureDetector(
                       onTap: vm.isVerifying
+                          ? null
+                          : () async {
+                              final otp = _otpController.text.trim();
+
+                              if (otp.length != 4) {
+                                Utils.snackBarErrorMessage(
+                                  "Enter valid 4 digit OTP",
+                                );
+                                return;
+                              }
+
+                              await vm.verifyOtp(widget.phoneNumber, otp);
+
+                              if (!mounted) return;
+
+                              final response = vm.verifyResponse;
+
+                              if (response != null && response.isSuccess) {
+                                final isLogin = response.user?.isLogin ?? false;
+
+                                bondNavigator.newPageRemoveUntil(
+                                  context,
+                                  page: isLogin
+                                      ? const MainBottomBar()
+                                      : const AddProfile(),
+                                );
+                              } else {
+                                Utils.snackBarErrorMessage(
+                                  "Invalid OTP. Please try again.",
+                                );
+                              }
+                            },
+
+                      /* onTap: vm.isVerifying
                           ? null
                           : () async {
                         final otp = _otpController.text.trim();
@@ -162,45 +211,76 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                           widget.phoneNumber,
                           otp,
                         );
+                        final response = vm.verifyResponse;
 
-                        if (success) {
-                          bondNavigator.newPageRemoveUntil(
-                            context,
-                            page: const AddProfile(),
-                          );
+                        if (response != null && response.isSuccess) {
+                          final isLogin = response.user?.isLogin ?? false;
+
+                          if (isLogin) {
+                            bondNavigator.newPageRemoveUntil(
+                              context,
+                              page: const MainBottomBar(),
+                            );
+                          } else {
+                            bondNavigator.newPageRemoveUntil(
+                              context,
+                              page: const AddProfile(),
+                            );
+                          }
                         } else {
                           Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
                         }
-                      },
+
+                        // if (success) {
+                        //   if(vm.verifyResponse?.user?.isLogin == false){
+                        //   bondNavigator.newPageRemoveUntil(
+                        //     context,
+                        //     page: const AddProfile(),
+                        //   );
+                        //   }else{
+                        //     bondNavigator.newPageRemoveUntil(
+                        //       context,
+                        //       page: const MainBottomBar(),
+                        //     );
+                        //   }
+                        // } else {
+                        //   Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
+                        // }
+                      },*/
                       child: Container(
                         height: 50,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isVerifying
-                              ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
+                              ? const LinearGradient(
+                                  colors: [Colors.grey, Colors.blueGrey],
+                                )
                               : const LinearGradient(
-                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                          ),
+                                  colors: [
+                                    Color(0xFFB86AF6),
+                                    Color(0xFFFF6A6A),
+                                  ],
+                                ),
                         ),
                         child: Center(
                           child: vm.isVerifying
                               ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
                               : const Text(
-                            "Login  →",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                                  "Login  →",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -240,11 +320,7 @@ class HeartOtpDisplay extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              const Icon(
-                Icons.favorite,
-                color: Color(0xFF322129),
-                size: 70,
-              ),
+              const Icon(Icons.favorite, color: Color(0xFF322129), size: 70),
               Text(
                 char,
                 style: const TextStyle(
