@@ -3,8 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String _keyToken = 'auth_token';
-  static const String _keyUserId = 'user_id';     // optional
-  static const String _keyPhone = 'user_phone';   // optional
+  static const String _keyUserId = 'user_id'; // optional
+  static const String _keyPhone = 'user_phone'; // optional
 
   // Save after successful login
   static Future<void> saveLoginData({

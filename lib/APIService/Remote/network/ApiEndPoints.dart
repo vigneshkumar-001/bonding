@@ -4,10 +4,11 @@ class ApiEndPoints {
   // bitbab
   // final String baseUrl = "https://bondingbackend.onrender.com/api/v1/";
   // final String baseUrl = "http://192.168.0.22:3005/api/v1/";
-  //   final String baseUrl = "https://qbkqz1b4-3005.inc1.devtunnels.ms/api/v1/";
-    final String baseUrl = "https://bondinig-ca63248fdb11.herokuapp.com/api/v1/";
+ // final String baseUrl = "https://qbkqz1b4-3005.inc1.devtunnels.ms/api/v1/";
+  final String baseUrl = "https://bondinig-ca63248fdb11.herokuapp.com/api/v1/";
 
   // final String profileBaseUrl = "https://predictapi.unitythink.com";
+  final String privacyPolicy = "privacy-policy/show";
 
   final String login = "auth/user/signup";
   final String verifyOtp = "auth/user/verify-otp";
@@ -21,25 +22,23 @@ class ApiEndPoints {
   final String placeOrder = "auth/user/placeOrder";
   final String confirmPurchase = "auth/user/confirmPurchase";
   final String userDepositHistory = "auth/user/userDepositHistory";
+  final String userSupportTicketList = "auth/user/support-ticket/list";
 
   final String getPaymentsStructure = "auth/user/getPaymentsStructure";
-
-
-
-
-
+  final String userSupportTicketCreate = "auth/user/support-ticket/create";
+  final String userSupportTicketHistory = "auth/user/support-ticket/messages";
+  final String userSupportTicketAddMessage  = "auth/user/support-ticket/message";
 
 
   ////////////// Staff flow ///////////////
 
-final String staffRegister = "staff/staff-data";
+  final String staffRegister = "staff/staff-data";
   final String staffVerifyOtp = "staff/verify-otps";
   final String staffIdVerify = "staff/staffIdVerify";
   final String updateStaffProfile = "staff/updateProfile";
   final String updateStaffAreaOfInterest = "staff/area-Of-Interest";
 
-
-  final String getStaffDetails   = "auth/user/getstaffDetails";
+  final String getStaffDetails = "auth/user/getstaffDetails";
 
   final String getStaffSingleData = "staff/getstaffSingleData";
 
@@ -48,6 +47,7 @@ final String staffRegister = "staff/staff-data";
   final String addBankDetails = "staff/addBankDetails";
 
   final String getAllBankDetails = "staff/getAllBankDetails";
+
   final String deleteBankDetails = "staff/deleteBankDetails";
 
   final String staffWithdraw = "staff/staffWithdraw";
@@ -57,8 +57,8 @@ final String staffRegister = "staff/staff-data";
   final String staffCallStats = "staff/getStaffCallStats";
 
   final String staffWeeklyCallGraph = "staff/getWeeklyCallGraph";
-
-
-
-
+  final String supportTicketList = "staff/support-ticket/list";
+  final String staffSupportTicketCreate = "staff/support-ticket/create";
+  final String staffSupportTicketHistory = "staff/support-ticket/messages";
+  final String staffSupportTicketAddMessage  = "staff/support-ticket/message";
 }

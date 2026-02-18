@@ -5,6 +5,7 @@ import 'package:bonding_app/BondingScreens/HomeScreen/Socket.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Socket/socket_service.dart';
 import 'package:bonding_app/StaffScreenScreens/RecentCallScreen/RecentCallScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffDashBoardScreen/Model/StaffSingleDataModel.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffProfileScreen/staffProfileScreen.dart';
@@ -23,6 +24,9 @@ import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
+
+import '../../BondingScreens/SupportScreen/support_screen.dart';
+import '../SupportScreen/support_screen.dart';
 
 class BondingDashboardPage extends StatefulWidget {
   const BondingDashboardPage({super.key});
@@ -227,7 +231,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                             const SizedBox(height: 16),
                             _quickLinks(),
                             const SizedBox(height: 16),
-                            _quickChatAccess(), // ← Chat entry point
+                            _quickChatAccess(staff), // ← Chat entry point
                             SizedBox(height: 100),
                           ],
                         ),
@@ -600,6 +604,12 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
             ),
             const Divider(color: Colors.white24, height: 1),
             ListTile(
+              onTap: () {
+                bondNavigator.newPage(
+                  context,
+                  page: SupportScreens(isStaff: true),
+                );
+              },
               leading: Container(
                 decoration: BoxDecoration(
                   color: Color(0xFF393434),
@@ -622,14 +632,14 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
     );
   }
 
-  Widget _quickChatAccess() {
+  Widget _quickChatAccess(StaffSingleProfile staff) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GestureDetector(
         onTap: () {
           bondNavigator.newPage(
             context,
-            page: const StaffChatListScreen(backPage: true),
+            page: StaffChatListScreen(backPage: true, staffId: staff.memberID),
           );
         },
         child: Container(

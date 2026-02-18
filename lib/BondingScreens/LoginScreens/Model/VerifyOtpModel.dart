@@ -20,8 +20,8 @@ class VerifyOtpResponse {
       user: json['user'] != null ? UserData.fromJson(json['user']) : null,
     );
   }
-
-  bool get isSuccess => status && token != null && token!.isNotEmpty;
+  bool get isSuccess => status;
+  // bool get isSuccess => status && token != null && token!.isNotEmpty;
 }
 
 class UserData {

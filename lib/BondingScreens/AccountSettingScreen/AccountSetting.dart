@@ -1,5 +1,6 @@
 import 'package:bonding_app/BondingScreens/BlockedUsers/BlockUserScreen.dart';
 import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/DeleteAccountScreen.dart';
+import 'package:bonding_app/BondingScreens/PrivacyPolicy/privacy_policy_screen.dart';
 import 'package:bonding_app/BondingScreens/ReportOverview/ReportOverviewScreen.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
@@ -71,7 +72,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.privacy_tip_outlined,
                         title: "privacy policy",
                         onTap: () {
-                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                          bondNavigator.newPage(context, page: PrivacyPolicyScreen());
+                          //UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
                           // Navigate to privacy policy
                         },
                       ),
@@ -80,8 +82,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.block_outlined,
                         title: "Blocked users",
                         onTap: () {
-                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
-                          // bondNavigator.newPage(context, page: BlockedUsersScreen());
+                         // UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                           bondNavigator.newPage(context, page: BlockedUsersScreen());
                           // Navigate to blocked users
                         },
                       ),

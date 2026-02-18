@@ -58,6 +58,7 @@ dependencies:
   web_socket_channel: ^3.0.3
   socket_io_client: ^3.1.4
   zego_uikit_signaling_plugin: ^2.8.20
+  dotted_border: ^3.0.0
 
 #  zego_uikit_signaling_plugin: ^2.8.20
 

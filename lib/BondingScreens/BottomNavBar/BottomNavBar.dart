@@ -6,7 +6,9 @@ import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
+import '../HomeScreen/ViewModel/UserVM.dart';
 
 class MainBottomBar extends StatefulWidget {
   final int? index;
@@ -28,13 +30,25 @@ class _MainBottomBarState extends State<MainBottomBar> {
   }
 
   /// 🔹 Screens
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    HistoryCard(),
-    ChatListScreen(backPage: false,),
-    TransactionsScreen(backPage: false,),
-    ProfileScreen(backPage: false,),
-  ];
+  List<Widget> get _screens {
+    final userId = context.read<UserViewModel>().currentUser?.id ?? "";
+    return [
+      const HomeScreen(),
+      const HistoryCard(),
+      UserChatListScreen(backPage: false,  ), // ✅ now valid
+      const TransactionsScreen(backPage: false),
+      const ProfileScreen(backPage: false),
+    ];
+  }
+
+  // final List<Widget> _screens = const [
+  //
+  //   HomeScreen(),
+  //   HistoryCard(),4
+  //   UserChatListScreen(backPage: false, userId: ''),
+  //   TransactionsScreen(backPage: false),
+  //   ProfileScreen(backPage: false),
+  // ];
 
   /// 🔹 Back press handler
   Future<bool> _onWillPop() async {
@@ -53,15 +67,17 @@ class _MainBottomBarState extends State<MainBottomBar> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
         body: _screens[_selectedIndex],
 
         /// 🔹 Custom Floating Bottom Bar
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF282323),
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(14),topRight: Radius.circular(14)),
-
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(14),
+              topRight: Radius.circular(14),
+            ),
           ),
           child: SafeArea(
             child: Container(
@@ -75,13 +91,11 @@ backgroundColor: Colors.transparent,
                   _navItem("assets/Images/chat.svg", 2),
                   _navItem("assets/Images/trans.svg", 3),
                   _navItem("assets/Images/profile.svg", 4),
-
                 ],
               ),
             ),
           ),
         ),
-
       ),
     );
   }
@@ -104,11 +118,8 @@ backgroundColor: Colors.transparent,
           shape: BoxShape.circle,
           gradient: isActive
               ? const LinearGradient(
-            colors: [
-              Color(0xFFB86AF6),
-              Color(0xFFFF6A6A),
-            ],
-          )
+                  colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                )
               : null,
         ),
         child: Center(
@@ -125,6 +136,4 @@ backgroundColor: Colors.transparent,
       ),
     );
   }
-
-
 }

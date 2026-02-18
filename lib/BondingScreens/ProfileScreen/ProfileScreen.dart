@@ -4,11 +4,13 @@ import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/EditProfile/EditProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
+import 'package:bonding_app/BondingScreens/SupportScreen/support_screen.dart';
 import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -206,8 +208,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               svg: "assets/Images/helpicon.svg",
                               title: "Help & support",
                               onTap: () {
-                                UnderDevelopmentWidgets.buildUnderDevelopmentDialog(
+                                bondNavigator.newPage(
                                   context,
+                                  page: const SupportScreens(isStaff: false),
                                 );
                                 // TODO: Navigate to help screen
                               },

@@ -48,7 +48,6 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                   child: SvgPicture.asset(
                     "assets/Images/bonding.svg",
                     height: 40,
-
                   ),
                 ),
               ),
@@ -73,7 +72,8 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                 children: [
                   // User Card
                   _buildAccountCard(
-                    imagePath: "assets/Images/user.png", // Replace with your actual asset
+                    imagePath:
+                        "assets/Images/user.png", // Replace with your actual asset
                     label: "User",
                     isSelected: selectedAccount == 1,
                     onTap: () {
@@ -87,7 +87,8 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
 
                   // Staff Card
                   _buildAccountCard(
-                    imagePath: "assets/Images/staff.png", // Replace with your actual asset
+                    imagePath:
+                        "assets/Images/staff.png", // Replace with your actual asset
                     label: "Staff",
                     isSelected: selectedAccount == 2,
                     onTap: () {
@@ -103,19 +104,30 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
 
               // Continue Button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 30,
+                ),
                 child: GestureDetector(
                   onTap: selectedAccount == 0
                       ? null // Disabled if nothing selected
                       : () {
-                    if (selectedAccount == 1) {
-                      // Navigate to User page
-                      bondNavigator.newPage(context, page: const LoginScreen());
-                    } else if (selectedAccount == 2) {
-                      // Navigate to Staff page - CHANGE THIS TO YOUR STAFF PAGE
-                      bondNavigator.newPage(context, page: const StaffRegisterScreen()); // Example
-                    }
-                  },
+                          if (selectedAccount == 1) {
+                            // Navigate to User page
+                            bondNavigator.newPage(
+                              context,
+                              page: const LoginScreen(),
+                            );
+                          } else if (selectedAccount == 2) {
+                            // Navigate to Staff page - CHANGE THIS TO YOUR STAFF PAGE
+                            bondNavigator.newPage(
+                              context,
+                              page: const StaffRegisterScreen(
+                                mode: StaffAuthMode.login,
+                              ),
+                            ); // Example
+                          }
+                        },
                   child: Container(
                     height: 56,
                     width: double.infinity,
@@ -123,11 +135,11 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                       borderRadius: BorderRadius.circular(8),
                       gradient: selectedAccount == 0
                           ? const LinearGradient(
-                        colors: [Color(0xFF666666), Color(0xFF888888)],
-                      )
+                              colors: [Color(0xFF666666), Color(0xFF888888)],
+                            )
                           : const LinearGradient(
-                        colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                      ),
+                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                            ),
                     ),
                     child: Center(
                       child: Text(
@@ -154,28 +166,21 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
-  })
-  {
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-
-
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? Color(0XFFf56464) : Color(0XFF5f3550),
             width: 1,
           ),
-
         ),
-        child:Padding(
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            children: [
-              Image.asset(imagePath,height: 120,),
-              AppText(label)
-            ],
+            children: [Image.asset(imagePath, height: 120), AppText(label)],
           ),
         ),
       ),

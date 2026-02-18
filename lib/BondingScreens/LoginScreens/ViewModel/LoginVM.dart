@@ -9,9 +9,9 @@ import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/Model/Int
 import 'package:bonding_app/BondingScreens/LoginScreens/Model/LoginModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/Model/VerifyOtpModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/Repository/LoginRepo.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:flutter/material.dart';
-
 
 class LoginViewModel extends ChangeNotifier {
   final AuthRepository _authRepo;
@@ -61,13 +61,12 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyOtp(String phone, String otp) async {
+/*  Future<bool> verifyOtp(String phone, String otp) async {
     _isVerifying = true;
     _verifyError = null;
     notifyListeners();
 
-    try
-    {
+    try {
       _verifyResponse = await _authRepo.verifyOtp(phone: phone, otp: otp);
       _isVerifying = false;
 
@@ -83,21 +82,21 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
 
       return true;
-
     } catch (e) {
       _verifyError = e.toString().replaceFirst('Exception: ', '');
       _isVerifying = false;
       notifyListeners();
       return false;
     }
-  }
-  Future<bool> staffVerifyOtp(String phone, String otp) async {
+  }*/
+
+/*  Future<bool> staffVerifyOtp(String phone, String otp) async {
     _isVerifying = true;
     _verifyError = null;
+
     notifyListeners();
 
-    try
-    {
+    try {
       _verifyResponse = await _authRepo.StaffVerifyOtp(phone: phone, otp: otp);
       _isVerifying = false;
 
@@ -113,15 +112,81 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
 
       return true;
-
     } catch (e) {
+      AppLogger.log.e(e.toString());
       _verifyError = e.toString().replaceFirst('Exception: ', '');
       _isVerifying = false;
       notifyListeners();
       return false;
     }
-  }
+  }*/
+  Future<bool> verifyOtp(String phone, String otp) async {
+    _isVerifying = true;
+    _verifyError = null;
+    _verifyResponse = null; // ✅ clear old response
+    notifyListeners();
 
+    try {
+      _verifyResponse = await _authRepo.verifyOtp(phone: phone, otp: otp);
+
+      final ok = _verifyResponse?.isSuccess == true;
+
+      if (ok) {
+        await AuthService.saveLoginData(
+          token: _verifyResponse!.token!,
+          userId: _verifyResponse!.user?.id,
+          phone: phone,
+        );
+      } else {
+        _verifyError = _verifyResponse?.message ?? "Invalid OTP";
+      }
+
+      _isVerifying = false;
+      notifyListeners();
+
+      return ok; // ✅ return true only if success
+    } catch (e) {
+      _verifyError = e.toString().replaceFirst('Exception: ', '');
+      _isVerifying = false;
+      _verifyResponse = null; // ✅ keep null on error
+      notifyListeners();
+      return false;
+    }
+  }
+  Future<bool> staffVerifyOtp(String phone, String otp) async {
+    _isVerifying = true;
+    _verifyError = null;
+    _verifyResponse = null; // ✅ clear old response
+    notifyListeners();
+
+    try {
+      _verifyResponse = await _authRepo.StaffVerifyOtp(phone: phone, otp: otp);
+
+      final ok = _verifyResponse?.isSuccess == true;
+
+      if (ok) {
+        await AuthService.saveLoginData(
+          token: _verifyResponse!.token!,
+          userId: _verifyResponse!.user?.id,
+          phone: phone,
+        );
+      } else {
+        _verifyError = _verifyResponse?.message ?? "Invalid OTP";
+      }
+
+      _isVerifying = false;
+      notifyListeners();
+
+      return ok; // ✅ return true only if success
+    } catch (e) {
+      AppLogger.log.e(e.toString());
+      _verifyError = e.toString().replaceFirst('Exception: ', '');
+      _isVerifying = false;
+      _verifyResponse = null; // ✅ keep null on error
+      notifyListeners();
+      return false;
+    }
+  }
 
   void clearErrors() {
     _errorMessage = null;
@@ -136,7 +201,7 @@ class LoginViewModel extends ChangeNotifier {
   }
   // lib/BondingScreens/LoginScreens/ViewModel/LoginVM.dart
 
-// Add these fields
+  // Add these fields
   File? _selectedProfileImage;
   bool _isUploading = false;
   String? _uploadError;
@@ -147,14 +212,14 @@ class LoginViewModel extends ChangeNotifier {
   String? get uploadError => _uploadError;
   UpdateProfileResponse? get updateResponse => _updateResponse;
 
-// Method to set image from UI
+  // Method to set image from UI
   void setProfileImage(File? image) {
     _selectedProfileImage = image;
     _uploadError = null;
     notifyListeners();
   }
 
-// Upload method
+  // Upload method
   Future<bool> uploadProfileImage() async {
     if (_selectedProfileImage == null) {
       _uploadError = "No image selected";
@@ -167,10 +232,13 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _updateResponse = await _authRepo.updateProfileImage(_selectedProfileImage!);
+      _updateResponse = await _authRepo.updateProfileImage(
+        _selectedProfileImage!,
+      );
       _isUploading = false;
 
-      if (_updateResponse!.isSuccess && _updateResponse!.data?.imageUrl != null) {
+      if (_updateResponse!.isSuccess &&
+          _updateResponse!.data?.imageUrl != null) {
         // Optional: save updated user data / image url locally
         notifyListeners();
         return true;
@@ -187,7 +255,6 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-
   Future<bool> uploadSelfie(File selfieFile) async {
     _isUploading = true;
     _uploadError = null;
@@ -195,7 +262,9 @@ class LoginViewModel extends ChangeNotifier {
 
     try {
       // Your real API call (example using your repo)
-      final response = await _authRepo.uploadStaffSelfie(selfieFile); // ← adjust method name
+      final response = await _authRepo.uploadStaffSelfie(
+        selfieFile,
+      ); // ← adjust method name
 
       _isUploading = false;
       print("response.status::::${response.status}");
@@ -216,9 +285,9 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-  }  // lib/BondingScreens/LoginScreens/ViewModel/LoginVM.dart
+  } // lib/BondingScreens/LoginScreens/ViewModel/LoginVM.dart
 
-// Add these new fields
+  // Add these new fields
   bool _isUpdatingBio = false;
   String? _bioError;
   BioProfileResponse? _bioResponse;
@@ -227,7 +296,7 @@ class LoginViewModel extends ChangeNotifier {
   String? get bioError => _bioError;
   BioProfileResponse? get bioResponse => _bioResponse;
 
-// New method
+  // New method
   Future<bool> updateBioData({
     required String name,
     required String gender,
@@ -265,7 +334,7 @@ class LoginViewModel extends ChangeNotifier {
 
   // lib/BondingScreens/LoginScreens/ViewModel/LoginVM.dart
 
-// Add these fields
+  // Add these fields
   bool _isUpdatingInterests = false;
   String? _interestError;
   AreaOfInterestResponse? _interestResponse;
@@ -274,7 +343,7 @@ class LoginViewModel extends ChangeNotifier {
   String? get interestError => _interestError;
   AreaOfInterestResponse? get interestResponse => _interestResponse;
 
-// Method
+  // Method
   Future<bool> updateAreaOfInterest(List<String> selectedTitles) async {
     if (selectedTitles.length < 3) {
       _interestError = "Please select at least 3 interests";
@@ -304,7 +373,7 @@ class LoginViewModel extends ChangeNotifier {
 
   // lib/BondingScreens/LoginScreens/ViewModel/LoginVM.dart
 
-// Add these fields
+  // Add these fields
   bool _isUpdatingLanguage = false;
   String? _languageError;
   LanguageUpdateResponse? _languageResponse;
@@ -313,7 +382,7 @@ class LoginViewModel extends ChangeNotifier {
   String? get languageError => _languageError;
   LanguageUpdateResponse? get languageResponse => _languageResponse;
 
-// Method to update language
+  // Method to update language
   Future<bool> updateUserLanguage(String selectedLanguage) async {
     if (selectedLanguage.isEmpty) {
       _languageError = "Please select a language";
@@ -340,6 +409,4 @@ class LoginViewModel extends ChangeNotifier {
       return false;
     }
   }
-
-
 }

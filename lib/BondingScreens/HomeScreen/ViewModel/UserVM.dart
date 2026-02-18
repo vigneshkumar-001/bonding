@@ -59,7 +59,7 @@ class UserViewModel extends ChangeNotifier {
       print("staus${response.data}");
 
       if (response.status && response.data != null) {
-        // // Update local model
+        // // Update local Model
         // _currentUser = _currentUser?.copyWith(
         //   coinBalance: response.data!.coinBalance,
         // );

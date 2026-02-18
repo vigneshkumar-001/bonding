@@ -7,6 +7,7 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Reusable_Widgets/under_development_widgets.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
+import 'package:bonding_app/StaffScreenScreens/SupportScreen/support_screen.dart';
 import 'package:bonding_app/StaffScreenScreens/WalletFlow/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import '../../BondingScreens/AuthService.dart';
 import '../../BondingScreens/Splash/SplashScreen2.dart';
+import '../../BondingScreens/SupportScreen/support_screen.dart';
 
 class StaffProfileScreen extends StatefulWidget {
   final bool backPage;
@@ -201,7 +203,10 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               svg: "assets/Images/helpicon.svg",
                               title: "Help & support",
                               onTap: () {
-                                UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const SupportScreens(isStaff: true,),
+                                );
                                 // TODO: Navigate to staff help/support screen
                               },
                             ),

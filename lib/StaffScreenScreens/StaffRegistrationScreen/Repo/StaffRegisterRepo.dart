@@ -183,7 +183,7 @@ class StaffRepository {
       );
 
       print("Get Staff Single Data Raw Response: $response");
-
+AppLogger.log.i("Get Staff Single Data Raw Response: $response");
       final staffResp = StaffSingleDataResponse.fromJson(response);
 
       if (staffResp.status && staffResp.data != null) {
@@ -204,6 +204,7 @@ class StaffRepository {
 
       if (kDebugMode) {
         print("Staff Call History Response: $response");
+        AppLogger.log.i("Staff Call History Response: $response");
       }
 
       final resp = CallHistoryResponse.fromJson(response);
@@ -213,7 +214,8 @@ class StaffRepository {
       } else {
         throw Exception(resp.message ?? "Failed to fetch call history");
       }
-    } catch (e) {
+    } catch (e,st) {
+      AppLogger.log.e('$e,$st');
       throw Exception("CallRepository getStaffCallHistory error: $e");
     }
   }
@@ -235,8 +237,10 @@ class StaffRepository {
       } else {
         throw Exception(resp.message ?? "Failed to fetch call stats");
       }
-    } catch (e) {
+    } catch (e,st) {
       debugPrint("StaffRepository getStaffCallStats error: $e");
+      AppLogger.log.e('StaffRepository getStaffCallStats error:\n$e,$st');
+
       throw Exception("Failed to fetch call stats: $e");
     }
   }

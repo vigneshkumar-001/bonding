@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:bonding_app/APIService/Remote/AppException.dart';
-import 'package:bonding_app/APIService/Remote/network/BaseApiService.dart' show BaseApiService;
+import 'package:bonding_app/APIService/Remote/network/BaseApiService.dart'
+    show BaseApiService;
 import 'package:bonding_app/BondingScreens/AuthService.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:http/http.dart' as http;
 // import 'package:prod/APIService/Remote/AppException.dart';
-
-
 
 class NetworkApiService extends BaseApiService {
   @override
@@ -14,9 +14,7 @@ class NetworkApiService extends BaseApiService {
     print("efcdececdecc");
     // final String? token = await AuthService.getToken();
     dynamic responseJson;
-    Map<String, String> headers = {
-      "Authorization": "Bearer ",
-    }; // add token
+    Map<String, String> headers = {"Authorization": "Bearer "}; // add token
     try {
       print("evceadcc");
       final response = await http.get(
@@ -58,14 +56,20 @@ class NetworkApiService extends BaseApiService {
     final uri = Uri.parse(
       baseUrl + endpoint,
     ).replace(queryParameters: queryParams);
-    final token = await AuthService.getToken()??"";
-
+    final token = await AuthService.getToken() ?? "";
+    AppLogger.log.i("========== HTTP REQUEST ==========");
+    AppLogger.log.i("METHOD: GET");
+    AppLogger.log.i("FULL URL: $uri");
+    AppLogger.log.i("ENDPOINT: $endpoint");
+    AppLogger.log.i("QUERY PARAMS: $queryParams");
+    AppLogger.log.i("TOKEN: $token");
+    AppLogger.log.i(
+      "HEADERS: {Authorization: Bearer $token, Accept: application/json}",
+    );
+    AppLogger.log.i("==================================");
     final response = await http.get(
       uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
 
     if (response.statusCode == 200) {
@@ -74,6 +78,7 @@ class NetworkApiService extends BaseApiService {
       throw Exception("HTTP ${response.statusCode}: ${response.body}");
     }
   }
+
   Future<Map<String, dynamic>> uploadImageMultipart({
     required String endpoint,
     required File imageFile,
@@ -110,7 +115,9 @@ class NetworkApiService extends BaseApiService {
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       } else {
-        throw Exception("Upload failed - HTTP ${response.statusCode}: ${response.body}");
+        throw Exception(
+          "Upload failed - HTTP ${response.statusCode}: ${response.body}",
+        );
       }
     } on SocketException {
       throw FetchDataException('No Internet Connection');
@@ -245,10 +252,7 @@ class NetworkApiService extends BaseApiService {
 
     final response = await http.get(
       uri,
-      headers: {
-        'Authorization': 'Bearer ',
-        'Accept': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer ', 'Accept': 'application/json'},
     );
 
     if (response.statusCode == 200) {
@@ -351,16 +355,16 @@ class NetworkApiService extends BaseApiService {
   Future<dynamic> postResponseV2(
     String url, {
     Map<String, dynamic>? body,
-  }) async
-  {
+  }) async {
     // final token = await UserPreferences().getToken()??"";
     // final String? token = await AuthService.getToken();
 
     // print("$token");
+    final token = await AuthService.getToken() ?? "";
     dynamic responseJson;
     var data = json.encode(body);
     var headers = {
-      "Authorization": "Bearer ", // add token
+      "Authorization": "Bearer $token", // add token
       "content-type": "application/json",
       "Accept": "application/json",
     };
@@ -476,11 +480,10 @@ class NetworkApiService extends BaseApiService {
   }
 
   Future<dynamic> postResponseV3(
-      String url, {
-        Map<String, dynamic>? body,
-      }) async
-  {
-    final token = await AuthService.getToken()??"";
+    String url, {
+    Map<String, dynamic>? body,
+  }) async {
+    final token = await AuthService.getToken() ?? "";
     // final String? token = await AuthService.getToken();
 
     // print("$token");
@@ -516,76 +519,76 @@ class NetworkApiService extends BaseApiService {
       await http
           .post(Uri.parse(baseUrl + url), headers: headers, body: data)
           .then((response) {
-        final endTime = DateTime.now();
-        final duration = endTime.difference(startTime);
+            final endTime = DateTime.now();
+            final duration = endTime.difference(startTime);
 
-        // PRINT RESPONSE DETAILS
-        print('📥 RESPONSE V2');
-        print('📥 Status Code: ${response.statusCode}');
-        print('📥 Response Time: ${duration.inMilliseconds}ms');
-        print('📥 Response Headers: ${response.headers}');
-        print('📥 Response Body:');
+            // PRINT RESPONSE DETAILS
+            print('📥 RESPONSE V2');
+            print('📥 Status Code: ${response.statusCode}');
+            print('📥 Response Time: ${duration.inMilliseconds}ms');
+            print('📥 Response Headers: ${response.headers}');
+            print('📥 Response Body:');
 
-        try {
-          responseJson = jsonDecode(response.body);
+            try {
+              responseJson = jsonDecode(response.body);
 
-          // Pretty print JSON response
-          final encoder = JsonEncoder.withIndent('  ');
-          print(encoder.convert(responseJson));
+              // Pretty print JSON response
+              final encoder = JsonEncoder.withIndent('  ');
+              print(encoder.convert(responseJson));
 
-          // Print success/failure summary
-          print('\n📊 RESPONSE SUMMARY:');
-          if (responseJson is Map) {
-            if (responseJson.containsKey('success')) {
-              print('   Success: ${responseJson['success']}');
-            }
-            if (responseJson.containsKey('message')) {
-              print('   Message: ${responseJson['message']}');
-            }
-            if (responseJson.containsKey('error')) {
-              print('   Error: ${responseJson['error']}');
-            }
+              // Print success/failure summary
+              print('\n📊 RESPONSE SUMMARY:');
+              if (responseJson is Map) {
+                if (responseJson.containsKey('success')) {
+                  print('   Success: ${responseJson['success']}');
+                }
+                if (responseJson.containsKey('message')) {
+                  print('   Message: ${responseJson['message']}');
+                }
+                if (responseJson.containsKey('error')) {
+                  print('   Error: ${responseJson['error']}');
+                }
 
-            // For trade orders, print specific details
-            if (url.contains('orders/buy') || url.contains('orders/sell')) {
-              print('\n💱 ORDER DETAILS:');
-              if (responseJson.containsKey('newOrders') &&
-                  responseJson['newOrders'] is List) {
-                final orders = responseJson['newOrders'];
-                print('   Number of Orders Created: ${orders.length}');
-                for (var i = 0; i < orders.length; i++) {
-                  final order = orders[i];
-                  print('   Order ${i + 1}:');
-                  print('     - ID: ${order['_id'] ?? 'N/A'}');
-                  print('     - Side: ${order['side'] ?? 'N/A'}');
-                  print('     - Action: ${order['action'] ?? 'N/A'}');
-                  print('     - Shares: ${order['shares'] ?? 'N/A'}');
-                  print(
-                    '     - Price: \$${order['price_per_share'] ?? 'N/A'}',
-                  );
-                  print('     - Created: ${order['createdAt'] ?? 'N/A'}');
+                // For trade orders, print specific details
+                if (url.contains('orders/buy') || url.contains('orders/sell')) {
+                  print('\n💱 ORDER DETAILS:');
+                  if (responseJson.containsKey('newOrders') &&
+                      responseJson['newOrders'] is List) {
+                    final orders = responseJson['newOrders'];
+                    print('   Number of Orders Created: ${orders.length}');
+                    for (var i = 0; i < orders.length; i++) {
+                      final order = orders[i];
+                      print('   Order ${i + 1}:');
+                      print('     - ID: ${order['_id'] ?? 'N/A'}');
+                      print('     - Side: ${order['side'] ?? 'N/A'}');
+                      print('     - Action: ${order['action'] ?? 'N/A'}');
+                      print('     - Shares: ${order['shares'] ?? 'N/A'}');
+                      print(
+                        '     - Price: \$${order['price_per_share'] ?? 'N/A'}',
+                      );
+                      print('     - Created: ${order['createdAt'] ?? 'N/A'}');
+                    }
+                  }
+                  if (responseJson.containsKey('totalSpent')) {
+                    print('   Total Spent: \$${responseJson['totalSpent']}');
+                  }
                 }
               }
-              if (responseJson.containsKey('totalSpent')) {
-                print('   Total Spent: \$${responseJson['totalSpent']}');
-              }
+            } catch (e) {
+              // If not JSON, print as text
+              responseJson = response.body;
+              print(response.body);
             }
-          }
-        } catch (e) {
-          // If not JSON, print as text
-          responseJson = response.body;
-          print(response.body);
-        }
 
-        print('=' * 60 + '\n');
-      })
+            print('=' * 60 + '\n');
+          })
           .catchError((error) {
-        print('🔴 POST REQUEST ERROR:');
-        print('🔴 Error: $error');
-        print('🔴 URL: ${baseUrl + url}');
-        print('=' * 60 + '\n');
-        throw error;
-      });
+            print('🔴 POST REQUEST ERROR:');
+            print('🔴 Error: $error');
+            print('🔴 URL: ${baseUrl + url}');
+            print('=' * 60 + '\n');
+            throw error;
+          });
     } on SocketException {
       print('🔴 NETWORK ERROR: No Internet Connection');
       print('🔴 URL: ${baseUrl + url}');
@@ -609,10 +612,7 @@ class NetworkApiService extends BaseApiService {
     // final token = await AuthService.getToken();
     final response = await http.put(
       Uri.parse(baseUrl + url),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ",
-      },
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer "},
       body: json.encode(body),
     );
     print("${response.body}");

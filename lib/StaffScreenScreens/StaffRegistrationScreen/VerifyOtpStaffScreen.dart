@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../StaffBottomNavBar/StaffBottomNavBar.dart';
+import 'StaffRegistrationScreens.dart';
 
 class LoginOtpStaffScreen extends StatefulWidget {
   final String phoneNumber;
@@ -29,16 +30,16 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vm = Provider.of<LoginViewModel>(context, listen: false);
-
-      if (vm.autoOtp != null) {
-        _otpController.text = vm.autoOtp!;
-        setState(() {}); // refresh hearts
-      }
-
-      _focusNode.requestFocus();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final vm = Provider.of<LoginViewModel>(context, listen: false);
+    //
+    //   if (vm.autoOtp != null) {
+    //     _otpController.text = vm.autoOtp!;
+    //     setState(() {}); // refresh hearts
+    //   }
+    //
+    //   _focusNode.requestFocus();
+    // });
   }
 
   void _handleOtpFill() {
@@ -199,10 +200,104 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 return;
                               }
 
-                          await vm.staffVerifyOtp(
+                              // ✅ IMPORTANT: use the boolean result
+                              final success = await vm.staffVerifyOtp(
                                 widget.phoneNumber,
                                 otp,
                               );
+
+                              // ✅ If API says invalid OTP, STOP HERE
+                              if (!success) {
+                                Utils.snackBarErrorMessage(
+                                  vm.verifyError ?? "Invalid OTP",
+                                );
+                                return;
+                              }
+
+                              // ✅ success => response must be non-null
+                              final response = vm.verifyResponse;
+                              if (response == null) {
+                                Utils.snackBarErrorMessage(
+                                  "Something went wrong. Please try again.",
+                                );
+                                return;
+                              }
+
+                              final isLogin = response.user?.isLogin ?? false;
+
+                              if (isLogin) {
+                                bondNavigator.newPageRemoveUntil(
+                                  context,
+                                  page: const StaffBottomBar(),
+                                );
+                              } else {
+                                bondNavigator.newPage(
+                                  context,
+                                  page: StaffRegisterScreen(
+                                    mode: StaffAuthMode.register,
+                                    prefillPhone: widget.phoneNumber,
+                                  ),
+                                );
+                              }
+                            },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: vm.isVerifying
+                              ? const LinearGradient(
+                                  colors: [Colors.grey, Colors.blueGrey],
+                                )
+                              : const LinearGradient(
+                                  colors: [
+                                    Color(0xFFB86AF6),
+                                    Color(0xFFFF6A6A),
+                                  ],
+                                ),
+                        ),
+                        child: Center(
+                          child: vm.isVerifying
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : const Text(
+                                  "Confirm  →",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+
+                    /*GestureDetector(
+                      onTap: vm.isVerifying
+                          ? null
+                          : () async {
+                              final otp = _otpController.text.trim();
+
+                              if (otp.isEmpty) {
+                                Utils.snackBarErrorMessage(
+                                  "Please enter the OTP",
+                                );
+                                return;
+                              }
+                              if (!_isValidOtp(otp)) {
+                                Utils.snackBarErrorMessage(
+                                  "Please enter all 4 digits",
+                                );
+                                return;
+                              }
+
+                              await vm.staffVerifyOtp(widget.phoneNumber, otp);
                               final response = vm.verifyResponse;
 
                               if (response != null && response.isSuccess) {
@@ -214,10 +309,18 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                     page: const StaffBottomBar(),
                                   );
                                 } else {
-                                  bondNavigator.newPageRemoveUntil(
+                                  bondNavigator.newPage(
                                     context,
-                                    page: const ProfileVerficationScreen(),
+                                    page: StaffRegisterScreen(
+                                      mode: StaffAuthMode.register,
+                                      prefillPhone:
+                                          widget.phoneNumber, // optional
+                                    ),
                                   );
+                                  // bondNavigator.newPageRemoveUntil(
+                                  //   context,
+                                  //   page: const ProfileVerficationScreen(),
+                                  // );
                                 }
                               }
                               // if (success) {
@@ -256,7 +359,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                   ),
                                 )
                               : const Text(
-                                  "Login  →",
+                                  "Confirm  →",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -265,8 +368,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 ),
                         ),
                       ),
-                    ),
-
+                    ),*/
                     const SizedBox(height: 30),
 
                     // Keyboard Toggle Button (Optional)

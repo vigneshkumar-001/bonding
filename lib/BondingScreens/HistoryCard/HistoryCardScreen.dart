@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/Chat/ChatDetailScreen.dart';
+import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
+import 'package:bonding_app/BondingScreens/Chat/ViewModel/chat_provider_vm.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Model/StaffDataModel.dart'; // ← assuming this exists
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/ProfileScreen.dart';
@@ -13,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
-import 'package:zego_zim/zego_zim.dart';  // ← ADD THIS LINE
+import 'package:zego_zim/zego_zim.dart'; // ← ADD THIS LINE
 
 class HistoryCard extends StatefulWidget {
   const HistoryCard({super.key});
@@ -25,8 +28,8 @@ class HistoryCard extends StatefulWidget {
 class _HistoryCardState extends State<HistoryCard> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<StaffViewModel,UserViewModel>(
-      builder: (context, staffVM, userVM,child) {
+    return Consumer2<StaffViewModel, UserViewModel>(
+      builder: (context, staffVM, userVM, child) {
         final currentUser = userVM.currentUser;
 
         return Scaffold(
@@ -55,30 +58,46 @@ class _HistoryCardState extends State<HistoryCard> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        SvgPicture.asset("assets/Images/bonding.svg", height: 32),
+                        SvgPicture.asset(
+                          "assets/Images/bonding.svg",
+                          height: 32,
+                        ),
                         const Spacer(),
 
                         // Coin balance (dynamic if you have user model)
                         Consumer<UserViewModel>(
                           builder: (context, userVM, _) {
-                            final balance = userVM.currentUser?.coinBalance ?? 10.00;
+                            final balance =
+                                userVM.currentUser?.coinBalance ?? 10.00;
                             return GestureDetector(
                               onTap: () {
-                                bondNavigator.newPage(context, page: const WalletScreen());
+                                bondNavigator.newPage(
+                                  context,
+                                  page: const WalletScreen(),
+                                );
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   gradient: const LinearGradient(
-                                    colors: [Color(0xFFcc529f), Color(0xFFf86460)],
+                                    colors: [
+                                      Color(0xFFcc529f),
+                                      Color(0xFFf86460),
+                                    ],
                                   ),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Image.asset("assets/Images/goldcoin1.png", height: 20),
+                                    Image.asset(
+                                      "assets/Images/goldcoin1.png",
+                                      height: 20,
+                                    ),
                                     const SizedBox(width: 6),
                                     Text(
                                       "${balance.toStringAsFixed(2)}",
@@ -98,12 +117,18 @@ class _HistoryCardState extends State<HistoryCard> {
 
                         // Profile avatar
                         GestureDetector(
-                          onTap: () => bondNavigator.newPage(context, page: const ProfileScreen(backPage: true,)),
+                          onTap: () => bondNavigator.newPage(
+                            context,
+                            page: const ProfileScreen(backPage: true),
+                          ),
                           child: CircleAvatar(
                             radius: 18,
-                            backgroundImage: (currentUser?.image != null && currentUser!.image!.isNotEmpty)
+                            backgroundImage:
+                                (currentUser?.image != null &&
+                                    currentUser!.image!.isNotEmpty)
                                 ? NetworkImage(currentUser.image!)
-                                : const AssetImage("assets/Images/profile.png") as ImageProvider,
+                                : const AssetImage("assets/Images/profile.png")
+                                      as ImageProvider,
                           ),
                         ),
                       ],
@@ -167,42 +192,50 @@ class _HistoryCardState extends State<HistoryCard> {
                   // Staff / History List
                   Expanded(
                     child: staffVM.isFetchingStaff
-                        ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
                         : staffVM.staffFetchError != null
                         ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            staffVM.staffFetchError!,
-                            style: const TextStyle(color: Colors.redAccent),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: staffVM.fetchStaffDetails,
-                            child: const Text("Retry"),
-                          ),
-                        ],
-                      ),
-                    )
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  staffVM.staffFetchError!,
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: staffVM.fetchStaffDetails,
+                                  child: const Text("Retry"),
+                                ),
+                              ],
+                            ),
+                          )
                         : staffVM.staffList.isEmpty
                         ? const Center(
-                      child: Text(
-                        "No history or staff available",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    )
+                            child: Text(
+                              "No history or staff available",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          )
                         : RefreshIndicator(
-                      onRefresh: staffVM.fetchStaffDetails,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: staffVM.staffList.length,
-                        itemBuilder: (context, index) {
-                          final staff = staffVM.staffList[index];
-                          return _profileCard(context, staff);
-                        },
-                      ),
-                    ),
+                            onRefresh: staffVM.fetchStaffDetails,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              itemCount: staffVM.staffList.length,
+                              itemBuilder: (context, index) {
+                                final staff = staffVM.staffList[index];
+                                return _profileCard(context, staff);
+                              },
+                            ),
+                          ),
                   ),
                 ],
               ),
@@ -225,11 +258,13 @@ class _HistoryCardState extends State<HistoryCard> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            gradient:  LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.white.withOpacity(0.10), Colors.white.withOpacity(0.04)],
-
+              colors: [
+                Colors.white.withOpacity(0.10),
+                Colors.white.withOpacity(0.04),
+              ],
             ),
             border: Border.all(
               color: Colors.white.withOpacity(0.15),
@@ -259,7 +294,10 @@ class _HistoryCardState extends State<HistoryCard> {
                           SizedBox(width: 6),
                           Text(
                             "Tamil", // ← can be dynamic from staff model later
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -267,9 +305,11 @@ class _HistoryCardState extends State<HistoryCard> {
                   ),
                   CircleAvatar(
                     radius: 35,
-                    backgroundImage: (staff.image != null && staff.image!.isNotEmpty)
+                    backgroundImage:
+                        (staff.image != null && staff.image!.isNotEmpty)
                         ? NetworkImage(staff.image!)
-                        : const AssetImage("assets/Images/videocallprofile.png") as ImageProvider,
+                        : const AssetImage("assets/Images/videocallprofile.png")
+                              as ImageProvider,
                   ),
                 ],
               ),
@@ -281,10 +321,12 @@ class _HistoryCardState extends State<HistoryCard> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: staff.areaOfInterest
-                      .map((interest) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _Tag(interest.title ?? ''),
-                  ))
+                      .map(
+                        (interest) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _Tag(interest.title ?? ''),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -293,7 +335,7 @@ class _HistoryCardState extends State<HistoryCard> {
 
               // Bio / Description
               AppText(
-                  "No bio available yet...",
+                "No bio available yet...",
                 color: Colors.white,
                 fontSize: 15,
                 maxLines: 3,
@@ -323,39 +365,84 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Inside _profileCard → the Chat button GestureDetector
 
+                  // Inside _profileCard → the Chat button GestureDetector
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
                         final userVM = Provider.of<UserViewModel>(context, listen: false);
                         final currentUser = userVM.currentUser;
-
                         if (currentUser == null) return;
 
+                        // (Your Zego check can stay if needed)
                         final connected = await ZimConnectionService.ensureConnected(
                           context,
                           userId: currentUser.memberID,
                           userName: currentUser.name ?? "User",
                         );
-
                         if (!connected) return;
 
-                        bondNavigator.newPage(
+                        final staffId = staff.id;          // staff mongo _id
+                        final userId = currentUser.id;     // user mongo _id
+                        final staffName = staff.name ?? "Staff";
+
+                        Navigator.push(
                           context,
-                          page: ChatDetailScreen(
-                            conversationID: staff.memberID,
-                            conversationType: ZIMConversationType.peer,
-                            name: staff.name ?? "Staff",
-                            staffId: staff.id,
+                          MaterialPageRoute(
+                            builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
+                              create: (_) => ChatProviderVm(
+                                repo: ChatRepository(NetworkApiService()),
+                              )..initChat(staffId: staffId, userId: userId,isStaff: false), // ✅ history + socket init
+                              child: ChatDetailScreen(
+                                staffId: staffId,
+                                staffName: staffName,
+                                userId: userId,
+                              ),
+                            ),
                           ),
                         );
                       },
-                      child:  Center(
-                        child: Image.asset(
-                          "assets/Images/chaticon.png",
 
-                        ),
+                      // onTap: () async {
+                      //   final userVM = Provider.of<UserViewModel>(
+                      //     context,
+                      //     listen: false,
+                      //   );
+                      //   final currentUser = userVM.currentUser;
+                      //
+                      //   if (currentUser == null) return;
+                      //
+                      //   final connected =
+                      //       await ZimConnectionService.ensureConnected(
+                      //         context,
+                      //         userId: currentUser.memberID,
+                      //         userName: currentUser.name ?? "User",
+                      //       );
+                      //
+                      //   if (!connected) return;
+                      //   bondNavigator.newPage(
+                      //     context,
+                      //     page: ChatDetailScreen(
+                      //       staffId: staff.id,                              // Mongo _id
+                      //       staffName: staff.name ?? "Staff",
+                      //       userId: currentUser.id,                         // Mongo _id
+                      //     ),
+                      //   );
+                      //
+                      //   // bondNavigator.newPage(
+                      //   //   context,
+                      //   //   page: ChatDetailScreen(
+                      //   //     // conversationID: staff.memberID,
+                      //   //     // conversationType: ZIMConversationType.peer,
+                      //   //     // name: staff.name ?? "Staff",
+                      //   //     staffId: staff.id,
+                      //   //     userId: '',
+                      //   //     staffName: '',
+                      //   //   ),
+                      //   // );
+                      // },
+                      child: Center(
+                        child: Image.asset("assets/Images/chaticon.png"),
                       ),
                     ),
                   ),
@@ -386,11 +473,7 @@ class _HistoryCardState extends State<HistoryCard> {
         children: [
           Image.asset(img, height: 20),
           const SizedBox(width: 4),
-          AppText(
-            text,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          AppText(text, color: Colors.white, fontWeight: FontWeight.w600),
           const SizedBox(width: 6),
           Icon(icon, color: Colors.white),
         ],
@@ -443,7 +526,8 @@ class _HistoryCardState extends State<HistoryCard> {
     } catch (e) {
       debugPrint("Error calculating age: $e");
       return null;
-    }}
+    }
+  }
 }
 
 class _Tag extends StatelessWidget {
@@ -457,10 +541,9 @@ class _Tag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        gradient: const LinearGradient(colors: [
-          Color(0xFF45333c),
-          Color(0xFF4a263c),
-        ]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF45333c), Color(0xFF4a263c)],
+        ),
         border: Border.all(color: const Color(0xFF5a3c4e)),
       ),
       child: AppText(

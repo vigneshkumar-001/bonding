@@ -5,11 +5,11 @@ class ZimConnectionService {
   static bool isConnected = false;
 
   static Future<bool> ensureConnected(
-      BuildContext context, {
-        required String userId,
-        required String userName,
-        String? avatarUrl,
-      }) async {
+    BuildContext context, {
+    required String userId,
+    required String userName,
+    String? avatarUrl,
+  }) async {
     if (isConnected) return true;
 
     try {
