@@ -271,10 +271,12 @@ class StaffViewModel extends ChangeNotifier {
 
 // Add these fields
   StaffSingleProfile? _currentStaff;
+  StaffSingleDataResponse? _staffSingleDataResponse;
   bool _isFetchingSingleStaff = false;
   String? _singleStaffError;
 
   StaffSingleProfile? get currentStaff => _currentStaff;
+  StaffSingleDataResponse? get staffData => _staffSingleDataResponse;
   bool get isFetchingSingleStaff => _isFetchingSingleStaff;
   String? get singleStaffError => _singleStaffError;
 
@@ -287,6 +289,7 @@ class StaffViewModel extends ChangeNotifier {
     try {
       final response = await _staffRepo.getStaffSingleData();
       _currentStaff = response.data;
+      _staffSingleDataResponse = response;
       _isFetchingSingleStaff = false;
       notifyListeners();
     } catch (e) {

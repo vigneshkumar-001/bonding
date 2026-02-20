@@ -9,7 +9,13 @@ import 'package:flutter/material.dart';
 import '../../Reusable_Widgets/under_development_widgets.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
-  const AccountSettingsScreen({super.key});
+  final bool isStaff;
+  final String userId;
+  const AccountSettingsScreen({
+    super.key,
+    required this.isStaff,
+    required this.userId,
+  });
 
   @override
   State<AccountSettingsScreen> createState() => _AccountSettingsScreenState();
@@ -42,10 +48,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         ),
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                          ),
+                          child: Icon(Icons.arrow_back, color: Colors.white),
                         ),
                       ),
                     ),
@@ -72,7 +75,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.privacy_tip_outlined,
                         title: "privacy policy",
                         onTap: () {
-                          bondNavigator.newPage(context, page: PrivacyPolicyScreen());
+                          bondNavigator.newPage(
+                            context,
+                            page: PrivacyPolicyScreen(),
+                          );
                           //UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
                           // Navigate to privacy policy
                         },
@@ -82,8 +88,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.block_outlined,
                         title: "Blocked users",
                         onTap: () {
-                         // UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
-                           bondNavigator.newPage(context, page: BlockedUsersScreen());
+                          // UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                          bondNavigator.newPage(
+                            context,
+                            page: BlockedUsersScreen(
+                              isStaff: widget.isStaff,
+                              userId: widget.userId,
+                            ),
+                          );
                           // Navigate to blocked users
                         },
                       ),
@@ -92,7 +104,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         icon: Icons.report_outlined,
                         title: "Report overview",
                         onTap: () {
-                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(context);
+                          UnderDevelopmentWidgets.buildUnderDevelopmentDialog(
+                            context,
+                          );
                           // bondNavigator.newPage(context, page: ReportOverviewScreen());
                           // Navigate to report overview
                         },
@@ -103,7 +117,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         title: "Delete Account",
 
                         onTap: () {
-                          bondNavigator.newPage(context, page: DeleteAccountScreen());
+                          bondNavigator.newPage(
+                            context,
+                            page: DeleteAccountScreen(isStaff: widget.isStaff),
+                          );
                           // Handle delete account
                         },
                       ),
@@ -135,11 +152,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: iconColor ?? Colors.grey[400],
-              size: 28,
-            ),
+            Icon(icon, color: iconColor ?? Colors.grey[400], size: 28),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -151,11 +164,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey[400],
-              size: 18,
-            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 18),
           ],
         ),
       ),

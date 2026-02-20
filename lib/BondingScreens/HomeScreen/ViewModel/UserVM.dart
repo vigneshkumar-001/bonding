@@ -18,8 +18,11 @@ class UserViewModel extends ChangeNotifier {
 
   // ─── State ──────────────────────────────────────────────────────────────
   UserProfile? _currentUser;
+  UserDetailsResponse? _userDetailsResponse;
+
   bool _isLoading = false;
   String? _errorMessage;
+  UserDetailsResponse? get userDetailsResponse => _userDetailsResponse;
 
   UserProfile? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
@@ -34,6 +37,8 @@ class UserViewModel extends ChangeNotifier {
     try {
       final response = await _userRepo.getUserDetails();
       _currentUser = response.data;
+      _userDetailsResponse = response;
+
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       debugPrint("User fetch error: $e");

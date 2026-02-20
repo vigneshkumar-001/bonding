@@ -3,11 +3,13 @@
 class UserDetailsResponse {
   final bool status;
   final String message;
+  final String supportEmail;
   final UserProfile? data;
 
   UserDetailsResponse({
     required this.status,
     required this.message,
+    required this.supportEmail,
     this.data,
   });
 
@@ -15,6 +17,7 @@ class UserDetailsResponse {
     return UserDetailsResponse(
       status: json['status'] == true,
       message: json['message']?.toString() ?? '',
+      supportEmail: json['supportEmail']?.toString() ?? '',
       data: json['data'] != null ? UserProfile.fromJson(json['data']) : null,
     );
   }
@@ -158,5 +161,6 @@ class InterestItem {
 
   InterestItem({required this.title});
 
-  factory InterestItem.fromJson(Map<String, dynamic> json) => InterestItem(title: json['title'] ?? '');
+  factory InterestItem.fromJson(Map<String, dynamic> json) =>
+      InterestItem(title: json['title'] ?? '');
 }

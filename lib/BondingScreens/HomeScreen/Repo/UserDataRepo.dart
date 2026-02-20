@@ -2,8 +2,10 @@
 
 import 'package:bonding_app/APIService/Remote/network/ApiEndPoints.dart';
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
+import 'package:bonding_app/BondingScreens/HistoryCard/Model/user_call_history_model.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Model/UpdateBalanceModel.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Model/UserDataModel.dart';
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:flutter/foundation.dart';
 
 class UserRepository {
@@ -27,15 +29,20 @@ class UserRepository {
         return userResp;
       } else {
         throw Exception(
-          userResp.message.isNotEmpty ? userResp.message : "Failed to fetch user details",
+          userResp.message.isNotEmpty
+              ? userResp.message
+              : "Failed to fetch user details",
         );
       }
     } catch (e) {
+      AppLogger.log.e(e);
       throw Exception("UserRepository getUserDetails error: $e");
     }
   }
 
-  Future<UserDetailsResponse> getUserCallHistory() async {
+
+
+  Future<UserCallHistoryResponse> getUserCallHistory() async {
     try {
       final response = await _apiService.getResponseV2(
         ApiEndPoints().userCallHistory,
@@ -45,13 +52,15 @@ class UserRepository {
         print("Get User Details Response: $response");
       }
 
-      final userResp = UserDetailsResponse.fromJson(response);
+      final userResp = UserCallHistoryResponse.fromJson(response);
 
       if (userResp.status && userResp.data != null) {
         return userResp;
       } else {
         throw Exception(
-          userResp.message.isNotEmpty ? userResp.message : "Failed to fetch user details",
+          userResp.message.isNotEmpty
+              ? userResp.message
+              : "Failed to fetch user details",
         );
       }
     } catch (e) {
@@ -59,22 +68,20 @@ class UserRepository {
     }
   }
 
-
   Future<UpdateBalanceResponse> updateCoinBalance({
     required int newCoinBalance,
     required String staffId,
     required dynamic staffAmount,
     required String callDuration,
-    required String callType
-  }) async
-  {
+    required String callType,
+  }) async {
     try {
       final body = {
         "coinBalance": newCoinBalance,
-        "staffId":staffId,
-        "staffEarned":staffAmount,
-        "callDuration":callDuration,
-        "callType":callType
+        "staffId": staffId,
+        "staffEarned": staffAmount,
+        "callDuration": callDuration,
+        "callType": callType,
       };
       print("body :: $body");
 
@@ -98,7 +105,8 @@ class UserRepository {
       throw Exception("UserRepository updateCoinBalance error: $e");
     }
   }
-// You can add more user-related methods later, e.g.
-// Future updateProfile(...)
-// Future getWalletBalance(...)
+
+  // You can add more user-related methods later, e.g.
+  // Future updateProfile(...)
+  // Future getWalletBalance(...)
 }

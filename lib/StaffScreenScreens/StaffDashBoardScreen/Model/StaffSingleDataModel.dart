@@ -3,11 +3,13 @@
 class StaffSingleDataResponse {
   final bool status;
   final String message;
+  final String supportEmail;
   final StaffSingleProfile? data;
 
   StaffSingleDataResponse({
     required this.status,
     required this.message,
+    required this.supportEmail,
     this.data,
   });
 
@@ -15,6 +17,7 @@ class StaffSingleDataResponse {
     return StaffSingleDataResponse(
       status: json['status'] == true,
       message: json['message']?.toString() ?? 'Failed to fetch staff details',
+      supportEmail: json['supportEmail']?.toString() ?? '',
       data: json['data'] != null ? StaffSingleProfile.fromJson(json['data']) : null,
     );
   }

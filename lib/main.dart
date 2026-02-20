@@ -1,6 +1,13 @@
+import 'package:bonding_app/BondingScreens/BlockedUsers/ViewModel/blocked_users_list_vm.dart';
+import 'package:bonding_app/BondingScreens/BlockedUsers/ViewModel/unblock_user_vm.dart';
 import 'package:bonding_app/BondingScreens/Chat/ViewModel/user_chat_list_vm.dart';
+import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/ViewModel/delete_account_reasons_vm.dart';
+import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/ViewModel/delete_account_vm.dart';
+import 'package:bonding_app/BondingScreens/HistoryCard/ViewModel/user_call_history_vm.dart';
+import 'package:bonding_app/BondingScreens/HomeScreen/Repo/call_controller.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/Repository/staff_repository.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/StaffChatListVm.dart';
+import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/block_user_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -49,14 +56,14 @@ void main() {
 
   ZegoUIKit().initLog();
 
-  ZIMKit().init(
-    appID: 467997506,
-    appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
-  );
   // ZIMKit().init(
-  //   appID: 1327852448,
-  //   appSign: "0879d8b8ca962db7ba26447774981478100de323dc760dfdf755dd2b0d0607e3",
+  //   appID: 467997506,
+  //   appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
   // );
+  ZIMKit().init(
+    appID: 1327852448,
+    appSign: "0879d8b8ca962db7ba26447774981478100de323dc760dfdf755dd2b0d0607e3",
+  );
 
   runApp(const MyApp());
 }
@@ -113,6 +120,14 @@ List<SingleChildWidget> getAllProviders() {
       create: (_) => TicketHistoryVM(SettingsRepository()),
     ),
     ChangeNotifierProvider(
+      create: (_) => BlockUserVM(repo: ChatRepository(NetworkApiService())),
+    ),
+    ChangeNotifierProvider(
+      create: (_) => DeleteAccountReasonsVM(repo: ChatRepository(NetworkApiService())),
+    ),  ChangeNotifierProvider(
+      create: (_) => DeleteAccountVM(repo: ChatRepository(NetworkApiService())),
+    ),
+    ChangeNotifierProvider(
       create: (_) => TicketMessageVM(SettingsRepository()),
     ),
 
@@ -126,19 +141,32 @@ List<SingleChildWidget> getAllProviders() {
           StaffChatListVm(repo: StaffChatRepository(NetworkApiService())),
     ),
     ChangeNotifierProvider(
+      create: (_) => UserChatListVm(repo: ChatRepository(NetworkApiService())),
+    ),
+    ChangeNotifierProvider(
       create: (_) =>
-          UserChatListVm(repo: ChatRepository(NetworkApiService())),
+          BlockedUsersListVm(repo: ChatRepository(NetworkApiService())),
+    ),
+    ChangeNotifierProvider(
+      create: (_) => UnblockUserVM(repo: ChatRepository(NetworkApiService())),
     ),
 
     // ---------------- User Home ----------------
     Provider<UserRepository>(
       create: (_) => UserRepository(NetworkApiService()),
     ),
+
+    ChangeNotifierProvider<CallController>(
+      create: (_) => CallController(),
+    ),
     ChangeNotifierProvider<UserViewModel>(
       create: (context) => UserViewModel(context.read<UserRepository>()),
       lazy: true,
     ),
-
+    ChangeNotifierProvider<UserCallHistoryVm>(
+      create: (context) => UserCallHistoryVm(context.read<UserRepository>()),
+      lazy: true,
+    ),
     // ---------------- Staff Flow ----------------
     Provider<StaffRepository>(
       create: (_) => StaffRepository(NetworkApiService()),

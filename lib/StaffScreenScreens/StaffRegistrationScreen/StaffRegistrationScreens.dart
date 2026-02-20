@@ -1,6 +1,7 @@
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/VerifyOtpStaffScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:flutter/material.dart';
@@ -252,6 +253,9 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       maxLength: 10,
+                      readOnly:
+                          widget.prefillPhone != null &&
+                          widget.prefillPhone!.trim().isNotEmpty,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: "Enter 10-digit number",
@@ -359,16 +363,25 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                     ? ""
                                     : dobController.text.trim(),
                               );
-
                               if (success) {
-                                bondNavigator.newPage(
-                                  context,
-                                  page: LoginOtpStaffScreen(
-                                    phoneNumber: phoneController.text.trim(),
-                                    // otp: vm.registerResponse!.otp!,
-                                    // otpExpiresTime: vm.registerResponse!.otpExpiresTime!,
-                                  ),
-                                );
+                                if (isLoginMode) {
+                                  // ✅ Login -> OTP
+                                  bondNavigator.newPage(
+                                    context,
+                                    page: LoginOtpStaffScreen(
+                                      phoneNumber: phoneController.text.trim(),
+                                    ),
+                                  );
+                                } else {
+                                  // ✅ Register -> Verification
+                                  bondNavigator.newPage(
+                                    context,
+                                    page: ProfileVerficationScreen(
+
+                                      // add any other data you need
+                                    ),
+                                  );
+                                }
                               } else {
                                 Utils.snackBarErrorMessage(
                                   isLoginMode
@@ -376,6 +389,23 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                       : "Registration failed. Please try again.",
                                 );
                               }
+
+                              // if (success) {
+                              //   bondNavigator.newPage(
+                              //     context,
+                              //     page: LoginOtpStaffScreen(
+                              //       phoneNumber: phoneController.text.trim(),
+                              //       // otp: vm.registerResponse!.otp!,
+                              //       // otpExpiresTime: vm.registerResponse!.otpExpiresTime!,
+                              //     ),
+                              //   );
+                              // } else {
+                              //   Utils.snackBarErrorMessage(
+                              //     isLoginMode
+                              //         ? "OTP request failed. Please try again."
+                              //         : "Registration failed. Please try again.",
+                              //   );
+                              // }
                             },
                       child: Container(
                         height: 52,

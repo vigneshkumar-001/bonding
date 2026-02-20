@@ -1,4 +1,5 @@
 // lib/BondingScreens/Chat/ViewModel/user_chat_list_vm.dart
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import '../Repository/chat_repository.dart';
 import '../Model/user_chat_list_model.dart';
@@ -54,7 +55,8 @@ class UserChatListVm extends ChangeNotifier {
       final res = UserChatListResponse.fromJson(
         Map<String, dynamic>.from(jsonBody as Map),
       );
-
+      AppLogger.log.i(jsonBody);
+      AppLogger.log.i(res);
       if (!res.status) {
         throw Exception(res.message.isNotEmpty ? res.message : "Fetch failed");
       }

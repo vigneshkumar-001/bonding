@@ -32,6 +32,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
     return Consumer<StaffViewModel>(
       builder: (context, staffVM, child) {
         final staff = staffVM.currentStaff;
+        final staffData = staffVM. staffData;
 
         // Loading / error states
         if (staffVM.isFetchingSingleStaff) {
@@ -142,7 +143,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       child: ClipOval(
                         child: staff.image != null && staff.image!.isNotEmpty
                             ? Image.network(
-                                staff.image!,
+                                staff.image?? '',
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
                                     Image.asset(
@@ -226,7 +227,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               onTap: () {
                                 bondNavigator.newPage(
                                   context,
-                                  page: const AccountSettingsScreen(),
+                                  page:   AccountSettingsScreen(isStaff: true,userId: staff.id,),
                                 );
                               },
                             ),
@@ -325,7 +326,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       child: Row(
                         children: [
                           RichText(
-                            text: const TextSpan(
+                            text:   TextSpan(
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -333,7 +334,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               children: [
                                 TextSpan(text: "Need Help? please contact "),
                                 TextSpan(
-                                  text: "support@bonding.com",
+                                  text: staffData?.supportEmail?? '',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500,

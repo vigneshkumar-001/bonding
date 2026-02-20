@@ -47,7 +47,7 @@ class AuthRepository {
       }
     } catch (e) {
       AppLogger.log.e("AuthRepository sendOtp error: $e");
-      throw Exception("AuthRepository sendOtp error: $e");
+      throw Exception("$e");
     }
   }
 

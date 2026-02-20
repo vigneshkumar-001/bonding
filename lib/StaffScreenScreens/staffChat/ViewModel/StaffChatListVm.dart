@@ -1,3 +1,4 @@
+import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:flutter/foundation.dart';
 
 import '../Model/staff_chat_list_item.dart';
@@ -39,7 +40,7 @@ class StaffChatListVm extends ChangeNotifier {
       }
 
       final json = await repo.getStaffChatList(page: page, limit: limit);
-
+      AppLogger.log.i(json);
       if (json["status"] != true) {
         throw Exception(json["message"] ?? "Chat list fetch failed");
       }

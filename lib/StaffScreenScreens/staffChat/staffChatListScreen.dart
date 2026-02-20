@@ -191,9 +191,9 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                             timeText: _fmtTime(c.lastMessageAt),
                             unreadCount: c.unreadCount,
                             userImage: c.user?.image.toString() ?? '',
-                            onTap: () {
+                            onTap: () async {
                               vm.clearUnread(c.userId);
-                              Navigator.push(
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => ChangeNotifierProvider(
@@ -201,13 +201,40 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                                       repo: ChatRepository(NetworkApiService()),
                                     ),
                                     child: StaffChatDetailScreen(
+                                      staffImage:
+                                          c.user?.image.toString() ?? '',
                                       staffId: widget.staffId,
                                       userId: c.userId,
+                                      isBlocked: c.isBlocked,
                                       userName: c.user?.name.toString() ?? '',
                                     ),
                                   ),
                                 ),
                               );
+
+                              if (result == true) {
+                                vm.fetchChatList(
+                                  reset: true,
+                                ); // 🔥 REFRESH LIST
+                              }
+
+                              // Navigator.push(
+                              //      context,
+                              //      MaterialPageRoute(
+                              //        builder: (_) => ChangeNotifierProvider(
+                              //          create: (_) => StaffChatProviderVm(
+                              //            repo: ChatRepository(NetworkApiService()),
+                              //          ),
+                              //          child: StaffChatDetailScreen(
+                              //            staffId: widget.staffId,
+                              //            userId: c.userId,
+                              //            isBlocked: c.isBlocked,
+                              //            userName: c.user?.name.toString() ?? '',
+                              //          ),
+                              //        ),
+                              //      ),
+                              //    );
+
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(

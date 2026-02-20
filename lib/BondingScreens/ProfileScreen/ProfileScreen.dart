@@ -32,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserViewModel>(
       builder: (context, userVM, child) {
         final user = userVM.currentUser;
+        final userDetails = userVM.userDetailsResponse;
 
         // If still loading or no user, show loading or fallback
         if (userVM.isLoading) {
@@ -233,7 +234,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onTap: () {
                                 bondNavigator.newPage(
                                   context,
-                                  page: const AccountSettingsScreen(),
+                                  page: AccountSettingsScreen(
+                                    userId: user.id,
+                                    isStaff: false,
+                                  ),
                                 );
                               },
                             ),
@@ -355,7 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         children: [
                           RichText(
-                            text: const TextSpan(
+                            text: TextSpan(
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -363,7 +367,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 TextSpan(text: "Need Help? please contact "),
                                 TextSpan(
-                                  text: "support@bonding.com",
+                                  text: userDetails?.supportEmail,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500,

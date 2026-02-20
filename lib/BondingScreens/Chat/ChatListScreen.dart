@@ -16,10 +16,7 @@ class UserChatListScreen extends StatefulWidget {
   final bool backPage;
 
   /// ✅ userId removed (avoid passing '' from bottom bar)
-  const UserChatListScreen({
-    super.key,
-    required this.backPage,
-  });
+  const UserChatListScreen({super.key, required this.backPage});
 
   @override
   State<UserChatListScreen> createState() => _UserChatListScreenState();
@@ -52,7 +49,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
     if (userId.trim().isEmpty) return;
 
-    context.read<UserChatListVm>().init(  limit: 12);
+    context.read<UserChatListVm>().init(limit: 12);
   }
 
   String _fmtTime(DateTime? dt) {
@@ -73,9 +70,9 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
     return ChangeNotifierProvider<UserChatListVm>(
       /// ✅ provide vm here (so user list works even if not provided globally)
-      create: (_) => UserChatListVm(
-        repo: ChatRepository(NetworkApiService()),
-      )..init(  limit: 12),
+      create: (_) =>
+          UserChatListVm(repo: ChatRepository(NetworkApiService()))
+            ..init(limit: 12),
       child: Consumer<UserChatListVm>(
         builder: (context, vm, _) {
           final list = vm.chats.where((c) {
@@ -94,7 +91,11 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFF140810), Color(0xFF3A152A), Color(0xFF140810)],
+                  colors: [
+                    Color(0xFF140810),
+                    Color(0xFF3A152A),
+                    Color(0xFF140810),
+                  ],
                 ),
               ),
               child: SafeArea(
@@ -124,7 +125,8 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                             const Spacer(),
                             _iconBtn(
                               icon: Icons.search,
-                              onTap: () => setState(() => isSearchActive = true),
+                              onTap: () =>
+                                  setState(() => isSearchActive = true),
                             ),
                           ] else ...[
                             Expanded(child: _searchBox()),
@@ -170,12 +172,16 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                       child: Builder(
                         builder: (_) {
                           if (vm.loading && vm.chats.isEmpty) {
-                            return const _CenterLoader(text: "Loading chats...");
+                            return const _CenterLoader(
+                              text: "Loading chats...",
+                            );
                           }
 
                           if (!vm.loading && list.isEmpty) {
                             return _EmptyState(
-                              title: q.isNotEmpty ? "No results" : "No chats yet",
+                              title: q.isNotEmpty
+                                  ? "No results"
+                                  : "No chats yet",
                               subTitle: q.isNotEmpty
                                   ? "Try another name."
                                   : "No staff messages yet.",
@@ -196,9 +202,9 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                 if (i == 0) {
                                   return vm.loading
                                       ? const Padding(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    child: _TopSmallLoader(),
-                                  )
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: _TopSmallLoader(),
+                                        )
                                       : const SizedBox(height: 2);
                                 }
 
@@ -206,7 +212,11 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                                 final staffName = c.staff?.name ?? "Staff";
                                 final staffId = (c.staffId ?? "").toString();
-                                final staffImage = (c.staff?.image ?? "").toString();
+                                final isBlocked = (c.isBlocked ?? false);
+                                final userId =
+                                    userVM.currentUser?.id?.toString() ?? "";
+                                final staffImage = (c.staff?.image ?? "")
+                                    .toString();
 
                                 return _ChatTile(
                                   name: staffName,
@@ -214,14 +224,18 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                   timeText: _fmtTime(c.lastMessageAt),
                                   unreadCount: c.unreadCount ?? 0,
                                   imageUrl: staffImage,
-                                  onTap: () {
+                                  onTap: () async {
                                     final uId = userId.trim();
                                     final sId = staffId.trim();
 
                                     if (!_isMongoId(uId) || !_isMongoId(sId)) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
-                                          content: Text("Invalid IDs user=$uId staff=$sId"),
+                                          content: Text(
+                                            "Invalid IDs user=$uId staff=$sId",
+                                          ),
                                         ),
                                       );
                                       return;
@@ -229,25 +243,34 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                                     vm.clearUnread(sId); // ✅ staffId key
 
-                                    Navigator.push(
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => ChangeNotifierProvider(
-                                          create: (_) => ChatProviderVm(
-                                            repo: ChatRepository(NetworkApiService()),
-                                          )..initChat(
-                                            isStaff: false,
-                                            staffId: sId,
-                                            userId: uId,
-                                          ),
+                                          create: (_) =>
+                                              ChatProviderVm(
+                                                repo: ChatRepository(
+                                                  NetworkApiService(),
+                                                ),
+                                              )..initChat(
+                                                isStaff: false,
+                                                staffId: sId,
+                                                userId: uId,
+                                              ),
                                           child: ChatDetailScreen(
+                                            staffImage: staffImage,
+
                                             staffId: sId,
+                                            isBlocked: isBlocked,
                                             staffName: staffName,
                                             userId: uId,
                                           ),
                                         ),
                                       ),
                                     );
+                                    if (result == true) {
+                                      vm.fetch(reset: true); // 🔥 REFRESH LIST
+                                    }
                                   },
                                 );
                               },
@@ -279,7 +302,10 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
             gradient: const LinearGradient(
               colors: [Color(0xFF282223), Color(0xFF23121a)],
             ),
-            border: Border.all(color: Colors.white.withOpacity(0.16), width: 0.8),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.16),
+              width: 0.8,
+            ),
           ),
           child: TextField(
             controller: _searchCtrl,
@@ -289,17 +315,26 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
               hintText: "Search by name",
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
               border: InputBorder.none,
-              prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.8)),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.white.withOpacity(0.8),
+              ),
               suffixIcon: q.isEmpty
                   ? null
                   : GestureDetector(
-                onTap: () => setState(() {
-                  q = "";
-                  _searchCtrl.clear();
-                }),
-                child: Icon(Icons.clear, color: Colors.white.withOpacity(0.7)),
+                      onTap: () => setState(() {
+                        q = "";
+                        _searchCtrl.clear();
+                      }),
+                      child: Icon(
+                        Icons.clear,
+                        color: Colors.white.withOpacity(0.7),
+                      ),
+                    ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 10,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             ),
           ),
         ),
@@ -357,12 +392,18 @@ class _CenterLoader extends StatelessWidget {
             const SizedBox(
               width: 18,
               height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 12),
             Text(
               text,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -407,8 +448,11 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.chat_bubble_outline_rounded,
-                size: 80, color: Colors.white.withOpacity(0.22)),
+            Icon(
+              Icons.chat_bubble_outline_rounded,
+              size: 80,
+              color: Colors.white.withOpacity(0.22),
+            ),
             const SizedBox(height: 14),
             Text(
               title,
@@ -422,7 +466,10 @@ class _EmptyState extends StatelessWidget {
             Text(
               subTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.55),
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -464,7 +511,9 @@ class _ErrorBanner extends StatelessWidget {
               foregroundColor: Colors.white,
               backgroundColor: Colors.redAccent.withOpacity(0.18),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: const Text("Retry"),
           ),
@@ -511,11 +560,17 @@ class _ChatTile extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: Colors.white.withOpacity(0.10),
-              backgroundImage: imageUrl.trim().isNotEmpty ? NetworkImage(imageUrl) : null,
+              backgroundImage: imageUrl.trim().isNotEmpty
+                  ? NetworkImage(imageUrl)
+                  : null,
               child: imageUrl.trim().isEmpty
-                  ? Text(first,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold))
+                  ? Text(
+                      first,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
                   : null,
             ),
             const SizedBox(width: 12),
@@ -553,12 +608,18 @@ class _ChatTile extends StatelessWidget {
                 if (timeText.isNotEmpty)
                   Text(
                     timeText,
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
                   ),
                 const SizedBox(height: 8),
                 if (unreadCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
                       borderRadius: BorderRadius.circular(20),

@@ -4,12 +4,15 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart'; 
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart'; // For navigation
 
 class DeleteAccountScreen extends StatelessWidget {
-  const DeleteAccountScreen({super.key});
+  final bool isStaff;
+  const DeleteAccountScreen({super.key, required this.isStaff});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF100a0a), // Same background as ProfileScreen
+      backgroundColor: const Color(
+        0xFF100a0a,
+      ), // Same background as ProfileScreen
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -23,11 +26,7 @@ class DeleteAccountScreen extends StatelessWidget {
               color: const Color(0xFF35272d),
               borderRadius: BorderRadius.circular(40),
             ),
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-              size: 20,
-            ),
+            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
           ),
         ),
         title: const Text(
@@ -72,7 +71,10 @@ class DeleteAccountScreen extends StatelessWidget {
             // Continue Button
             GestureDetector(
               onTap: () {
-bondNavigator.newPage(context, page: DeleteReasonScreen());
+                bondNavigator.newPage(
+                  context,
+                  page: DeleteReasonScreen(isStaff: isStaff),
+                );
               },
               child: Container(
                 height: 45,
@@ -80,10 +82,7 @@ bondNavigator.newPage(context, page: DeleteReasonScreen());
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF8d51d2),
-                      Color(0xFFf8655f),
-                    ],
+                    colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
                   ),
                 ),
                 alignment: Alignment.center,
@@ -103,7 +102,7 @@ bondNavigator.newPage(context, page: DeleteReasonScreen());
             // Go back button
             GestureDetector(
               onTap: () {
-bondNavigator.backPage(context);
+                bondNavigator.backPage(context);
               },
               child: Container(
                 height: 45,
@@ -119,22 +118,24 @@ bondNavigator.backPage(context);
                   ),
                 ),
                 alignment: Alignment.center,
-                child:  ShaderMask(
+                child: ShaderMask(
                   shaderCallback: (Rect bounds) {
                     return const LinearGradient(
-                      colors: [Color(0xFF9D4EDD), Color(0xFFFF5A5F)], // Same gradient as Continue button
+                      colors: [
+                        Color(0xFF9D4EDD),
+                        Color(0xFFFF5A5F),
+                      ], // Same gradient as Continue button
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ).createShader(bounds);
                   },
-                  child:  AppText(
+                  child: AppText(
                     "Go back",
 
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      // Important: Use white as base color so gradient applies properly
-                      color: Colors.white,
-
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    // Important: Use white as base color so gradient applies properly
+                    color: Colors.white,
                   ),
                 ),
               ),

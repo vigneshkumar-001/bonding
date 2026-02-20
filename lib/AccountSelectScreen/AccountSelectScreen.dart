@@ -72,9 +72,10 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                 children: [
                   // User Card
                   _buildAccountCard(
+                    height: 120,
                     imagePath:
-                        "assets/Images/user.png", // Replace with your actual asset
-                    label: "User",
+                        "assets/Images/men.png",
+                    label: "men ",
                     isSelected: selectedAccount == 1,
                     onTap: () {
                       setState(() {
@@ -87,9 +88,10 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
 
                   // Staff Card
                   _buildAccountCard(
+                    height: 120,
                     imagePath:
-                        "assets/Images/staff.png", // Replace with your actual asset
-                    label: "Staff",
+                        "assets/Images/women.png", // Replace with your actual asset
+                    label: "Women",
                     isSelected: selectedAccount == 2,
                     onTap: () {
                       setState(() {
@@ -164,12 +166,14 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
   Widget _buildAccountCard({
     required String imagePath,
     required String label,
+    required double height,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -177,11 +181,12 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
             width: 1,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [Image.asset(imagePath, height: 120), AppText(label)],
-          ),
+        child: Column(
+          children: [
+            Image.asset(imagePath, height: height),
+            SizedBox(height: 7),
+            AppText(label),
+          ],
         ),
       ),
     );

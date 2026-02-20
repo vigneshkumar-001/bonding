@@ -8,6 +8,7 @@ import 'package:bonding_app/BondingScreens/LoginScreens/InterestLanguage/Interes
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/InterestScreen.dart';
 import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/Socket/socket_service.dart';
 import 'package:bonding_app/StaffScreenScreens/LiveSeflieVerificationScreen/LiveVerificationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
@@ -34,7 +35,7 @@ class _SplashscreenState extends State<Splashscreen>
     super.initState();
     _checkLoginAndStatus();
   }
-
+  final socketService = SocketService();
   Future<void> _checkLoginAndStatus() async {
     // Show splash for a moment (branding/animation)
     await Future.delayed(const Duration(seconds: 2));
@@ -60,6 +61,7 @@ class _SplashscreenState extends State<Splashscreen>
     await Future.wait([
       userVM.fetchUserDetails(),
       staffVM.fetchStaffSingleData(),
+      socketService.connectStaff(staffVM.currentStaff?.memberID?? ''),
     ]);
 
     if (!mounted) return;

@@ -162,6 +162,7 @@ class ChatProviderVm extends ChangeNotifier {
     // send to backend
     _socket.sendMessage(staffId: _staffId!, userId: _userId!, message: msg);
     debugPrint("📡 SEND(socket emitted): $msg");
+
   }
 
   void retrySend(ChatMessageModel m) {
