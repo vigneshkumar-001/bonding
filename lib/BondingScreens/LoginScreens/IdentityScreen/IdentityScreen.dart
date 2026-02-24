@@ -29,8 +29,10 @@ class _IdentityScreenState extends State<IdentityScreen> {
     super.dispose();
   }
 
-  bool _isValidName(String name) => name.trim().isNotEmpty && name.trim().length >= 2;
-  bool _isValidBio(String bio) => bio.trim().isNotEmpty && bio.trim().length >= 10;
+  bool _isValidName(String name) =>
+      name.trim().isNotEmpty && name.trim().length >= 2;
+  bool _isValidBio(String bio) =>
+      bio.trim().isNotEmpty && bio.trim().length >= 10;
   bool _isValidDob(String dob) => dob.trim().isNotEmpty;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -49,7 +51,9 @@ class _IdentityScreenState extends State<IdentityScreen> {
               onSurface: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF6A6A)),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFFF6A6A),
+              ),
             ),
           ),
           child: child!,
@@ -58,7 +62,8 @@ class _IdentityScreenState extends State<IdentityScreen> {
     );
 
     if (pickedDate != null && mounted) {
-      String formatted = "${pickedDate.day.toString().padLeft(2, '0')}/"
+      String formatted =
+          "${pickedDate.day.toString().padLeft(2, '0')}/"
           "${pickedDate.month.toString().padLeft(2, '0')}/"
           "${pickedDate.year}";
       dobController.text = formatted;
@@ -100,7 +105,10 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       children: [
                         GestureDetector(
                           onTap: () => bondNavigator.backPage(context),
-                          child: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                          child: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         AppText(
@@ -120,26 +128,48 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       maxLines: 2,
                     ),
 
-                    const SizedBox(height: 24),
-
+                    // const SizedBox(height: 24),
+                    //
+                    // AppText(
+                    //   "I am a:",
+                    //   color: Colors.white,
+                    //   fontSize: 15,
+                    //   fontWeight: FontWeight.w600,
+                    // ),
+                    //
+                    // const SizedBox(height: 10),
+                    //
+                    // Row(
+                    //   children: [
+                    //     _genderButton("Male", isMale, () => setState(() => isMale = true)),
+                    //     const SizedBox(width: 12),
+                    //     _genderButton("Female", !isMale, () => setState(() => isMale = false)),
+                    //   ],
+                    // ),
+                    const SizedBox(height: 30),
                     AppText(
-                      "I am a:",
+                      "Name:",
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
-
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        _genderButton("Male", isMale, () => setState(() => isMale = true)),
-                        const SizedBox(width: 12),
-                        _genderButton("Female", !isMale, () => setState(() => isMale = false)),
-                      ],
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: nameController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: "Enter your name",
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: const Color(0xFF231d1d),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     AppText(
                       "Birthday:",
@@ -175,45 +205,22 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       ),
                     ),
 
-                    if (vm.bioError != null) ...[
-                      const SizedBox(height: 16),
-                      Center(
-                        child: Text(
-                          vm.bioError!,
-                          style: const TextStyle(color: Colors.redAccent, fontSize: 14),
-                        ),
-                      ),
-                    ],
-
                     const SizedBox(height: 20),
 
-                    AppText("Name:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: nameController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: "Enter your name",
-                        hintStyle: const TextStyle(color: Colors.white70),
-                        filled: true,
-                        fillColor: const Color(0xFF231d1d),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                    AppText(
+                      "Bio:",
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
-
-                    const SizedBox(height: 20),
-
-                    AppText("Bio:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
                       controller: bioController,
                       maxLines: 4,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Ex: A coffee lover who enjoys late-night conversations.",
+                        hintText:
+                            "Ex: A coffee lover who enjoys late-night conversations.",
                         hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
@@ -225,71 +232,98 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     ),
 
                     const SizedBox(height: 30),
-
+                    if (vm.bioError != null) ...[
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Text(
+                          vm.bioError!,
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                     GestureDetector(
                       onTap: vm.isUpdatingBio
                           ? null
                           : () async {
-                        final name = nameController.text.trim();
-                        final bio = bioController.text.trim();
-                        final dob = dobController.text.trim();
-                        final gender = isMale ? "Male" : "Female";
+                              final name = nameController.text.trim();
+                              final bio = bioController.text.trim();
+                              final dob = dobController.text.trim();
+                              final gender = isMale ? "Male" : "Female";
 
-                        if (!_isValidDob(dob)) {
-                          Utils.snackBarErrorMessage("Please select your birthday");
-                          return;
-                        }
-                        if (!_isValidName(name)) {
-                          Utils.snackBarErrorMessage("Please enter a valid name");
-                          return;
-                        }
-                        if (!_isValidBio(bio)) {
-                          Utils.snackBarErrorMessage("Please write a short bio (min 10 chars)");
-                          return;
-                        }
+                              if (!_isValidDob(dob)) {
+                                Utils.snackBarErrorMessage(
+                                  "Please select your birthday",
+                                );
+                                return;
+                              }
+                              if (!_isValidName(name)) {
+                                Utils.snackBarErrorMessage(
+                                  "Please enter a valid name",
+                                );
+                                return;
+                              }
+                              if (!_isValidBio(bio)) {
+                                Utils.snackBarErrorMessage(
+                                  "Please write a short bio (min 10 chars)",
+                                );
+                                return;
+                              }
 
-                        final success = await vm.updateBioData(
-                          name: name,
-                          gender: gender,
-                          dob: dob,
-                          bio: bio,
-                        );
+                              final success = await vm.updateBioData(
+                                name: name,
+                                gender: '',
+                                dob: dob,
+                                bio: bio,
+                              );
 
-                        if (success) {
-                          bondNavigator.newPageRemoveUntil(
-                            context,
-                            page: const InterestScreen(),
-                          );
-                        } else {
-                          Utils.snackBarErrorMessage("Failed to update profile. Try again.");
-                        }
-                      },
+                              if (success) {
+                                bondNavigator.newPageRemoveUntil(
+                                  context,
+                                  page: const InterestScreen(),
+                                );
+                              } else {
+                                Utils.snackBarErrorMessage(
+                                  "Failed to update profile. Try again.",
+                                );
+                              }
+                            },
                       child: Container(
                         height: 52,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           gradient: vm.isUpdatingBio
-                              ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
+                              ? const LinearGradient(
+                                  colors: [Colors.grey, Colors.blueGrey],
+                                )
                               : const LinearGradient(
-                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                          ),
+                                  colors: [
+                                    Color(0xFFB86AF6),
+                                    Color(0xFFFF6A6A),
+                                  ],
+                                ),
                         ),
                         child: Center(
                           child: vm.isUpdatingBio
                               ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                          )
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
                               : const Text(
-                            "Continue  →",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                                  "Continue  →",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -314,7 +348,9 @@ class _IdentityScreenState extends State<IdentityScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             gradient: isActive
-                ? const LinearGradient(colors: [Color(0xFF8f51d1), Color(0xFFc350a9)])
+                ? const LinearGradient(
+                    colors: [Color(0xFF8f51d1), Color(0xFFc350a9)],
+                  )
                 : null,
             color: isActive ? null : const Color(0xFF5a344b),
           ),

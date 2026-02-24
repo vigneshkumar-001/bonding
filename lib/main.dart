@@ -28,7 +28,6 @@ import 'package:bonding_app/BondingScreens/SupportScreen/ViewModel/ticket_messag
 
 import 'package:bonding_app/BondingScreens/PrivacyPolicy/ViewModel/privacy_policyVM.dart';
 
-import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:bonding_app/BondingScreens/Transactions/ViewModel/TransactionHistoryVM.dart';
 
 import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/Repository/PaymentRepo.dart';
@@ -44,13 +43,21 @@ import 'package:provider/single_child_widget.dart';
 
 import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
-import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+const int _zegoAppId = 725765612;
+const String _zegoAppSign =
+    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (_zegoAppId == 0 || _zegoAppSign.isEmpty) {
+    throw StateError(
+      'Missing ZEGO config. Provide --dart-define=ZEGO_APP_ID and --dart-define=ZEGO_APP_SIGN.',
+    );
+  }
 
   ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
 
@@ -61,8 +68,8 @@ void main() {
   //   appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
   // );
   ZIMKit().init(
-    appID: 1327852448,
-    appSign: "0879d8b8ca962db7ba26447774981478100de323dc760dfdf755dd2b0d0607e3",
+    appID: _zegoAppId,
+    appSign: _zegoAppSign,
   );
 
   runApp(const MyApp());
@@ -90,6 +97,8 @@ class MyApp extends StatelessWidget {
 
 List<SingleChildWidget> getAllProviders() {
   return [
+    Provider<NetworkApiService>(create: (_) => NetworkApiService()),
+
     // ---------------- User Login ----------------
     Provider<AuthRepository>(create: (_) => AuthRepository()),
     ChangeNotifierProvider<LoginViewModel>(
@@ -120,12 +129,19 @@ List<SingleChildWidget> getAllProviders() {
       create: (_) => TicketHistoryVM(SettingsRepository()),
     ),
     ChangeNotifierProvider(
-      create: (_) => BlockUserVM(repo: ChatRepository(NetworkApiService())),
+      create: (context) => BlockUserVM(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
     ChangeNotifierProvider(
-      create: (_) => DeleteAccountReasonsVM(repo: ChatRepository(NetworkApiService())),
-    ),  ChangeNotifierProvider(
-      create: (_) => DeleteAccountVM(repo: ChatRepository(NetworkApiService())),
+      create: (context) => DeleteAccountReasonsVM(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => DeleteAccountVM(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
     ChangeNotifierProvider(
       create: (_) => TicketMessageVM(SettingsRepository()),
@@ -137,23 +153,29 @@ List<SingleChildWidget> getAllProviders() {
 
     // ---------------- Staff Chat List (Socket) ----------------
     ChangeNotifierProvider(
-      create: (_) =>
-          StaffChatListVm(repo: StaffChatRepository(NetworkApiService())),
+      create: (context) => StaffChatListVm(
+        repo: StaffChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
     ChangeNotifierProvider(
-      create: (_) => UserChatListVm(repo: ChatRepository(NetworkApiService())),
+      create: (context) => UserChatListVm(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
     ChangeNotifierProvider(
-      create: (_) =>
-          BlockedUsersListVm(repo: ChatRepository(NetworkApiService())),
+      create: (context) => BlockedUsersListVm(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
     ChangeNotifierProvider(
-      create: (_) => UnblockUserVM(repo: ChatRepository(NetworkApiService())),
+      create: (context) => UnblockUserVM(
+        repo: ChatRepository(context.read<NetworkApiService>()),
+      ),
     ),
 
     // ---------------- User Home ----------------
     Provider<UserRepository>(
-      create: (_) => UserRepository(NetworkApiService()),
+      create: (context) => UserRepository(context.read<NetworkApiService>()),
     ),
 
     ChangeNotifierProvider<CallController>(
@@ -169,7 +191,7 @@ List<SingleChildWidget> getAllProviders() {
     ),
     // ---------------- Staff Flow ----------------
     Provider<StaffRepository>(
-      create: (_) => StaffRepository(NetworkApiService()),
+      create: (context) => StaffRepository(context.read<NetworkApiService>()),
     ),
     ChangeNotifierProvider<StaffViewModel>(
       create: (context) => StaffViewModel(context.read<StaffRepository>()),

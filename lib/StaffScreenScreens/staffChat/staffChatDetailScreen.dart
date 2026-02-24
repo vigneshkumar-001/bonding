@@ -89,7 +89,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         _beforePixels = _scroll.position.pixels;
         _maintainPosAfterLoadMore = true;
 
-        vm.loadHistory(reset: false, isStaff: true, userId: widget.userId);
+        vm.loadHistory(reset: false, isStaff: true);
       }
     }
   }
@@ -675,11 +675,8 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                             padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                             child: _ErrorBanner(
                               message: _lastErrorShown!,
-                              onRetry: () => vm.loadHistory(
-                                reset: true,
-                                isStaff: true,
-                                userId: widget.userId,
-                              ),
+                              onRetry: () =>
+                                  vm.loadHistory(reset: true, isStaff: true),
                               onClose: () =>
                                   setState(() => _lastErrorShown = null),
                             ),
@@ -1103,7 +1100,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         _beforePixels = _scroll.position.pixels;
         _maintainPosAfterLoadMore = true;
 
-        vm.loadHistory(reset: false, isStaff: true, userId: widget.userId);
+        vm.loadHistory(reset: false, isStaff: true);
       }
     }
   }
@@ -1495,11 +1492,8 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                             padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                             child: _ErrorBanner(
                               message: _lastErrorShown!,
-                              onRetry: () => vm.loadHistory(
-                                reset: true,
-                                isStaff: true,
-                                userId: widget.userId,
-                              ),
+                              onRetry: () =>
+                                  vm.loadHistory(reset: true, isStaff: true),
                               onClose: () =>
                                   setState(() => _lastErrorShown = null),
                             ),

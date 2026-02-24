@@ -31,6 +31,10 @@ import 'package:zego_zimkit/zego_zimkit.dart';
 
 import 'package:logger/logger.dart';
 
+const int _zegoAppId = 725765612;
+const String _zegoAppSign =
+    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -205,14 +209,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _zegoInitializing = true;
       logI("ZEGO_INIT", "init start -> user=${user.memberID}");
 
-      await ZegoUIKitPrebuiltCallInvitationService().init(
-        plugins: [plugin],
-        // appID: 467997506,
-        appID: 1327852448,
-        appSign: "0879d8b8ca962db7ba26447774981478100de323dc760dfdf755dd2b0d0607e3",
-            // "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
-        userID: user.memberID.trim(),
-        userName: (user.name ?? "User").trim(),
+        await ZegoUIKitPrebuiltCallInvitationService().init(
+          plugins: [plugin],
+          appID: _zegoAppId,
+          appSign: _zegoAppSign,
+          userID: user.memberID.trim(),
+          userName: (user.name ?? "User").trim(),
         notificationConfig: ZegoCallInvitationNotificationConfig(
           androidNotificationConfig: ZegoAndroidNotificationConfig(
             channelID: "ZegoUIKit",
@@ -478,6 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _callLimitTimer?.cancel();
     _inviteTimeoutTimer?.cancel();
     _periodicCheckTimer?.cancel();
+    // socketService.removeStaffListListener();
 
     if (_zegoInitialized) {
       ZegoUIKitPrebuiltCallInvitationService().uninit();

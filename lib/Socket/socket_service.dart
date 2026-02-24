@@ -160,7 +160,12 @@ class SocketService {
   }
 
   void listenStaffList(Function(dynamic) onUpdate) {
+    _socket?.off("get_staff_list");
     _socket?.on("get_staff_list", (data) => onUpdate(data));
+  }
+
+  void removeStaffListListener() {
+    _socket?.off("get_staff_list");
   }
 
   // ============================================================

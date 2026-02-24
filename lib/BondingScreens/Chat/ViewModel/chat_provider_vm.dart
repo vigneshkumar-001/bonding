@@ -52,7 +52,7 @@ class ChatProviderVm extends ChangeNotifier {
 
     // ✅ if already registered, join immediately
     if (_socket.isConnected) {
-      _socket.joinChat(staffId: _staffId!, userId: _userId!);
+      _socket.joinChatSafe(staffId: _staffId!, userId: _userId!);
     }
 
     if (!_listenersAttached) {
@@ -200,7 +200,7 @@ class ChatProviderVm extends ChangeNotifier {
     _subRegistered ??= _socket.registeredUserStream.listen((_) {
       if (_staffId == null || _userId == null) return;
       _joined = false;
-      _socket.joinChat(staffId: _staffId!, userId: _userId!);
+      _socket.joinChatSafe(staffId: _staffId!, userId: _userId!);
     });
 
     _subJoined ??= _socket.chatJoinedStream.listen((data) {

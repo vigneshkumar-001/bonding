@@ -61,19 +61,19 @@ class StaffChatProviderVm extends ChangeNotifier {
     }
 
     // 4) preload history (API)
-    await loadHistory(reset: true,isStaff: isStaff,userId:userId );
+    await loadHistory(reset: true, isStaff: isStaff);
 
     // 5) join chat room
     if (_socket.isConnected && _staffMongoId != null && _userId != null) {
       _joined = false;
-      _socket.joinChat(staffId: _staffMongoId!, userId: _userId!);
+      _socket.joinChatSafe(staffId: _staffMongoId!, userId: _userId!);
     }
   }
 
   // ============================
   // ✅ API: Load history (same API)
   // ============================
-  Future<void> loadHistory({bool reset = false,required bool isStaff,required String userId}) async {
+  Future<void> loadHistory({bool reset = false, required bool isStaff}) async {
     if (_staffMongoId == null) return;
     if (loading || loadingMore) return;
 
@@ -93,7 +93,7 @@ class StaffChatProviderVm extends ChangeNotifier {
     try {
       final jsonBody = await repo.getChatHistory(
         isStaff: isStaff,
-        staffId: userId,
+        staffId: _staffMongoId!,
         page: page,
         limit: limit,
       );
@@ -210,7 +210,7 @@ class StaffChatProviderVm extends ChangeNotifier {
     _subRegistered ??= _socket.registeredStaffStream.listen((_) {
       if (_staffMongoId == null || _userId == null) return;
       _joined = false;
-      _socket.joinChat(staffId: _staffMongoId!, userId: _userId!);
+      _socket.joinChatSafe(staffId: _staffMongoId!, userId: _userId!);
     });
 
     _subJoined ??= _socket.chatJoinedStream.listen((data) {
