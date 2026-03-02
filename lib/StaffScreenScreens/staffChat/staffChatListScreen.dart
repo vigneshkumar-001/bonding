@@ -37,7 +37,7 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<StaffChatListVm>().connect(
-        baseUrl: "https://bondinig-ca63248fdb11.herokuapp.com",
+        baseUrl: "https://bnd.twoofus.tech",
         staffId: widget.staffId,
       );
     });

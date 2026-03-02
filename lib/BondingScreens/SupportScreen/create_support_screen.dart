@@ -9,6 +9,7 @@ import 'package:bonding_app/Bonding_Utils/ColorHandlers/AppColors.dart';
 import 'package:bonding_app/StaffScreenScreens/SupportScreen/support_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http_parser;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,14 @@ import '../../Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import '../../Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import '../../Reusable_Widgets/BondingNavigator.dart';
 import '../../Reusable_Widgets/Common_AppBar/common_app_bar.dart';
+
+
+
+
+
+import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart' as http_parser;
 
 class CreateSupportScreen extends StatefulWidget {
   final bool isStaff;
@@ -79,15 +88,15 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
       request.headers['Authorization'] = 'Bearer $token';
 
       // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
-      // final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
-      // final extension = mimeType.split('/').last;
-      //
-      // request.files.add(await http.MultipartFile.fromPath(
-      //   'image',
-      //   imageFile.path,
-      //   filename: 'profile.$extension',
-      //   contentType: http_parser.MediaType('image', extension),
-      // ));
+      final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      final extension = mimeType.split('/').last;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'image',
+        imageFile.path,
+        filename: 'profile.$extension',
+        contentType: http_parser.MediaType('image', extension),
+      ));
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);

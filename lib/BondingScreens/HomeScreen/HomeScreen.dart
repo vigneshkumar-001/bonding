@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final staffID = staffVM.staffList.first.memberID;
         logI("SOCKET", "Connecting socket as staff -> $staffID");
 
-        socketService.connectStaff(staffID);
+        // socketService.connectStaff(staffID);
         socketService.listenStaffList((data) {
           staffVM.updateStaffPresence(data);
         });
@@ -1136,7 +1136,10 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (balance < pricePerMin) {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => WalletScreen()));
               Utils.snackBarErrorMessage("Insufficient balance");
+
+
               return;
             }
 

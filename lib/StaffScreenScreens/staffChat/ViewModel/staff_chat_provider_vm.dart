@@ -47,7 +47,7 @@ class StaffChatProviderVm extends ChangeNotifier {
 
     // 1) connect staff socket
     await _socket.connectStaffRegister(
-      baseUrl: "https://bondinig-ca63248fdb11.herokuapp.com",
+      baseUrl: "https://bnd.twoofus.tech",
     );
 
     // 2) wait for registered mongo id (most important)

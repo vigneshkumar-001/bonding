@@ -5,7 +5,8 @@ class ApiEndPoints {
   // final String baseUrl = "https://bondingbackend.onrender.com/api/v1/";
   // final String baseUrl = "http://192.168.0.22:3005/api/v1/";
  // final String baseUrl = "https://qbkqz1b4-3005.inc1.devtunnels.ms/api/v1/";
-  final String baseUrl = "https://bondinig-ca63248fdb11.herokuapp.com/api/v1/";
+ //  final String baseUrl = "https://bondinig-ca63248fdb11.herokuapp.com/api/v1/";
+  final String baseUrl = "https://bnd.twoofus.tech/api/v1/";
 
   // final String profileBaseUrl = "https://predictapi.unitythink.com";
   final String privacyPolicy = "privacy-policy/show";

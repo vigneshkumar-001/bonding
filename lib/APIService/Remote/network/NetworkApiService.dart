@@ -6,6 +6,8 @@ import 'package:bonding_app/APIService/Remote/network/BaseApiService.dart'
 import 'package:bonding_app/BondingScreens/AuthService.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http_parser;
+import 'package:mime/mime.dart';
 // import 'package:prod/APIService/Remote/AppException.dart';
 
 class NetworkApiService extends BaseApiService {
@@ -87,6 +89,66 @@ class NetworkApiService extends BaseApiService {
     Map<String, String>? additionalFields,
   }) async {
     final uri = Uri.parse(baseUrl + endpoint);
+    final request = http.MultipartRequest('POST', uri);
+
+    request.headers.addAll({
+      'Accept': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    });
+    final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+    final extension = mimeType.split('/').last;
+    final multipartFile = await http.MultipartFile.fromPath(
+      fieldName,
+      imageFile.path,
+
+      filename: imageFile.path.split(Platform.pathSeparator).last,
+      contentType: http_parser.MediaType('image', extension),
+    );
+    request.files.add(multipartFile);
+
+    if (additionalFields != null && additionalFields.isNotEmpty) {
+      request.fields.addAll(additionalFields);
+    }
+
+    // ✅ ONE PRINT: what you're sending (URL + body parts)
+    print(
+        'SENDING -> URL: ${request.url}\n'
+            'FIELDS: ${request.fields}\n'
+            'FILES: ${request.files.map((f) => {
+          "field": f.field,
+          "filename": f.filename,
+          "length": f.length,
+        }).toList()}\n'
+    );
+
+    try {
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+
+      // ✅ ONE PRINT: response
+      print(
+          'RESPONSE <- ${response.statusCode}\n'
+              'BODY: ${response.body}\n'
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception("Upload failed - HTTP ${response.statusCode}: ${response.body}");
+      }
+    } on SocketException {
+      throw FetchDataException('No Internet Connection');
+    }
+  }
+/*
+  Future<Map<String, dynamic>> uploadImageMultipart({
+    required String endpoint,
+    required File imageFile,
+    String fieldName = 'image',
+    String? token,
+    Map<String, String>? additionalFields,
+  }) async {
+    final uri = Uri.parse(baseUrl + endpoint);
 
     final request = http.MultipartRequest('POST', uri);
 
@@ -96,21 +158,22 @@ class NetworkApiService extends BaseApiService {
     });
 
     // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
-    // final multipartFile = await http.MultipartFile.fromPath(
-    //   fieldName,
-    //   imageFile.path,
-    //   filename: imageFile.path.split(Platform.pathSeparator).last,
-    // );
-    // request.files.add(multipartFile);
+    final multipartFile = await http.MultipartFile.fromPath(
+      fieldName,
+      imageFile.path,
+      filename: imageFile.path.split(Platform.pathSeparator).last,
+    );
+    request.files.add(multipartFile);
 
     // ❌ TEMP DISABLE: extra fields attach (HIDE form-data)
-    // if (additionalFields != null && additionalFields.isNotEmpty) {
-    //   request.fields.addAll(additionalFields);
-    // }
+      if (additionalFields != null && additionalFields.isNotEmpty) {
+        request.fields.addAll(additionalFields);
+      }
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+      AppLogger.log.i(response);
 
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
@@ -122,9 +185,10 @@ class NetworkApiService extends BaseApiService {
     } on SocketException {
       throw FetchDataException('No Internet Connection');
     } catch (e) {
+      AppLogger.log.e(e);
       rethrow;
     }
-  }
+  }*/
 
   // Future<Map<String, dynamic>> uploadImageMultipart({
   //   required String endpoint,

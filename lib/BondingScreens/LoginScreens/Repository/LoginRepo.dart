@@ -121,8 +121,62 @@ class AuthRepository {
   }
 
   // lib/repositories/auth_repository.dart
-
   Future<UpdateProfileResponse> updateProfileImage(File imageFile) async {
+    try {
+      final token = await AuthService.getToken();
+
+      // ✅ PRINT: what updateProfileImage is passing
+      if (kDebugMode) {
+        final endpoint = ApiEndPoints().updateProfile;
+        final fileName = imageFile.path.split(Platform.pathSeparator).last;
+
+        AppLogger.log.i(
+          'updateProfileImage() -> '
+              'endpoint: $endpoint, '
+              'fieldName: image, '
+              'token: ${token == null ? "null" : "len=${token.length}"}, '
+              'filePath: ${imageFile.path}, '
+              'fileName: $fileName, '
+              'fileSizeBytes: ${imageFile.lengthSync()}',
+        );
+
+        print(
+          'updateProfileImage() ->\n'
+              'endpoint: $endpoint\n'
+              'fieldName: image\n'
+              'token: ${token == null ? "null" : "len=${token.length}"}\n'
+              'filePath: ${imageFile.path}\n'
+              'fileName: $fileName\n'
+              'fileSizeBytes: ${imageFile.lengthSync()}\n',
+        );
+      }
+
+      final response = await _apiService.uploadImageMultipart(
+        endpoint: ApiEndPoints().updateProfile,
+        imageFile: imageFile,
+        fieldName: 'image',
+        token: token,
+      );
+
+      // ✅ PRINT: response
+      if (kDebugMode) {
+        AppLogger.log.i('Update Profile Raw Response: $response');
+        print("Update Profile Raw Response: $response");
+      }
+
+      final updateResp = UpdateProfileResponse.fromJson(response);
+
+      if (updateResp.isSuccess) {
+        return updateResp;
+      } else {
+        throw Exception(updateResp.message);
+      }
+    } catch (e) {
+      print(e);
+      throw Exception("AuthRepository updateProfileImage error: $e");
+    }
+  }
+  /*Future<UpdateProfileResponse> updateProfileImage(File imageFile) async {
     try {
       // Optional: get token
       final token = await AuthService.getToken();
@@ -136,6 +190,7 @@ class AuthRepository {
       );
 
       if (kDebugMode) {
+        AppLogger.log.i('Update Profile Raw Response: $response');
         print("Update Profile Raw Response: $response");
       }
 
@@ -147,9 +202,10 @@ class AuthRepository {
         throw Exception(updateResp.message);
       }
     } catch (e) {
+      print(e);
       throw Exception("AuthRepository updateProfileImage error: $e");
     }
-  }
+  }*/
 
   Future<UpdateProfileResponse> uploadStaffSelfie(File imageFile) async {
     try {

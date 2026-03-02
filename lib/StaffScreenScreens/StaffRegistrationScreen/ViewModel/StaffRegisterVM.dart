@@ -228,7 +228,7 @@ class StaffViewModel extends ChangeNotifier {
 
   String? get staffFetchError => _staffFetchError;
 
-// New method
+
 
   void updateStaffPresence(List<dynamic> socketData) {
     for (var item in socketData) {

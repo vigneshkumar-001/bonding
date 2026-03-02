@@ -96,6 +96,77 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       final uri = Uri.parse('${ApiEndPoints().baseUrl}auth/user/editProfile');
+      final request = http.MultipartRequest('POST', uri);
+
+      // Add auth header
+      request.headers['Authorization'] = 'Bearer $token';
+
+      final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      final extension = mimeType.split('/').last;
+
+      final filePart = await http.MultipartFile.fromPath(
+        'image',
+        imageFile.path,
+        filename: 'profile.$extension',
+        contentType: http_parser.MediaType('image', extension),
+      );
+      request.files.add(filePart);
+
+      // ✅ ONE PRINT: what is being sent
+      print(
+          'SENDING -> URL: ${request.url}\n'
+              'HEADERS: ${{
+            ...request.headers,
+            // don’t leak full token in logs
+            if (request.headers.containsKey("Authorization")) "Authorization": "Bearer ***",
+          }}\n'
+              'FIELDS: ${request.fields}\n'
+              'FILES: ${request.files.map((f) => {
+            "field": f.field,
+            "filename": f.filename,
+            "length": f.length,
+            "contentType": f.contentType?.toString(),
+          }).toList()}\n'
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      // ✅ ONE PRINT: response
+      print(
+          'RESPONSE <- ${response.statusCode}\n'
+              'BODY: ${response.body}\n'
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json['status'] == true && json['data'] != null) {
+          final newImageUrl = json['data']['image'] as String?;
+          if (newImageUrl != null && newImageUrl.isNotEmpty) {
+            return newImageUrl;
+          }
+        }
+      }
+
+      Utils.snackBarErrorMessage(
+        "Request failed: ${response.statusCode} - ${response.body}",
+      );
+      return null;
+    } catch (e) {
+      Utils.snackBarErrorMessage("Request error: $e");
+      return null;
+    }
+  }
+/*  Future<String?> _uploadImage(File imageFile) async {
+    try {
+      final token = await AuthService.getToken() ?? "";
+
+      if (token.isEmpty) {
+        Utils.snackBarErrorMessage("Authentication token not found");
+        return null;
+      }
+
+      final uri = Uri.parse('${ApiEndPoints().baseUrl}auth/user/editProfile');
 
       final request = http.MultipartRequest('POST', uri);
 
@@ -103,15 +174,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       request.headers['Authorization'] = 'Bearer $token';
 
       // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
-      // final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
-      // final extension = mimeType.split('/').last;
-      //
-      // request.files.add(await http.MultipartFile.fromPath(
-      //   'image',
-      //   imageFile.path,
-      //   filename: 'profile.$extension',
-      //   contentType: http_parser.MediaType('image', extension),
-      // ));
+      final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
+      final extension = mimeType.split('/').last;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'image',
+        imageFile.path,
+        filename: 'profile.$extension',
+        contentType: http_parser.MediaType('image', extension),
+      ));
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
@@ -134,60 +205,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Utils.snackBarErrorMessage("Request error: $e");
       return null;
     }
-  }
-
-  //
-  // // Upload image with auth token
-  // Future<String?> _uploadImage(File imageFile) async {
-  //   try {
-  //     final token = await AuthService.getToken() ?? "";
-  //
-  //     if (token.isEmpty) {
-  //       Utils.snackBarErrorMessage("Authentication token not found");
-  //       return null;
-  //     }
-  //
-  //     final uri = Uri.parse('${ApiEndPoints().baseUrl}auth/user/editProfile');
-  //
-  //     var request = http.MultipartRequest('POST', uri);
-  //
-  //     // Add auth header
-  //     request.headers['Authorization'] = 'Bearer $token';
-  //
-  //     final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
-  //     final extension = mimeType.split('/').last;
-  //
-  //     request.files.add(await http.MultipartFile.fromPath(
-  //       'image',
-  //       imageFile.path,
-  //       filename: 'profile.$extension',
-  //       contentType: http_parser.MediaType('image', extension),
-  //     ));
-  //
-  //     final streamedResponse = await request.send();
-  //     final response = await http.Response.fromStream(streamedResponse);
-  //
-  //     if (response.statusCode == 200) {
-  //       final json = jsonDecode(response.body);
-  //       if (json['status'] == true && json['data'] != null) {
-  //         final newImageUrl = json['data']['image'] as String?;
-  //         if (newImageUrl != null && newImageUrl.isNotEmpty) {
-  //           return newImageUrl;
-  //         }
-  //       }
-  //     }
-  //
-  //     Utils.snackBarErrorMessage("Image upload failed: ${response.statusCode} - ${response.body}");
-  //     return null;
-  //   } catch (e) {
-  //     Utils.snackBarErrorMessage("Image upload error: $e");
-  //     print("Upload error: $e");
-  //     return null;
-  //   }
-  // }
-
-  // Update full profile
-  Future<void> _updateProfile() async {
+  }*/
+   Future<void> _updateProfile() async {
     final userVM = context.read<UserViewModel>();
     final user = userVM.currentUser;
 
