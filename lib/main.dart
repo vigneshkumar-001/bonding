@@ -194,12 +194,15 @@ List<SingleChildWidget> getAllProviders() {
       create: (context) => StaffRepository(context.read<NetworkApiService>()),
     ),
     ChangeNotifierProvider<StaffViewModel>(
+      
       create: (context) => StaffViewModel(context.read<StaffRepository>()),
     ),
   ];
+
+
 }
 
-// import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
+// import 'package:bondin.   g_app/APIService/Remote/network/NetworkApiService.dart';
 // import 'package:bonding_app/BondingScreens/HomeScreen/Repo/UserDataRepo.dart';
 // import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 // import 'package:bonding_app/BondingScreens/LoginScreens/Repository/LoginRepo.dart';

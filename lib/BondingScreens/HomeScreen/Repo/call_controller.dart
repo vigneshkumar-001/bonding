@@ -97,10 +97,33 @@ class CallController extends ChangeNotifier {
       if (isVideoCall) Permission.camera,
     ].request();
 
-    if (!statuses[Permission.microphone]!.isGranted ||
-        (isVideoCall && !statuses[Permission.camera]!.isGranted)) {
+    final micGranted = statuses[Permission.microphone]?.isGranted ?? false;
+    final camGranted =
+        !isVideoCall || (statuses[Permission.camera]?.isGranted ?? false);
+
+    if (!micGranted || !camGranted) {
+      final blocked =
+          (statuses[Permission.microphone]?.isPermanentlyDenied ?? false) ||
+              (statuses[Permission.microphone]?.isRestricted ?? false) ||
+              (isVideoCall &&
+                  ((statuses[Permission.camera]?.isPermanentlyDenied ??
+                          false) ||
+                      (statuses[Permission.camera]?.isRestricted ?? false)));
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Permissions required")),
+        SnackBar(
+          content: Text(
+            blocked
+                ? "Microphone/Camera permission is blocked. Open Settings."
+                : "Microphone/Camera permission required",
+          ),
+          action: blocked
+              ? SnackBarAction(
+                  label: "Open Settings",
+                  onPressed: openAppSettings,
+                )
+              : null,
+        ),
       );
       return;
     }

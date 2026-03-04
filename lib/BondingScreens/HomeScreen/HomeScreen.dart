@@ -151,6 +151,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<bool> _ensureCallPermissions({required bool isVideoCall}) async {
+    final permissions = <Permission>[
+      Permission.microphone,
+      if (isVideoCall) Permission.camera,
+    ];
+
+    final statuses = await permissions.request();
+
+    final micGranted = statuses[Permission.microphone]?.isGranted ?? false;
+    final camGranted = !isVideoCall ||
+        (statuses[Permission.camera]?.isGranted ?? false);
+    if (micGranted && camGranted) return true;
+
+    final blocked = (statuses[Permission.microphone]?.isPermanentlyDenied ??
+            false) ||
+        (statuses[Permission.microphone]?.isRestricted ?? false) ||
+        (isVideoCall &&
+            ((statuses[Permission.camera]?.isPermanentlyDenied ?? false) ||
+                (statuses[Permission.camera]?.isRestricted ?? false)));
+
+    if (!mounted) return false;
+
+    if (blocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "Microphone/Camera permission is blocked. Please allow it in Settings.",
+          ),
+          action: SnackBarAction(
+            label: "Open Settings",
+            onPressed: openAppSettings,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Microphone/Camera permission required")),
+      );
+    }
+
+    return false;
+  }
+
   Future<void> _waitForZegoLocalReady() async {
     for (int i = 0; i < 30; i++) {
       final id = _getZegoLocalUserIDSafe();
@@ -1142,16 +1185,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return;
             }
 
-            final statuses = await [
-              Permission.microphone,
-              if (isVideoCall) Permission.camera,
-            ].request();
-
-            if (!statuses[Permission.microphone]!.isGranted ||
-                (isVideoCall && !statuses[Permission.camera]!.isGranted)) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Permissions required")),
-              );
+            if (!await _ensureCallPermissions(isVideoCall: isVideoCall)) {
               return;
             }
 

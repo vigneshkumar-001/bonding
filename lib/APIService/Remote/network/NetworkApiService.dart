@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:bonding_app/APIService/Remote/AppException.dart';
 import 'package:bonding_app/APIService/Remote/network/BaseApiService.dart'
     show BaseApiService;
@@ -10,23 +11,29 @@ import 'package:http/http.dart' as http_parser;
 import 'package:mime/mime.dart';
 // import 'package:prod/APIService/Remote/AppException.dart';
 
+void _debugLog(Object? message) {
+  if (kDebugMode) {
+    debugPrint(message?.toString() ?? 'null');
+  }
+}
+
 class NetworkApiService extends BaseApiService {
   @override
   Future getResponse(String url) async {
-    print("efcdececdecc");
+    _debugLog("efcdececdecc");
     // final String? token = await AuthService.getToken();
     dynamic responseJson;
     Map<String, String> headers = {"Authorization": "Bearer "}; // add token
     try {
-      print("evceadcc");
+      _debugLog("evceadcc");
       final response = await http.get(
         Uri.parse(baseUrl + url),
         headers: headers,
       );
-      print("??>>?>?>?>$response");
+      _debugLog("??>>?>?>?>$response");
       responseJson = returnResponse(response);
-      print("????????$responseJson");
-      print("////////////${baseUrl + url}");
+      _debugLog("????????$responseJson");
+      _debugLog("////////////${baseUrl + url}");
     } on SocketException {
       throw FetchDataException('No Internet Connection');
     }
@@ -34,17 +41,17 @@ class NetworkApiService extends BaseApiService {
   }
 
   Future getResponseV3(String url) async {
-    print("efcdececdecc");
+    _debugLog("efcdececdecc");
 
     dynamic responseJson;
     // add token
     try {
-      print("evceadcc");
+      _debugLog("evceadcc");
       final response = await http.get(Uri.parse(url));
-      print("??>>?>?>?>$response");
+      _debugLog("??>>?>?>?>$response");
       responseJson = returnResponse(response);
-      print("????????$responseJson");
-      print("////////////${url}");
+      _debugLog("????????$responseJson");
+      _debugLog("////////////${url}");
     } on SocketException {
       throw FetchDataException('No Internet Connection');
     }
@@ -59,16 +66,15 @@ class NetworkApiService extends BaseApiService {
       baseUrl + endpoint,
     ).replace(queryParameters: queryParams);
     final token = await AuthService.getToken() ?? "";
-    AppLogger.log.i("========== HTTP REQUEST ==========");
-    AppLogger.log.i("METHOD: GET");
-    AppLogger.log.i("FULL URL: $uri");
-    AppLogger.log.i("ENDPOINT: $endpoint");
-    AppLogger.log.i("QUERY PARAMS: $queryParams");
-    AppLogger.log.i("TOKEN: $token");
-    AppLogger.log.i(
-      "HEADERS: {Authorization: Bearer $token, Accept: application/json}",
-    );
-    AppLogger.log.i("==================================");
+    if (kDebugMode) {
+      AppLogger.log.i("========== HTTP REQUEST ==========");
+      AppLogger.log.i("METHOD: GET");
+      AppLogger.log.i("FULL URL: $uri");
+      AppLogger.log.i("ENDPOINT: $endpoint");
+      AppLogger.log.i("QUERY PARAMS: $queryParams");
+      AppLogger.log.i("TOKEN: len=${token.length}");
+      AppLogger.log.i("==================================");
+    }
     final response = await http.get(
       uri,
       headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
@@ -111,7 +117,7 @@ class NetworkApiService extends BaseApiService {
     }
 
     // ✅ ONE PRINT: what you're sending (URL + body parts)
-    print(
+    _debugLog(
         'SENDING -> URL: ${request.url}\n'
             'FIELDS: ${request.fields}\n'
             'FILES: ${request.files.map((f) => {
@@ -126,7 +132,7 @@ class NetworkApiService extends BaseApiService {
       final response = await http.Response.fromStream(streamed);
 
       // ✅ ONE PRINT: response
-      print(
+      _debugLog(
           'RESPONSE <- ${response.statusCode}\n'
               'BODY: ${response.body}\n'
       );
@@ -222,22 +228,22 @@ class NetworkApiService extends BaseApiService {
   //   }
   //
   //   // ─── Debug print request summary ───────────────────────────────
-  //   print('\n' + '=' * 60);
-  //   print('📤 MULTIPART UPLOAD REQUEST');
-  //   print('📤 URL: $uri');
-  //   print('📤 Headers: ${request.headers}');
-  //   print('📤 Fields: ${request.fields}');
-  //   print('📤 Files: ${request.files.map((f) => f.filename).toList()}');
-  //   print('-' * 60);
+  //   _debugLog('\n' + '=' * 60);
+  //   _debugLog('📤 MULTIPART UPLOAD REQUEST');
+  //   _debugLog('📤 URL: $uri');
+  //   _debugLog('📤 Headers: ${request.headers}');
+  //   _debugLog('📤 Fields: ${request.fields}');
+  //   _debugLog('📤 Files: ${request.files.map((f) => f.filename).toList()}');
+  //   _debugLog('-' * 60);
   //
   //   try {
   //     final streamedResponse = await request.send();
   //     final response = await http.Response.fromStream(streamedResponse);
   //
-  //     print('📥 Status Code: ${response.statusCode}');
-  //     print('📥 Response Body:');
-  //     print(response.body);
-  //     print('=' * 60 + '\n');
+  //     _debugLog('📥 Status Code: ${response.statusCode}');
+  //     _debugLog('📥 Response Body:');
+  //     _debugLog(response.body);
+  //     _debugLog('=' * 60 + '\n');
   //
   //     if (response.statusCode == 200) {
   //       try {
@@ -253,7 +259,7 @@ class NetworkApiService extends BaseApiService {
   //   } on SocketException {
   //     throw FetchDataException('No Internet Connection');
   //   } catch (e) {
-  //     print('🔴 UPLOAD ERROR: $e');
+  //     _debugLog('🔴 UPLOAD ERROR: $e');
   //     rethrow;
   //   }
   // }
@@ -275,8 +281,8 @@ class NetworkApiService extends BaseApiService {
       },
     );
 
-    print("Status Code: ${response.statusCode}");
-    print("Raw body: ${response.body}");
+    _debugLog("Status Code: ${response.statusCode}");
+    _debugLog("Raw body: ${response.body}");
 
     if (response.statusCode == 200) {
       try {
@@ -285,7 +291,7 @@ class NetworkApiService extends BaseApiService {
 
         // If it's a String, decode again
         if (firstDecode is String) {
-          print("Double-encoded JSON detected, decoding again...");
+          _debugLog("Double-encoded JSON detected, decoding again...");
           firstDecode = json.decode(firstDecode);
         }
 
@@ -296,7 +302,7 @@ class NetworkApiService extends BaseApiService {
           throw Exception("Unexpected response format");
         }
       } catch (e) {
-        print("JSON decode error: $e");
+        _debugLog("JSON decode error: $e");
         rethrow;
       }
     } else {
@@ -394,21 +400,21 @@ class NetworkApiService extends BaseApiService {
 
   @override
   Future postResponse(String url, {Map<String, dynamic>? body}) async {
-    print("$url");
+    _debugLog("$url");
     dynamic responseJson;
     var data = json.encode(body);
     var headers = {
       "content-type": "application/json",
       "Accept": "application/json",
     };
-    print(data);
+    _debugLog(data);
     try {
       await http
           .post(Uri.parse(baseUrl + url), headers: headers, body: data)
           .then((value) {
             responseJson = jsonDecode(value.body);
-            print("${baseUrl + url}");
-            print("///attend$responseJson");
+            _debugLog("${baseUrl + url}");
+            _debugLog("///attend$responseJson");
           });
     } on SocketException {
       throw FetchDataException('No Internet Connection');
@@ -423,7 +429,7 @@ class NetworkApiService extends BaseApiService {
     // final token = await UserPreferences().getToken()??"";
     // final String? token = await AuthService.getToken();
 
-    // print("$token");
+    // _debugLog("$token");
     final token = await AuthService.getToken() ?? "";
     dynamic responseJson;
     var data = json.encode(body);
@@ -434,22 +440,22 @@ class NetworkApiService extends BaseApiService {
     };
 
     // PRINT REQUEST DETAILS
-    print('\n' + '=' * 60);
-    print('📤 POST REQUEST V2');
-    print('📤 URL: ${baseUrl + url}');
-    print('📤 Headers: ${jsonEncode(headers)}');
-    print('📤 Body:');
+    _debugLog('\n' + '=' * 60);
+    _debugLog('📤 POST REQUEST V2');
+    _debugLog('📤 URL: ${baseUrl + url}');
+    _debugLog('📤 Headers: ${jsonEncode(headers)}');
+    _debugLog('📤 Body:');
     if (body != null) {
       try {
         final encoder = JsonEncoder.withIndent('  ');
-        print(encoder.convert(body));
+        _debugLog(encoder.convert(body));
       } catch (e) {
-        print(body.toString());
+        _debugLog(body.toString());
       }
     } else {
-      print('No body');
+      _debugLog('No body');
     }
-    print('-' * 40);
+    _debugLog('-' * 40);
 
     try {
       final startTime = DateTime.now();
@@ -461,82 +467,82 @@ class NetworkApiService extends BaseApiService {
             final duration = endTime.difference(startTime);
 
             // PRINT RESPONSE DETAILS
-            print('📥 RESPONSE V2');
-            print('📥 Status Code: ${response.statusCode}');
-            print('📥 Response Time: ${duration.inMilliseconds}ms');
-            print('📥 Response Headers: ${response.headers}');
-            print('📥 Response Body:');
+            _debugLog('📥 RESPONSE V2');
+            _debugLog('📥 Status Code: ${response.statusCode}');
+            _debugLog('📥 Response Time: ${duration.inMilliseconds}ms');
+            _debugLog('📥 Response Headers: ${response.headers}');
+            _debugLog('📥 Response Body:');
 
             try {
               responseJson = jsonDecode(response.body);
 
               // Pretty print JSON response
               final encoder = JsonEncoder.withIndent('  ');
-              print(encoder.convert(responseJson));
+              _debugLog(encoder.convert(responseJson));
 
               // Print success/failure summary
-              print('\n📊 RESPONSE SUMMARY:');
+              _debugLog('\n📊 RESPONSE SUMMARY:');
               if (responseJson is Map) {
                 if (responseJson.containsKey('success')) {
-                  print('   Success: ${responseJson['success']}');
+                  _debugLog('   Success: ${responseJson['success']}');
                 }
                 if (responseJson.containsKey('message')) {
-                  print('   Message: ${responseJson['message']}');
+                  _debugLog('   Message: ${responseJson['message']}');
                 }
                 if (responseJson.containsKey('error')) {
-                  print('   Error: ${responseJson['error']}');
+                  _debugLog('   Error: ${responseJson['error']}');
                 }
 
                 // For trade orders, print specific details
                 if (url.contains('orders/buy') || url.contains('orders/sell')) {
-                  print('\n💱 ORDER DETAILS:');
+                  _debugLog('\n💱 ORDER DETAILS:');
                   if (responseJson.containsKey('newOrders') &&
                       responseJson['newOrders'] is List) {
                     final orders = responseJson['newOrders'];
-                    print('   Number of Orders Created: ${orders.length}');
+                    _debugLog('   Number of Orders Created: ${orders.length}');
                     for (var i = 0; i < orders.length; i++) {
                       final order = orders[i];
-                      print('   Order ${i + 1}:');
-                      print('     - ID: ${order['_id'] ?? 'N/A'}');
-                      print('     - Side: ${order['side'] ?? 'N/A'}');
-                      print('     - Action: ${order['action'] ?? 'N/A'}');
-                      print('     - Shares: ${order['shares'] ?? 'N/A'}');
-                      print(
+                      _debugLog('   Order ${i + 1}:');
+                      _debugLog('     - ID: ${order['_id'] ?? 'N/A'}');
+                      _debugLog('     - Side: ${order['side'] ?? 'N/A'}');
+                      _debugLog('     - Action: ${order['action'] ?? 'N/A'}');
+                      _debugLog('     - Shares: ${order['shares'] ?? 'N/A'}');
+                      _debugLog(
                         '     - Price: \$${order['price_per_share'] ?? 'N/A'}',
                       );
-                      print('     - Created: ${order['createdAt'] ?? 'N/A'}');
+                      _debugLog('     - Created: ${order['createdAt'] ?? 'N/A'}');
                     }
                   }
                   if (responseJson.containsKey('totalSpent')) {
-                    print('   Total Spent: \$${responseJson['totalSpent']}');
+                    _debugLog('   Total Spent: \$${responseJson['totalSpent']}');
                   }
                 }
               }
             } catch (e) {
               // If not JSON, print as text
               responseJson = response.body;
-              print(response.body);
+              _debugLog(response.body);
             }
 
-            print('=' * 60 + '\n');
+            _debugLog('=' * 60 + '\n');
           })
           .catchError((error) {
-            print('🔴 POST REQUEST ERROR:');
-            print('🔴 Error: $error');
-            print('🔴 URL: ${baseUrl + url}');
-            print('=' * 60 + '\n');
+            _debugLog('🔴 POST REQUEST ERROR:');
+            _debugLog('🔴 Error: $error');
+            _debugLog('🔴 URL: ${baseUrl + url}');
+            _debugLog('=' * 60 + '\n');
             throw error;
           });
     } on SocketException {
-      print('🔴 NETWORK ERROR: No Internet Connection');
-      print('🔴 URL: ${baseUrl + url}');
-      print('=' * 60 + '\n');
+      _debugLog('🔴 NETWORK ERROR: No Internet Connection');
+      _debugLog('🔴 URL: ${baseUrl + url}');
+      _debugLog('=' * 60 + '\n');
       throw FetchDataException('No Internet Connection');
     } catch (e) {
-      print('🔴 UNEXPECTED ERROR:');
-      print('🔴 Error: $e');
-      print('🔴 URL: ${baseUrl + url}');
-      print('=' * 60 + '\n');
+      _debugLog('🔴 UNEXPECTED ERROR:');
+      _debugLog('🔴 Error: $e');
+      _debugLog('🔴 URL: ${baseUrl + url}');
+      _debugLog('=' * 60 + '\n');
       rethrow;
     }
 
@@ -550,7 +556,7 @@ class NetworkApiService extends BaseApiService {
     final token = await AuthService.getToken() ?? "";
     // final String? token = await AuthService.getToken();
 
-    // print("$token");
+    // _debugLog("$token");
     dynamic responseJson;
     var data = json.encode(body);
     var headers = {
@@ -560,22 +566,22 @@ class NetworkApiService extends BaseApiService {
     };
 
     // PRINT REQUEST DETAILS
-    print('\n' + '=' * 60);
-    print('📤 POST REQUEST V2');
-    print('📤 URL: ${baseUrl + url}');
-    print('📤 Headers: ${jsonEncode(headers)}');
-    print('📤 Body:');
+    _debugLog('\n' + '=' * 60);
+    _debugLog('📤 POST REQUEST V2');
+    _debugLog('📤 URL: ${baseUrl + url}');
+    _debugLog('📤 Headers: ${jsonEncode(headers)}');
+    _debugLog('📤 Body:');
     if (body != null) {
       try {
         final encoder = JsonEncoder.withIndent('  ');
-        print(encoder.convert(body));
+        _debugLog(encoder.convert(body));
       } catch (e) {
-        print(body.toString());
+        _debugLog(body.toString());
       }
     } else {
-      print('No body');
+      _debugLog('No body');
     }
-    print('-' * 40);
+    _debugLog('-' * 40);
 
     try {
       final startTime = DateTime.now();
@@ -587,82 +593,82 @@ class NetworkApiService extends BaseApiService {
             final duration = endTime.difference(startTime);
 
             // PRINT RESPONSE DETAILS
-            print('📥 RESPONSE V2');
-            print('📥 Status Code: ${response.statusCode}');
-            print('📥 Response Time: ${duration.inMilliseconds}ms');
-            print('📥 Response Headers: ${response.headers}');
-            print('📥 Response Body:');
+            _debugLog('📥 RESPONSE V2');
+            _debugLog('📥 Status Code: ${response.statusCode}');
+            _debugLog('📥 Response Time: ${duration.inMilliseconds}ms');
+            _debugLog('📥 Response Headers: ${response.headers}');
+            _debugLog('📥 Response Body:');
 
             try {
               responseJson = jsonDecode(response.body);
 
               // Pretty print JSON response
               final encoder = JsonEncoder.withIndent('  ');
-              print(encoder.convert(responseJson));
+              _debugLog(encoder.convert(responseJson));
 
               // Print success/failure summary
-              print('\n📊 RESPONSE SUMMARY:');
+              _debugLog('\n📊 RESPONSE SUMMARY:');
               if (responseJson is Map) {
                 if (responseJson.containsKey('success')) {
-                  print('   Success: ${responseJson['success']}');
+                  _debugLog('   Success: ${responseJson['success']}');
                 }
                 if (responseJson.containsKey('message')) {
-                  print('   Message: ${responseJson['message']}');
+                  _debugLog('   Message: ${responseJson['message']}');
                 }
                 if (responseJson.containsKey('error')) {
-                  print('   Error: ${responseJson['error']}');
+                  _debugLog('   Error: ${responseJson['error']}');
                 }
 
                 // For trade orders, print specific details
                 if (url.contains('orders/buy') || url.contains('orders/sell')) {
-                  print('\n💱 ORDER DETAILS:');
+                  _debugLog('\n💱 ORDER DETAILS:');
                   if (responseJson.containsKey('newOrders') &&
                       responseJson['newOrders'] is List) {
                     final orders = responseJson['newOrders'];
-                    print('   Number of Orders Created: ${orders.length}');
+                    _debugLog('   Number of Orders Created: ${orders.length}');
                     for (var i = 0; i < orders.length; i++) {
                       final order = orders[i];
-                      print('   Order ${i + 1}:');
-                      print('     - ID: ${order['_id'] ?? 'N/A'}');
-                      print('     - Side: ${order['side'] ?? 'N/A'}');
-                      print('     - Action: ${order['action'] ?? 'N/A'}');
-                      print('     - Shares: ${order['shares'] ?? 'N/A'}');
-                      print(
+                      _debugLog('   Order ${i + 1}:');
+                      _debugLog('     - ID: ${order['_id'] ?? 'N/A'}');
+                      _debugLog('     - Side: ${order['side'] ?? 'N/A'}');
+                      _debugLog('     - Action: ${order['action'] ?? 'N/A'}');
+                      _debugLog('     - Shares: ${order['shares'] ?? 'N/A'}');
+                      _debugLog(
                         '     - Price: \$${order['price_per_share'] ?? 'N/A'}',
                       );
-                      print('     - Created: ${order['createdAt'] ?? 'N/A'}');
+                      _debugLog('     - Created: ${order['createdAt'] ?? 'N/A'}');
                     }
                   }
                   if (responseJson.containsKey('totalSpent')) {
-                    print('   Total Spent: \$${responseJson['totalSpent']}');
+                    _debugLog('   Total Spent: \$${responseJson['totalSpent']}');
                   }
                 }
               }
             } catch (e) {
               // If not JSON, print as text
               responseJson = response.body;
-              print(response.body);
+              _debugLog(response.body);
             }
 
-            print('=' * 60 + '\n');
+            _debugLog('=' * 60 + '\n');
           })
           .catchError((error) {
-            print('🔴 POST REQUEST ERROR:');
-            print('🔴 Error: $error');
-            print('🔴 URL: ${baseUrl + url}');
-            print('=' * 60 + '\n');
+            _debugLog('🔴 POST REQUEST ERROR:');
+            _debugLog('🔴 Error: $error');
+            _debugLog('🔴 URL: ${baseUrl + url}');
+            _debugLog('=' * 60 + '\n');
             throw error;
           });
     } on SocketException {
-      print('🔴 NETWORK ERROR: No Internet Connection');
-      print('🔴 URL: ${baseUrl + url}');
-      print('=' * 60 + '\n');
+      _debugLog('🔴 NETWORK ERROR: No Internet Connection');
+      _debugLog('🔴 URL: ${baseUrl + url}');
+      _debugLog('=' * 60 + '\n');
       throw FetchDataException('No Internet Connection');
     } catch (e) {
-      print('🔴 UNEXPECTED ERROR:');
-      print('🔴 Error: $e');
-      print('🔴 URL: ${baseUrl + url}');
-      print('=' * 60 + '\n');
+      _debugLog('🔴 UNEXPECTED ERROR:');
+      _debugLog('🔴 Error: $e');
+      _debugLog('🔴 URL: ${baseUrl + url}');
+      _debugLog('=' * 60 + '\n');
       rethrow;
     }
 
@@ -679,7 +685,7 @@ class NetworkApiService extends BaseApiService {
       headers: {"Content-Type": "application/json", "Authorization": "Bearer "},
       body: json.encode(body),
     );
-    print("${response.body}");
+    _debugLog("${response.body}");
     return json.decode(response.body);
   }
 
@@ -692,7 +698,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(bearPull + url), headers: headers, body: data)
@@ -713,7 +719,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(perpetualURL + url), headers: headers, body: data)
@@ -734,7 +740,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(lanchpad + url), headers: headers, body: data)
@@ -755,7 +761,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(simpleEarn + url), headers: headers, body: data)
@@ -776,7 +782,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(launchpadV2 + url), headers: headers, body: data)
@@ -797,7 +803,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse(baseUrlV2 + url), headers: headers, body: data)
@@ -819,7 +825,7 @@ class NetworkApiService extends BaseApiService {
     String? token,
   }) async {
     final uri = Uri.parse(baseUrl + url);
-    print("$uri");
+    _debugLog("$uri");
     final request = http.MultipartRequest('POST', uri);
 
     // ONLY these headers — DO NOT set content-type!
@@ -840,8 +846,8 @@ class NetworkApiService extends BaseApiService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print("Upload Status: ${streamedResponse.statusCode}");
-      print("Upload Response: ${response.body}");
+      _debugLog("Upload Status: ${streamedResponse.statusCode}");
+      _debugLog("Upload Response: ${response.body}");
 
       if (streamedResponse.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
@@ -862,7 +868,7 @@ class NetworkApiService extends BaseApiService {
   //   var request = http.MultipartRequest('POST', Uri.parse(baseUrl + url));
   //   Map<String, String> data = body!.cast();
   //   //for token
-  //   print(data);
+  //   _debugLog(data);
   //   request.headers.addAll({
   //     "Authorization": "Bearer ${token.$}",
   //     "content-type": "multipart/form-data",
@@ -896,7 +902,7 @@ class NetworkApiService extends BaseApiService {
   //     "content-type": "application/json",
   //     "Accept": "application/json"
   //   };
-  //   print(data);
+  //   _debugLog(data);
   //   try {
   //     await http
   //         .post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
@@ -907,7 +913,7 @@ class NetworkApiService extends BaseApiService {
   //   } on SocketException {
   //     throw FetchDataException('No Internet Connection');
   //   }
-  //   print(responseJson);
+  //   _debugLog(responseJson);
   //   return responseJson;
   // }
 

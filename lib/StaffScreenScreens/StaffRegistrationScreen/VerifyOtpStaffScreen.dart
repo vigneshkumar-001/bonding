@@ -53,9 +53,6 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
 
   @override
   void dispose() {
-    final vm = Provider.of<LoginViewModel>(context, listen: false);
-    vm.removeListener(_handleOtpFill);
-
     _otpController.dispose();
     _focusNode.dispose();
     super.dispose();
