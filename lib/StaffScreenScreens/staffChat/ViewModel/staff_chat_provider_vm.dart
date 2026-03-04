@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bonding_app/APIService/Remote/network/ApiEndPoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
 import 'package:bonding_app/BondingScreens/Chat/Model/chat_message_model.dart';
@@ -46,9 +47,7 @@ class StaffChatProviderVm extends ChangeNotifier {
     _userId = userId;
 
     // 1) connect staff socket
-    await _socket.connectStaffRegister(
-      baseUrl: "https://bnd.twoofus.tech",
-    );
+    await _socket.connectStaffRegister(baseUrl: ApiEndPoints().socketBaseUrl);
 
     // 2) wait for registered mongo id (most important)
     final mongo = await _socket.waitForRegisteredStaffMongoId();
@@ -61,7 +60,7 @@ class StaffChatProviderVm extends ChangeNotifier {
     }
 
     // 4) preload history (API)
-    await loadHistory(reset: true, isStaff: isStaff);
+    await loadHistory(reset: true, isStaff: isStaff,userId: userId);
 
     // 5) join chat room
     if (_socket.isConnected && _staffMongoId != null && _userId != null) {
@@ -73,7 +72,7 @@ class StaffChatProviderVm extends ChangeNotifier {
   // ============================
   // ✅ API: Load history (same API)
   // ============================
-  Future<void> loadHistory({bool reset = false, required bool isStaff}) async {
+  Future<void> loadHistory({bool reset = false, required bool isStaff,required String userId}) async {
     if (_staffMongoId == null) return;
     if (loading || loadingMore) return;
 
@@ -93,7 +92,7 @@ class StaffChatProviderVm extends ChangeNotifier {
     try {
       final jsonBody = await repo.getChatHistory(
         isStaff: isStaff,
-        staffId: _staffMongoId!,
+        staffId: userId,
         page: page,
         limit: limit,
       );
@@ -243,10 +242,12 @@ class StaffChatProviderVm extends ChangeNotifier {
       // ✅ if this is my staff echo -> replace last local sending staff bubble
       final isMine = (msg.senderRole ?? "").toLowerCase() == "staff";
       if (isMine) {
-        final idx = _messages.lastIndexWhere((x) =>
-        x.isLocal == true &&
-            (x.senderRole ?? "").toLowerCase() == "staff" &&
-            (x.message ?? "") == (msg.message ?? ""));
+        final idx = _messages.lastIndexWhere(
+          (x) =>
+              x.isLocal == true &&
+              (x.senderRole ?? "").toLowerCase() == "staff" &&
+              (x.message ?? "") == (msg.message ?? ""),
+        );
 
         if (idx != -1) {
           _messages[idx] = msg.copyWith(

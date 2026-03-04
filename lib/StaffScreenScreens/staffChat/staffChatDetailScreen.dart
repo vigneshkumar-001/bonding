@@ -89,7 +89,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         _beforePixels = _scroll.position.pixels;
         _maintainPosAfterLoadMore = true;
 
-        vm.loadHistory(reset: false, isStaff: true);
+        vm.loadHistory(reset: false, isStaff: true, userId: widget.userId);
       }
     }
   }
@@ -556,14 +556,15 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                         // ),
                         CachedNetworkImage(
                           imageUrl: widget.staffImage,
-                          imageBuilder: (context, imageProvider) => CircleAvatar(
-                            radius: 22,
-                            backgroundImage: imageProvider,
-                          ),
+                          imageBuilder: (context, imageProvider) =>
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundImage: imageProvider,
+                              ),
                           placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                          const Icon(Icons.person, color: Colors.white),
+                              const Icon(Icons.person, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -675,8 +676,11 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                             padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
                             child: _ErrorBanner(
                               message: _lastErrorShown!,
-                              onRetry: () =>
-                                  vm.loadHistory(reset: true, isStaff: true),
+                              onRetry: () => vm.loadHistory(
+                                reset: true,
+                                isStaff: true,
+                                userId: widget.userId,
+                              ),
                               onClose: () =>
                                   setState(() => _lastErrorShown = null),
                             ),

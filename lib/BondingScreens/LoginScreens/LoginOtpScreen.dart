@@ -75,7 +75,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                   children: [
                     const SizedBox(height: 10),
                     SvgPicture.asset(
-                      "assets/Images/bonding.svg",
+                      "assets/Images/bonding.png",
                       height: 35,
                       width: 35,
                     ),

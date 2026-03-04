@@ -209,12 +209,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _zegoInitializing = true;
       logI("ZEGO_INIT", "init start -> user=${user.memberID}");
 
-        await ZegoUIKitPrebuiltCallInvitationService().init(
-          plugins: [plugin],
-          appID: _zegoAppId,
-          appSign: _zegoAppSign,
-          userID: user.memberID.trim(),
-          userName: (user.name ?? "User").trim(),
+      await ZegoUIKitPrebuiltCallInvitationService().init(
+        plugins: [plugin],
+        appID: _zegoAppId,
+        appSign: _zegoAppSign,
+        userID: user.memberID.trim(),
+        userName: (user.name ?? "User").trim(),
         notificationConfig: ZegoCallInvitationNotificationConfig(
           androidNotificationConfig: ZegoAndroidNotificationConfig(
             channelID: "ZegoUIKit",
@@ -521,10 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          "assets/Images/bonding.svg",
-                          height: 32,
-                        ),
+                        Image.asset("assets/Images/bonding.png", height: 32),
                         const Spacer(),
                         GestureDetector(
                           onTap: () => bondNavigator.newPage(
@@ -1136,9 +1133,11 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (balance < pricePerMin) {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => WalletScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => WalletScreen()),
+              );
               Utils.snackBarErrorMessage("Insufficient balance");
-
 
               return;
             }

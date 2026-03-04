@@ -219,7 +219,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35),
+                    Image.asset("assets/Images/bonding.png", height: 35),
                     const SizedBox(height: 30),
 
                     Center(

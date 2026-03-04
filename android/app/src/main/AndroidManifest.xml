@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:label="bonding_app"
+        android:label="Twoofus"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

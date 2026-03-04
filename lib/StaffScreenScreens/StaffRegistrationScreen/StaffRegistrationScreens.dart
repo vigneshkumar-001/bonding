@@ -153,7 +153,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35),
+                    Image.asset("assets/Images/bonding.png", height: 35),
                     const SizedBox(height: 30),
 
                     Center(
@@ -377,7 +377,6 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                   bondNavigator.newPage(
                                     context,
                                     page: ProfileVerficationScreen(
-
                                       // add any other data you need
                                     ),
                                   );

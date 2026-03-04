@@ -1,3 +1,5 @@
+
+
 // lib/Socket/socket_service.dart
 
 import 'dart:async';
@@ -6,6 +8,7 @@ import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../APIService/Remote/network/ApiEndPoints.dart';
 import '../BondingScreens/AuthService.dart';
 
 class SocketService {
@@ -67,7 +70,7 @@ class SocketService {
 
   bool _manualDisconnect = false;
 
-  String _baseUrl = "https://bnd.twoofus.tech";
+  String _baseUrl = ApiEndPoints().socketBaseUrl;
 
   String? _lastRegisterEvent; // register_user / register_staff
 
@@ -85,13 +88,14 @@ class SocketService {
     }
 
     final hasValidPort = uri.hasPort && uri.port > 0;
+    final port = hasValidPort
+        ? uri.port
+        : (uri.scheme == 'https' ? 443 : 80);
 
     return Uri(
       scheme: uri.scheme,
-
       host: uri.host,
-
-      port: hasValidPort ? uri.port : null,
+      port: port,
     ).toString();
   }
 
@@ -311,43 +315,41 @@ class SocketService {
 
   Future<void> _connectBase() async {
     _manualDisconnect = false;
-
     _attempt = 0;
-
     _registeredOk = false;
-
     _reconnectTimer?.cancel();
 
     _baseUrl = _normalizeBaseUrl(_baseUrl);
-
-    AppLogger.log.i("Socket URL => $_baseUrl");
+    AppLogger.log.i("🔌 Socket URL => $_baseUrl");
 
     final raw = await AuthService.getToken();
+    final token = (raw ?? "").trim();
 
-    final t = (raw ?? "").trim();
-
-    final bearer = t.isEmpty ? "" : (t.startsWith("Bearer ") ? t : "Bearer $t");
-
-    if (bearer.isEmpty) {
-      AppLogger.log.e("Socket token missing, skip connect");
-
+    if (token.isEmpty) {
+      AppLogger.log.e("❌ Socket token missing. Abort connection.");
       return;
     }
+
+    final bearer = token.startsWith("Bearer ")
+        ? token
+        : "Bearer $token";
 
     _disposeSocketOnly();
 
     _socket = IO.io(
       _baseUrl,
-
       IO.OptionBuilder()
+          .setTransports(['websocket']) // WebSocket first (BEST for mobile)
           .setPath('/socket.io')
-          .setTransports(['polling', 'websocket'])
-          .disableAutoConnect()
           .enableForceNew()
-          .disableReconnection() // using manual reconnect below
-          .setTimeout(12000)
-          .setAuth({"token": bearer})
-          .setExtraHeaders({"Authorization": bearer})
+          .disableAutoConnect()
+          .enableReconnection() // Let socket handle basic reconnection
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(2000)
+          .setTimeout(15000)
+          .setAuth({
+        "token": bearer, // backend should read: socket.handshake.auth.token
+      })
           .build(),
     );
 

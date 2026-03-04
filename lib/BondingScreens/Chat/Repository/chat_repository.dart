@@ -23,6 +23,7 @@ class ChatRepository {
 
       if (kDebugMode) {
         print("Chat History Response: $response");
+        AppLogger.log.i('Chat History Response: $response');
       }
 
       return Map<String, dynamic>.from(response);
@@ -85,9 +86,11 @@ class ChatRepository {
       throw Exception("ChatRepository unblockUser error: $e");
     }
   }
-  Future<Map<String, dynamic>> getDeleteAccountReasons({   required bool isStaff,}) async {
-    try {
 
+  Future<Map<String, dynamic>> getDeleteAccountReasons({
+    required bool isStaff,
+  }) async {
+    try {
       final endpoint = isStaff
           ? "staff/deleteAccountReasons"
           : "auth/user/deleteAccountReasons";
@@ -105,17 +108,14 @@ class ChatRepository {
 
   Future<Map<String, dynamic>> deleteAccount({
     required List<String> reasonCodes,
-    required bool isStaff
+    required bool isStaff,
   }) async {
     try {
-
       final endpoint = isStaff
           ? "staff/deleteAccount"
           : "auth/user/deleteAccount";
 
-      final body = {
-        "reasonCodes": reasonCodes,
-      };
+      final body = {"reasonCodes": reasonCodes};
 
       final response = await _apiService.postResponseV2(endpoint, body: body);
 
@@ -128,6 +128,7 @@ class ChatRepository {
       throw Exception("ChatRepository deleteAccount error: $e");
     }
   }
+
   Future<Map<String, dynamic>> blockUser({
     required String userId,
     required String reason,

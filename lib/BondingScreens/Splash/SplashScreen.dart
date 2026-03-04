@@ -203,16 +203,16 @@ class _SplashscreenState extends State<Splashscreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset("assets/Images/bonding.svg", height: 80),
+              Image.asset("assets/Images/bonding.png", height: 80),
               const SizedBox(height: 16),
-              Container(
-                width: 140,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              // Container(
+              //   width: 140,
+              //   height: 3,
+              //   decoration: BoxDecoration(
+              //     color: Colors.white.withOpacity(0.6),
+              //     borderRadius: BorderRadius.circular(10),
+              //   ),
+              // ),
               const SizedBox(height: 20),
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
