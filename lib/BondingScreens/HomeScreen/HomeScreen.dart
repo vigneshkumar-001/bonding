@@ -564,10 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          "assets/Images/bonding.svg",
-                          height: 32,
-                        ),
+                        Image.asset("assets/Images/bonding.png", height: 32),
                         const Spacer(),
                         GestureDetector(
                           onTap: () => bondNavigator.newPage(

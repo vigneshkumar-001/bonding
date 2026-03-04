@@ -15,10 +15,12 @@ class VerificationInprogressScreen extends StatefulWidget {
   const VerificationInprogressScreen({super.key});
 
   @override
-  State<VerificationInprogressScreen> createState() => _VerificationInprogressScreenState();
+  State<VerificationInprogressScreen> createState() =>
+      _VerificationInprogressScreenState();
 }
 
-class _VerificationInprogressScreenState extends State<VerificationInprogressScreen> {
+class _VerificationInprogressScreenState
+    extends State<VerificationInprogressScreen> {
   Timer? _pollingTimer;
 
   @override
@@ -48,7 +50,9 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
         final staff = staffVM.currentStaff;
 
         // Debug: show real status every rebuild
-        print("Current staff isApproved: ${staff?.isApproved} (raw: ${staff?.isApproved.runtimeType})");
+        print(
+          "Current staff isApproved: ${staff?.isApproved} (raw: ${staff?.isApproved.runtimeType})",
+        );
 
         if (staff == null) {
           return const Scaffold(
@@ -59,16 +63,23 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
 
         final status = staff.isApproved?.toString().trim() ?? '0';
         final isApprovedNow = status == '1' || status == 'approved';
-        final isRejected = status == '2' || status == 'rejected' || status == 'declined';
+        final isRejected =
+            status == '2' || status == 'rejected' || status == 'declined';
 
         // Auto-navigation (safe, post-frame)
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (isApprovedNow) {
             _pollingTimer?.cancel();
-            bondNavigator.newPageRemoveUntil(context, page: const ApprovedScreen());
+            bondNavigator.newPageRemoveUntil(
+              context,
+              page: const ApprovedScreen(),
+            );
           } else if (isRejected) {
             _pollingTimer?.cancel();
-            bondNavigator.newPageRemoveUntil(context, page: const VerificationUnsuccessScreen());
+            bondNavigator.newPageRemoveUntil(
+              context,
+              page: const VerificationUnsuccessScreen(),
+            );
           }
         });
 
@@ -81,7 +92,11 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [Color(0xFF5A1F3F), Color(0xFF3A152A), Color(0xFF140810)],
+                colors: [
+                  Color(0xFF5A1F3F),
+                  Color(0xFF3A152A),
+                  Color(0xFF140810),
+                ],
               ),
             ),
             child: SafeArea(
@@ -91,17 +106,15 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35),
+                    Image.asset("assets/Images/bonding.png", height: 35),
                     const SizedBox(height: 40),
                     Center(
-                      child
-                          : Image.asset("assets/Images/time.png", height: 200),
+                      child: Image.asset("assets/Images/time.png", height: 200),
                     ),
                     const SizedBox(height: 30),
                     Center(
                       child: AppText(
-
-                             "Verification in Progress",
+                        "Verification in Progress",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -111,8 +124,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
                     const SizedBox(height: 16),
                     Center(
                       child: AppText(
-
-                             "Your documents have been submitted successfully.\nOur team is reviewing your profile.\nThis usually takes 24–48 hours.",
+                        "Your documents have been submitted successfully.\nOur team is reviewing your profile.\nThis usually takes 24–48 hours.",
                         color: const Color(0xFFc7c7cc),
                         fontSize: 16,
                         textAlign: TextAlign.center,
@@ -135,27 +147,27 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
               child: isApprovedNow || isRejected
                   ? const SizedBox.shrink()
                   : Opacity(
-                opacity: 0.6,
-                child: Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Waiting for Approval...",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                      opacity: 0.6,
+                      child: Container(
+                        height: 52,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Waiting for Approval...",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ),
         );

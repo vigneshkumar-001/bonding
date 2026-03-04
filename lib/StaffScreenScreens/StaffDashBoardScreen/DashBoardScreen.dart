@@ -299,7 +299,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          SvgPicture.asset("assets/Images/bonding.svg", height: 32),
+          Image.asset("assets/Images/bonding.png", height: 32),
           const Spacer(),
           const SizedBox(width: 12),
           GestureDetector(

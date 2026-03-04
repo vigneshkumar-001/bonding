@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bonding_app/APIService/Remote/network/ApiEndPoints.dart';
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/staff_chat_provider_vm.dart';
@@ -37,7 +38,7 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<StaffChatListVm>().connect(
-        baseUrl: "https://bnd.twoofus.tech",
+        baseUrl: ApiEndPoints().socketBaseUrl,
         staffId: widget.staffId,
       );
     });

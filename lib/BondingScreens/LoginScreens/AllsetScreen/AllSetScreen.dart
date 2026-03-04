@@ -47,8 +47,8 @@ class _AllsetScreenState extends State<AllsetScreen> {
                     const SizedBox(height: 10),
 
                     /// Logo
-                    SvgPicture.asset(
-                      "assets/Images/bonding.svg",
+                    Image.asset(
+                      "assets/Images/bonding.png",
                       height: 35,
                     ),
 

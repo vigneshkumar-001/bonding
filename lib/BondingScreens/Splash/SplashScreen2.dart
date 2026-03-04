@@ -33,8 +33,8 @@ class _SplashScreen2State extends State<SplashScreen2> {
                   padding: const EdgeInsets.only(left: 8, top: 8),
                   child: Row(
                     children: [
-                      SvgPicture.asset(
-                        "assets/Images/bonding.svg",
+                      Image.asset(
+                        "assets/Images/bonding.png",
                         height: 35,
                         width: 35,
                       ),
@@ -83,7 +83,7 @@ class _SplashScreen2State extends State<SplashScreen2> {
                                     ),
                                   ),
                               child: const Text(
-                                "Bonding",
+                                "Twoofus",
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,

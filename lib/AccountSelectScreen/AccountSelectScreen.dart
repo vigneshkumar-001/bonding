@@ -46,7 +46,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: SvgPicture.asset(
-                    "assets/Images/bonding.svg",
+                    "assets/Images/bonding.png",
                     height: 40,
                   ),
                 ),

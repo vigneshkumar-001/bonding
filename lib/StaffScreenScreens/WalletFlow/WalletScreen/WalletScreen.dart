@@ -89,7 +89,7 @@ class _StaffWalletScreenState extends State<StaffWalletScreen> {
         ),
         ),
         const Spacer(),
-        SvgPicture.asset("assets/Images/bonding.svg", height: 32),
+        Image.asset("assets/Images/bonding.png", height: 32),
         const Spacer(),
         const SizedBox(width: 30),
         ],

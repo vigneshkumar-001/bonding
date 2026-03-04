@@ -58,8 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset(
-                      "assets/Images/bonding.svg",
+                    Image.asset(
+                      "assets/Images/bonding.png",
                       height: 35,
                       width: 35,
                     ),
