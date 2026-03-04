@@ -43,38 +43,53 @@ PODS:
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
-  - Firebase/CoreOnly (12.6.0):
-    - FirebaseCore (~> 12.6.0)
-  - Firebase/Messaging (12.6.0):
+  - Firebase/CoreOnly (12.8.0):
+    - FirebaseCore (~> 12.8.0)
+  - Firebase/Database (12.8.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 12.6.0)
-  - firebase_core (4.3.0):
-    - Firebase/CoreOnly (= 12.6.0)
+    - FirebaseDatabase (~> 12.8.0)
+  - Firebase/Messaging (12.8.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 12.8.0)
+  - firebase_core (4.4.0):
+    - Firebase/CoreOnly (= 12.8.0)
     - Flutter
-  - firebase_messaging (16.1.0):
-    - Firebase/Messaging (= 12.6.0)
+  - firebase_database (12.1.2):
+    - Firebase/Database (= 12.8.0)
     - firebase_core
     - Flutter
-  - FirebaseCore (12.6.0):
-    - FirebaseCoreInternal (~> 12.6.0)
+  - firebase_messaging (16.1.0):
+    - Firebase/Messaging (= 12.8.0)
+    - firebase_core
+    - Flutter
+  - FirebaseAppCheckInterop (12.8.0)
+  - FirebaseCore (12.8.0):
+    - FirebaseCoreInternal (~> 12.8.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
-  - FirebaseCoreInternal (12.6.0):
+  - FirebaseCoreInternal (12.8.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
-  - FirebaseInstallations (12.6.0):
-    - FirebaseCore (~> 12.6.0)
+  - FirebaseDatabase (12.8.0):
+    - FirebaseAppCheckInterop (~> 12.8.0)
+    - FirebaseCore (~> 12.8.0)
+    - FirebaseSharedSwift (~> 12.8.0)
+    - GoogleUtilities/UserDefaults (~> 8.1)
+    - leveldb-library (~> 1.22)
+  - FirebaseInstallations (12.8.0):
+    - FirebaseCore (~> 12.8.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - PromisesObjC (~> 2.4)
-  - FirebaseMessaging (12.6.0):
-    - FirebaseCore (~> 12.6.0)
-    - FirebaseInstallations (~> 12.6.0)
+  - FirebaseMessaging (12.8.0):
+    - FirebaseCore (~> 12.8.0)
+    - FirebaseInstallations (~> 12.8.0)
     - GoogleDataTransport (~> 10.1)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Reachability (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - nanopb (~> 3.30910.0)
+  - FirebaseSharedSwift (12.8.0)
   - Flutter (1.0.0)
   - flutter_callkit_incoming (0.0.1):
     - CryptoSwift
@@ -120,6 +135,7 @@ PODS:
   - just_audio (0.0.1):
     - Flutter
     - FlutterMacOS
+  - leveldb-library (1.22.6)
   - Masonry (1.1.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -138,11 +154,17 @@ PODS:
   - PromisesObjC (2.4.0)
   - proximity_sensor (0.0.1):
     - Flutter
+  - razorpay-core-pod (1.0.3)
+  - razorpay-pod (1.5.2):
+    - razorpay-core-pod (= 1.0.3)
+  - razorpay_flutter (1.1.10):
+    - Flutter
+    - razorpay-pod
   - screen_brightness_ios (0.1.0):
     - Flutter
-  - SDWebImage (5.21.5):
-    - SDWebImage/Core (= 5.21.5)
-  - SDWebImage/Core (5.21.5)
+  - SDWebImage (5.21.7):
+    - SDWebImage/Core (= 5.21.7)
+  - SDWebImage/Core (5.21.7)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -163,18 +185,18 @@ PODS:
     - Flutter
   - zego_express_engine (3.23.0):
     - Flutter
-  - zego_uikit (2.28.37):
+  - zego_uikit (2.28.44):
     - Flutter
     - Masonry
     - zego_express_engine
     - ZegoUIKitReport (= 0.2.10)
-  - zego_uikit_prebuilt_call (4.22.2):
+  - zego_uikit_prebuilt_call (4.22.3):
     - Flutter
   - zego_uikit_signaling_plugin (2.8.19):
     - Flutter
-  - zego_zim (2.25.0):
+  - zego_zim (2.26.0):
     - Flutter
-    - ZIM (= 2.25.0)
+    - ZIM (= 2.26.0)
   - zego_zim_audio (1.0.5):
     - Flutter
     - ZIMAudio (= 1.0.5)
@@ -184,7 +206,7 @@ PODS:
     - Flutter
     - ZPNs (= 2.6.0)
   - ZegoUIKitReport (0.2.10)
-  - ZIM (2.25.0)
+  - ZIM (2.26.0)
   - ZIMAudio (1.0.5)
   - ZIPFoundation (0.9.20)
   - ZPNs (2.6.0)
@@ -196,6 +218,7 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_callkit_incoming (from `.symlinks/plugins/flutter_callkit_incoming/ios`)
@@ -210,6 +233,7 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - proximity_sensor (from `.symlinks/plugins/proximity_sensor/ios`)
+  - razorpay_flutter (from `.symlinks/plugins/razorpay_flutter/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -233,15 +257,21 @@ SPEC REPOS:
     - DKImagePickerController
     - DKPhotoGallery
     - Firebase
+    - FirebaseAppCheckInterop
     - FirebaseCore
     - FirebaseCoreInternal
+    - FirebaseDatabase
     - FirebaseInstallations
     - FirebaseMessaging
+    - FirebaseSharedSwift
     - GoogleDataTransport
     - GoogleUtilities
+    - leveldb-library
     - Masonry
     - nanopb
     - PromisesObjC
+    - razorpay-core-pod
+    - razorpay-pod
     - SDWebImage
     - SwiftyGif
     - ZegoUIKitReport
@@ -263,6 +293,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_picker/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_database:
+    :path: ".symlinks/plugins/firebase_database/ios"
   firebase_messaging:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
@@ -291,6 +323,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   proximity_sensor:
     :path: ".symlinks/plugins/proximity_sensor/ios"
+  razorpay_flutter:
+    :path: ".symlinks/plugins/razorpay_flutter/ios"
   screen_brightness_ios:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
   share_plus:
@@ -326,21 +360,25 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
-  audioplayers_darwin: 4f9ca89d92d3d21cec7ec580e78ca888e5fb68bd
+  audioplayers_darwin: 835ced6edd4c9fc8ebb0a7cc9e294a91d99917d5
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   CryptoSwift: e64e11850ede528a02a0f3e768cec8e9d92ecb90
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
-  Firebase: a451a7b61536298fd5cbfe3a746fd40443a50679
-  firebase_core: ba00a168e719694f38960502ceb560285603d073
-  firebase_messaging: bf0e29321927edc02a563c984dbfa5b063864b15
-  FirebaseCore: 0e38ad5d62d980a47a64b8e9301ffa311457be04
-  FirebaseCoreInternal: 69bf1306a05b8ac43004f6cc1f804bb7b05b229e
-  FirebaseInstallations: 631b38da2e11a83daa4bfb482f79d286a5dfa7ad
-  FirebaseMessaging: a61bc42dcab3f7a346d94bbb54dab2c9435b18b2
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  Firebase: 9a58fdbc9d8655ed7b79a19cf9690bb007d3d46d
+  firebase_core: ee30637e6744af8e0c12a6a1e8a9718506ec2398
+  firebase_database: 1a8f01fc41f3a8ae8a85b7acb5308db15e3c36e3
+  firebase_messaging: f303f7fc3cf621204b49a1d8afec239f1f829142
+  FirebaseAppCheckInterop: ba3dc604a89815379e61ec2365101608d365cf7d
+  FirebaseCore: 0dbad74bda10b8fb9ca34ad8f375fb9dd3ebef7c
+  FirebaseCoreInternal: fe5fa466aeb314787093a7dce9f0beeaad5a2a21
+  FirebaseDatabase: d4b7fce656dcdf9bd8b2c2c29023fb2074b280e9
+  FirebaseInstallations: 6a14ab3d694ebd9f839c48d330da5547e9ca9dc0
+  FirebaseMessaging: 7f42cfd10ec64181db4e01b305a613791c8e782c
+  FirebaseSharedSwift: f57ed48f4542b2d7eb4738f4f23ba443f78b3780
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_callkit_incoming: cb8138af67cda6dd981f7101a5d709003af21502
   flutter_logs_yoer: 4b6ed7705cc0e5306d9ecce1d5be5568045e0e73
   flutter_ringtone_player: a77c42464250845611eaa44c27e8714acc800138
@@ -348,40 +386,44 @@ SPEC CHECKSUMS:
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
+  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
+  leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   native_device_orientation: f3ba5f2ddbab3deee23a5f6693b4f97b02dafea2
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   proximity_sensor: 2aef59f90cf0382935faf58ad0a79e1e860773bd
+  razorpay-core-pod: ef0309dbf8e3e5a1330f6cad89dcf9226d8ef758
+  razorpay-pod: a9cb6e158aee8754053b147008eff6b4897789c8
+  razorpay_flutter: 0e98e4fcaae27ad50e011d85f66d85e0a008754a
   screen_brightness_ios: 5ed898fa50fa82a26171c086ca5e28228f932576
-  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
+  SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
-  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   vibration: ca8104a8875b9c493e15b21b04e456befd0ff6eb
-  video_player_avfoundation: dd410b52df6d2466a42d28550e33e4146928280a
+  video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
   zego_callkit: 8e3bc2e9fc6895cff1b27841b1de1100344d2613
   zego_express_engine: 9b73b5b83129ee033287f6597fd5d700b84b27c8
-  zego_uikit: 6064a39817a431fa567c112fd5b722aa737cd82a
-  zego_uikit_prebuilt_call: be5d85deb992269ed89736b02f07dca47da56360
+  zego_uikit: 728c996bc68760fc203863b90440869d7c97a2ae
+  zego_uikit_prebuilt_call: 5134f0ab000850779b5ad9b73e91d168cf316a3c
   zego_uikit_signaling_plugin: ffced40608c89b1ac0241a6194dacb9bc5af19b7
-  zego_zim: 51534d092fcbaf994e8fd8cbc1269f00c7ead6fd
+  zego_zim: 07439ba3a5bef4d273b4a27c3922c54d68beef51
   zego_zim_audio: 0730f5679085c9587c6bff6d09a8c4fb7a6df10a
   zego_zimkit: eb898bea1f8b43a1cb814eaab39617ef679b6917
   zego_zpns: e2ef9b972e9b6be00b78b32b71c550c426584752
   ZegoUIKitReport: a993f7ccc5d243998a7e601a60e16fcd6c084417
-  ZIM: 75fde45d5cb5802f9dedba9c3de0798fde559643
+  ZIM: 960b41d6e05fed8cc6af80fd9b10529477a2d8e4
   ZIMAudio: a5bca7fcbcbefeb71af992ef2336c6c98e0398ec
   ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
   ZPNs: 73bad0046a74e37315201053f9a0e7ac625d9436
 
-PODFILE CHECKSUM: 53a6aebc29ccee84c41f92f409fc20cd4ca011f1
+PODFILE CHECKSUM: f8deac22075f27a332f2e30baa4c451deac56cc7
 
 COCOAPODS: 1.16.2

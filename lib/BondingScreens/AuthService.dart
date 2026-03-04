@@ -27,7 +27,6 @@ class AuthService {
 
   static Future<bool> isLoggedIn() async {
     final token = await getToken();
-    print("Token ::::::: $token");
     return token != null && token.isNotEmpty;
   }
 
@@ -36,25 +35,22 @@ class AuthService {
     // 1) ✅ Disconnect Zego Call Invitation Service
     try {
       await ZegoUIKitPrebuiltCallInvitationService().uninit();
-      print("✅ Zego Invitation Service uninit success");
-    } catch (e) {
-      print("⚠️ Zego uninit failed: $e");
+    } catch (_) {
+      // no-op: best effort cleanup
     }
 
     // 2) ✅ Disconnect ZIMKit (Chat)
     try {
       await ZIMKit().disconnectUser();
-      print("✅ ZIMKit disconnect success");
-    } catch (e) {
-      print("⚠️ ZIMKit disconnect failed: $e");
+    } catch (_) {
+      // no-op: best effort cleanup
     }
 
     // 3) ✅ Disconnect Socket (Staff socket)
     try {
       SocketService().disconnect(); // உங்கள் socket_service.dart ல disconnect method இருக்கணும்
-      print("✅ Socket disconnect success");
-    } catch (e) {
-      print("⚠️ Socket disconnect failed: $e");
+    } catch (_) {
+      // no-op: best effort cleanup
     }
 
     // 4) ✅ Clear local saved auth data
@@ -63,7 +59,6 @@ class AuthService {
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyPhone);
 
-    print("✅ Auth cleared");
   }
 }
 

@@ -73,9 +73,6 @@ class UserProfile {
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
-    print("Raw keys in fromJson: ${json.keys.toList()}");
-    print("formStatus raw: ${json['formStatus']}");
-
     return UserProfile(
       id: json['_id'] ?? '',
       phone: json['phone'] ?? '',

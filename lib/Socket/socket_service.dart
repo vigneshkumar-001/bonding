@@ -338,15 +338,16 @@ class SocketService {
 
     _socket = IO.io(
       _baseUrl,
-
       IO.OptionBuilder()
           .setPath('/socket.io')
-          .setTransports(['polling', 'websocket'])
+          // iOS is more sensitive to polling timeouts via some proxies/CDNs.
+          .setTransports(['websocket'])
           .disableAutoConnect()
           .enableForceNew()
           .disableReconnection() // using manual reconnect below
-          .setTimeout(12000)
+          .setTimeout(20000)
           .setAuth({"token": bearer})
+          .setQuery({"token": bearer})
           .setExtraHeaders({"Authorization": bearer})
           .build(),
     );
