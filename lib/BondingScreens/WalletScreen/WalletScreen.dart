@@ -62,7 +62,7 @@ class _WalletScreenState extends State<WalletScreen> {
               // 'key': 'rzp_test_S8pViJJW5CVujd',
               'key': 'rzp_test_SKfjxkHfwHHcrY',
               'amount': amountInRupees * 100, // Razorpay expects paise
-              'name': 'Bonding App',
+              'name': 'Twoofus',
               'description': '${package.coin} Coins Package',
               'order_id': orderId,
               'prefill': {'contact': '9952225025', 'email': 'user@example.com'},

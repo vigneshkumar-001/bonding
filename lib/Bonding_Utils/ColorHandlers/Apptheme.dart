@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Apptheme {
   /// light theme Color
   static final lightThemeData = ThemeData(
-    bottomAppBarTheme: BottomAppBarTheme(
+    bottomAppBarTheme: BottomAppBarThemeData(
       color: Color(0xFFD4D4D4),
     ), // Set bottom app bar color to gray
     colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -168,7 +168,7 @@ class Apptheme {
     hoverColor: appColors.userTextDark,
     chipTheme: ChipThemeData(backgroundColor: appColors.SwapArrowRoundDark),
     disabledColor: appColors.hintdark,
-    bottomAppBarTheme: BottomAppBarTheme(
+    bottomAppBarTheme: BottomAppBarThemeData(
       color: Color(0xFF262737),
     ), // Set bottom app bar color to black
     textTheme: TextTheme(
