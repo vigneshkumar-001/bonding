@@ -8,7 +8,6 @@ import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel
 import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/VerificationApprovedScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class VerificationInprogressScreen extends StatefulWidget {
@@ -48,11 +47,6 @@ class _VerificationInprogressScreenState
     return Consumer<StaffViewModel>(
       builder: (context, staffVM, child) {
         final staff = staffVM.currentStaff;
-
-        // Debug: show real status every rebuild
-        print(
-          "Current staff isApproved: ${staff?.isApproved} (raw: ${staff?.isApproved.runtimeType})",
-        );
 
         if (staff == null) {
           return const Scaffold(

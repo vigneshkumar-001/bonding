@@ -8,8 +8,10 @@ import 'package:bonding_app/BondingScreens/HomeScreen/Repo/call_controller.dart'
 import 'package:bonding_app/StaffScreenScreens/staffChat/Repository/staff_repository.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/StaffChatListVm.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/block_user_vm.dart';
+import 'package:bonding_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bonding_app/Bonding_Utils/App_Theme/App_Theme.dart';
 
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Repo/UserDataRepo.dart';
@@ -82,14 +84,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: getAllProviders(),
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
-        home: const Splashscreen(),
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, _) {
+          return MaterialApp(
+            navigatorKey: navigatorKey,
+            title: 'TwoOfUs',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            themeMode:
+                themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: const Splashscreen(),
+          );
+        },
       ),
     );
   }
@@ -97,6 +104,7 @@ class MyApp extends StatelessWidget {
 
 List<SingleChildWidget> getAllProviders() {
   return [
+    ChangeNotifierProvider<ThemeController>(create: (_) => ThemeController()),
     Provider<NetworkApiService>(create: (_) => NetworkApiService()),
 
     // ---------------- User Login ----------------

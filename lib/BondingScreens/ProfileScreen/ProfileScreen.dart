@@ -7,9 +7,13 @@ import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
 import 'package:bonding_app/BondingScreens/SupportScreen/support_screen.dart';
 import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
+import 'package:bonding_app/Bonding_Utils/App_Theme/App_Theme.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -36,20 +40,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         // If still loading or no user, show loading or fallback
         if (userVM.isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+          return const AppScaffold(
+            body: AppLoader.center(),
           );
         }
 
         if (user == null) {
-          return Scaffold(
+          final cs = Theme.of(context).colorScheme;
+          return AppScaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "No user data available",
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: cs.onSurfaceVariant),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -62,14 +67,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: const Color(0xFF100a0a),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+        return AppScaffold(
+          safeArea: true,
+          body: SingleChildScrollView(
+            child: Column(
                   children: [
                     // Top bar: Back + Title + Edit
                     Padding(
@@ -77,47 +80,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          widget.backPage
-                              ? GestureDetector(
-                                  onTap: () => bondNavigator.backPage(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF35272d),
-                                      borderRadius: BorderRadius.circular(40),
+                            widget.backPage
+                                ? GestureDetector(
+                                    onTap: () => bondNavigator.backPage(context),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: cs.surfaceContainerHighest
+                                            .withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.arrow_back, color: cs.onSurface),
+                                      ),
                                     ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
+                                  )
+                                : GestureDetector(
+                                    onTap: () => bondNavigator.newPageRemoveUntil(
+                                      context,
+                                      page: MainBottomBar(index: 0),
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: cs.surfaceContainerHighest
+                                            .withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.arrow_back, color: cs.onSurface),
                                       ),
                                     ),
                                   ),
-                                )
-                              : GestureDetector(
-                                  onTap: () => bondNavigator.newPageRemoveUntil(
-                                    context,
-                                    page: MainBottomBar(index: 0),
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF35272d),
-                                      borderRadius: BorderRadius.circular(40),
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
                           AppText(
                             "Profile",
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: cs.onSurface,
                           ),
                           GestureDetector(
                             onTap: () {
@@ -126,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 page: const EditProfileScreen(),
                               );
                             },
-                            child: const Icon(Icons.edit, color: Colors.white),
+                            child: Icon(Icons.edit, color: cs.onSurface),
                           ),
                         ],
                       ),
@@ -141,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFFcc529f),
+                          color: cs.primary,
                           width: 3,
                         ),
                       ),
@@ -168,8 +167,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Username (dynamic)
                     Text(
                       user.name ?? "User",
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: cs.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -180,7 +179,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // User ID (dynamic)
                     Text(
                       "ID: ${user.memberID}",
-                      style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
+                        fontSize: 14,
+                      ),
                     ),
 
                     const SizedBox(height: 30),
@@ -190,8 +192,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF231d1d),
+                          color: cs.surfaceContainerHighest
+                              .withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.45),
+                            width: 0.7,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -252,57 +259,115 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF231d1d),
+                          color: cs.surfaceContainerHighest
+                              .withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.45),
+                            width: 0.7,
+                          ),
                         ),
                         child: _buildMenuRow(
                           svg: "assets/Images/logouticon.svg",
                           title: "Logout",
-                          titleColor: const Color(0xFFFF083D),
+                          titleColor: cs.error,
                           onTap: () async {
                             final confirm = await showDialog<bool>(
                               context: context,
                               barrierDismissible: true,
                               builder: (ctx) {
+                                final cs = Theme.of(ctx).colorScheme;
                                 return AlertDialog(
-                                  backgroundColor: const Color(0xFF231d1d),
+                                  backgroundColor: cs.surface,
+                                  surfaceTintColor: Colors.transparent,
+                                  elevation: 12,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  title: const Text(
-                                    "Logout",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
+                                    borderRadius: BorderRadius.circular(18),
+                                    side: BorderSide(
+                                      color:
+                                          cs.outlineVariant.withValues(alpha: 0.6),
                                     ),
                                   ),
-                                  content: const Text(
+                                  titlePadding: const EdgeInsets.fromLTRB(
+                                    18,
+                                    16,
+                                    18,
+                                    0,
+                                  ),
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                    18,
+                                    12,
+                                    18,
+                                    0,
+                                  ),
+                                  actionsPadding: const EdgeInsets.fromLTRB(
+                                    12,
+                                    12,
+                                    12,
+                                    12,
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.logout_rounded,
+                                        color: cs.error,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        "Logout",
+                                        style: TextStyle(
+                                          color: cs.onSurface,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  content: Text(
                                     "Do you want to log out?",
-                                    style: TextStyle(color: Colors.white70),
+                                    style: TextStyle(color: cs.onSurfaceVariant),
                                   ),
                                   actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(ctx, false),
-                                      child: const Text(
-                                        "Cancel",
-                                        style: TextStyle(color: Colors.white70),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFFFF083D,
-                                        ),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: OutlinedButton(
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: cs.onSurface,
+                                              side: BorderSide(
+                                                color: cs.outlineVariant
+                                                    .withValues(alpha: 0.7),
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                              ),
+                                              minimumSize:
+                                                  const Size.fromHeight(44),
+                                            ),
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, false),
+                                            child: const Text("Cancel"),
                                           ),
                                         ),
-                                      ),
-                                      onPressed: () => Navigator.pop(ctx, true),
-                                      child: const Text("Logout"),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: cs.error,
+                                              foregroundColor: cs.onError,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                              ),
+                                              minimumSize:
+                                                  const Size.fromHeight(44),
+                                            ),
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, true),
+                                            child: const Text("Logout"),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 );
@@ -313,6 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                             await AuthService.logout(); // clear token/session here
                             if (!context.mounted) return;
+                            context.read<ThemeController>().isDarkMode = true;
 
                             Navigator.pushReplacement(
                               context,
@@ -361,7 +427,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: cs.onSurfaceVariant,
                                 fontSize: 14,
                               ),
                               children: [
@@ -369,7 +435,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 TextSpan(
                                   text: userDetails?.supportEmail,
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: brand.primaryGradient.colors.first,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -384,8 +450,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );
@@ -397,25 +461,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
     Color? titleColor,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            SvgPicture.asset(svg),
+            SvgPicture.asset(
+              svg,
+              colorFilter: ColorFilter.mode(
+                titleColor ?? cs.onSurface,
+                BlendMode.srcIn,
+              ),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  color: titleColor ?? Colors.white,
+                  color: titleColor ?? cs.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 18),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: cs.onSurfaceVariant,
+              size: 18,
+            ),
           ],
         ),
       ),

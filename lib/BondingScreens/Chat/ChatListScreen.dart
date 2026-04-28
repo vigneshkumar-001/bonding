@@ -11,6 +11,7 @@ import 'package:bonding_app/BondingScreens/Chat/ViewModel/chat_provider_vm.dart'
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart'; // ✅ to get currentUser.id
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/ui/app_background.dart';
 
 class UserChatListScreen extends StatefulWidget {
   final bool backPage;
@@ -79,25 +80,14 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
             final query = q.trim().toLowerCase();
             if (query.isEmpty) return true;
 
-            final name = (c.staff?.name ?? "Staff").toLowerCase();
+            final name = (c.staff?.name ?? "Women").toLowerCase();
             return name.contains(query);
           }).toList();
 
+          final cs = Theme.of(context).colorScheme;
+
           return Scaffold(
-            body: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF140810),
-                    Color(0xFF3A152A),
-                    Color(0xFF140810),
-                  ],
-                ),
-              ),
+            body: AppBackground(
               child: SafeArea(
                 child: Column(
                   children: [
@@ -120,7 +110,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                               "Chats",
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: cs.onSurface,
                             ),
                             const Spacer(),
                             _iconBtn(
@@ -148,12 +138,12 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                     // if user not ready
                     if (userId.trim().isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.all(16),
                         child: Center(
                           child: Text(
                             "User not logged in / userId missing",
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: cs.onSurfaceVariant),
                           ),
                         ),
                       ),
@@ -184,13 +174,13 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                   : "No chats yet",
                               subTitle: q.isNotEmpty
                                   ? "Try another name."
-                                  : "No staff messages yet.",
+                                  : "No women messages yet.",
                             );
                           }
 
                           return RefreshIndicator(
-                            color: Colors.white,
-                            backgroundColor: const Color(0xFF271c1f),
+                            color: cs.primary,
+                            backgroundColor: cs.surface,
                             onRefresh: () async => vm.fetch(reset: true),
                             child: ListView.builder(
                               physics: const AlwaysScrollableScrollPhysics(
@@ -210,13 +200,15 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                                 final c = list[i - 1];
 
-                                final staffName = c.staff?.name ?? "Staff";
+                                final staffName = c.staff?.name ?? "Women";
                                 final staffId = (c.staffId ?? "").toString();
                                 final isBlocked = (c.isBlocked ?? false);
                                 final userId =
                                     userVM.currentUser?.id?.toString() ?? "";
                                 final staffImage = (c.staff?.image ?? "")
                                     .toString();
+                                final staffMemberId =
+                                    (c.staff?.memberId ?? "").toString();
 
                                 return _ChatTile(
                                   name: staffName,
@@ -234,7 +226,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                       ).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            "Invalid IDs user=$uId staff=$sId",
+                                            "Invalid IDs user=$uId women=$sId",
                                           ),
                                         ),
                                       );
@@ -261,6 +253,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                             staffImage: staffImage,
 
                                             staffId: sId,
+                                            staffMemberId: staffMemberId,
                                             isBlocked: isBlocked,
                                             staffName: staffName,
                                             userId: uId,
@@ -291,6 +284,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
   // ---------- UI helpers ----------
   Widget _searchBox() {
+    final cs = Theme.of(context).colorScheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -299,25 +293,23 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
           height: 44,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF282223), Color(0xFF23121a)],
-            ),
+            color: cs.surfaceContainerHighest.withValues(alpha: 0.85),
             border: Border.all(
-              color: Colors.white.withOpacity(0.16),
+              color: cs.outlineVariant.withValues(alpha: 0.7),
               width: 0.8,
             ),
           ),
           child: TextField(
             controller: _searchCtrl,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: cs.onSurface),
             onChanged: (v) => setState(() => q = v),
             decoration: InputDecoration(
               hintText: "Search by name",
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+              hintStyle: TextStyle(color: cs.onSurfaceVariant),
               border: InputBorder.none,
               prefixIcon: Icon(
                 Icons.search,
-                color: Colors.white.withOpacity(0.8),
+                color: cs.onSurfaceVariant,
               ),
               suffixIcon: q.isEmpty
                   ? null
@@ -328,7 +320,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                       }),
                       child: Icon(
                         Icons.clear,
-                        color: Colors.white.withOpacity(0.7),
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
               contentPadding: const EdgeInsets.symmetric(
@@ -343,29 +335,34 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
   }
 
   Widget _iconBtn({required IconData icon, required VoidCallback onTap}) {
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.7),
+            width: 0.6,
+          ),
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
+        child: Icon(icon, color: cs.onSurface, size: 22),
       ),
     );
   }
 
   Widget _backBtn() {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF282323),
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(40),
       ),
       padding: const EdgeInsets.all(8.0),
-      child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+      child: Icon(Icons.arrow_back, color: cs.onSurface, size: 28),
     );
   }
 }
@@ -378,30 +375,34 @@ class _CenterLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.75),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(0.14), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.7),
+            width: 0.6,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white,
+                color: cs.primary,
               ),
             ),
             const SizedBox(width: 12),
             Text(
               text,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: cs.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -417,18 +418,22 @@ class _TopSmallLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.65),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.7),
+            width: 0.6,
+          ),
         ),
-        child: const SizedBox(
+        child: SizedBox(
           width: 16,
           height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          child: CircularProgressIndicator(strokeWidth: 2, color: cs.primary),
         ),
       ),
     );
@@ -442,6 +447,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -451,13 +457,13 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.chat_bubble_outline_rounded,
               size: 80,
-              color: Colors.white.withOpacity(0.22),
+              color: cs.onSurfaceVariant.withValues(alpha: 0.35),
             ),
             const SizedBox(height: 14),
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: cs.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
@@ -467,7 +473,7 @@ class _EmptyState extends StatelessWidget {
               subTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.55),
+                color: cs.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -485,31 +491,32 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A151B),
+        color: cs.errorContainer.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.35)),
+        border: Border.all(color: cs.error.withValues(alpha: 0.35)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+          Icon(Icons.error_outline, color: cs.error, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(color: cs.onErrorContainer, fontSize: 13),
             ),
           ),
           const SizedBox(width: 10),
           TextButton(
             onPressed: onRetry,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.redAccent.withOpacity(0.18),
+              foregroundColor: cs.onErrorContainer,
+              backgroundColor: cs.error.withValues(alpha: 0.12),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -542,6 +549,7 @@ class _ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final first = name.isNotEmpty ? name[0].toUpperCase() : "S";
 
     return InkWell(
@@ -552,22 +560,25 @@ class _ChatTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.10), width: 0.6),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.65),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.7),
+            width: 0.6,
+          ),
         ),
         child: Row(
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: Colors.white.withOpacity(0.10),
+              backgroundColor: cs.primary.withValues(alpha: 0.12),
               backgroundImage: imageUrl.trim().isNotEmpty
                   ? NetworkImage(imageUrl)
                   : null,
               child: imageUrl.trim().isEmpty
                   ? Text(
                       first,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: cs.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     )
@@ -582,8 +593,8 @@ class _ChatTile extends StatelessWidget {
                     name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: cs.onSurface,
                       fontWeight: FontWeight.w700,
                       fontSize: 15.5,
                     ),
@@ -594,7 +605,7 @@ class _ChatTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.65),
+                      color: cs.onSurfaceVariant,
                       fontSize: 13,
                     ),
                   ),
@@ -609,7 +620,7 @@ class _ChatTile extends StatelessWidget {
                   Text(
                     timeText,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: cs.onSurfaceVariant.withValues(alpha: 0.85),
                       fontSize: 12,
                     ),
                   ),
@@ -621,13 +632,13 @@ class _ChatTile extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent,
+                      color: cs.primary,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "$unreadCount",
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: cs.onPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -709,7 +720,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
       if (query.isEmpty) return true;
 
       // ✅ user list response has "staff" object
-      final name = (c.staff?.name ?? "Staff").toLowerCase();
+      final name = (c.staff?.name ?? "Women").toLowerCase();
       return name.contains(query);
     }).toList();
 
@@ -791,13 +802,13 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                     }
 
                     if (!vm.loading && list.isEmpty) {
-                      return _EmptyState(
-                        title: q.isNotEmpty ? "No results" : "No chats yet",
-                        subTitle: q.isNotEmpty
-                            ? "Try another name."
-                            : "No staff messages yet.",
-                      );
-                    }
+	                      return _EmptyState(
+	                        title: q.isNotEmpty ? "No results" : "No chats yet",
+	                        subTitle: q.isNotEmpty
+	                            ? "Try another name."
+	                            : "No women messages yet.",
+	                      );
+	                    }
 
                     return RefreshIndicator(
                       color: Colors.white,
@@ -821,7 +832,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                           final c = list[i - 1];
 
-                          final staffName = c.staff?.name ?? "Staff";
+	                          final staffName = c.staff?.name ?? "Women";
                           final staffId = c.staffId; // ✅ staff mongo id
                           final staffImage = c.staff?.image ?? "";
 

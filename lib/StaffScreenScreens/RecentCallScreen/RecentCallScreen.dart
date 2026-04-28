@@ -1,11 +1,13 @@
 import 'dart:ui';
-import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/RecentCallScreen/Model/recentCallModel.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -50,57 +52,44 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
-          backgroundColor: const Color(0xFF120810),
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: vm.isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
-                  : vm.errorMessage != null
+        final cs = Theme.of(context).colorScheme;
+        return AppScaffold(
+          body: vm.isLoading
+              ? const AppLoader.center()
+              : vm.errorMessage != null
                   ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(vm.errorMessage!, style: const TextStyle(color: Colors.redAccent)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: vm.refresh,
-                      child: const Text("Retry"),
-                    ),
-                  ],
-                ),
-              )
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            vm.errorMessage!,
+                            style: TextStyle(color: cs.error),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: vm.refresh,
+                            child: const Text("Retry"),
+                          ),
+                        ],
+                      ),
+                    )
                   : Column(
-                children: [
-                  _topBar(context),
-                  const SizedBox(height: 12),
-                  _filterChips(),
-                  const SizedBox(height: 12),
-                  Expanded(child: _callList(vm)),
-                ],
-              ),
-            ),
-          ),
+                      children: [
+                        _topBar(context),
+                        const SizedBox(height: 12),
+                        _filterChips(),
+                        const SizedBox(height: 12),
+                        Expanded(child: _callList(vm)),
+                      ],
+                    ),
         );
       },
     );
   }
 
   Widget _topBar(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -109,32 +98,36 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
             onTap: () => Navigator.pop(context),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF35272d),
-                borderRadius: BorderRadius.circular(40),
+                color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                child: Icon(Icons.arrow_back, color: cs.onSurface, size: 28),
               ),
             ),
           ):GestureDetector(
            onTap: () => bondNavigator.newPageRemoveUntil(context, page: StaffBottomBar(index: 0,)),
            child: Container(
              decoration: BoxDecoration(
-               color: const Color(0xFF35272d),
-               borderRadius: BorderRadius.circular(40),
+               color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+               borderRadius: BorderRadius.circular(14),
              ),
-             child: const Padding(
+             child: Padding(
                padding: EdgeInsets.all(8.0),
-               child: Icon(Icons.arrow_back, color: Colors.white, size: 28),
+               child: Icon(Icons.arrow_back, color: cs.onSurface, size: 28),
              ),
            ),
          ),
           if (isSearchVisible) ...[
             const SizedBox(width: 12),
-            const Text(
+            Text(
               "Recent Calls",
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: cs.onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
           const Spacer(),
@@ -150,17 +143,18 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF3c2733), Color(0xFF3c1b2e)],
+                        color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
+                        border: Border.all(
+                          color: cs.outlineVariant.withValues(alpha: 0.45),
+                          width: 0.8,
                         ),
-                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8),
                       ),
                       child: TextField(
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: cs.onSurface),
                         decoration: InputDecoration(
-                          hintText: 'Search by “name, status”',
-                          hintStyle: const TextStyle(color: Color(0xFFc7c7cc), fontSize: 16),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white70, size: 22),
+                          hintText: 'Search by \u201Cname, status\u201D',
+                          hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
+                          prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant, size: 22),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         ),
@@ -172,7 +166,7 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
             ),
           GestureDetector(
             onTap: () => setState(() => isSearchVisible = !isSearchVisible),
-            child: Image.asset('assets/Images/search.png', color: Colors.white),
+            child: Image.asset('assets/Images/search.png', color: cs.onSurface),
           ),
         ],
       ),
@@ -180,6 +174,8 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
   }
 
   Widget _filterChips() {
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
     final filters = ["all calls", "video calls", "audio calls"];
 
     return SingleChildScrollView(
@@ -195,14 +191,19 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                gradient: isSelected
-                    ? const LinearGradient(colors: [Color(0xFFB35CF6), Color(0xFFFF6F61)])
-                    : const LinearGradient(colors: [Color(0xFF3c2733), Color(0xFF3c1b2e)]),
-                border: isSelected ? null : Border.all(color: Colors.white24),
+                gradient: isSelected ? brand.primaryGradient : null,
+                color: isSelected
+                    ? null
+                    : cs.surfaceContainerHighest.withValues(alpha: 0.55),
+                border: isSelected
+                    ? null
+                    : Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.45),
+                      ),
               ),
               child: Text(
                 filter,
-                style: TextStyle(color: isSelected ? Colors.white : Colors.white70),
+                style: TextStyle(color: isSelected ? cs.onPrimary : cs.onSurface),
               ),
             ),
           );
@@ -212,9 +213,13 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
   }
 
   Widget _callList(StaffViewModel vm) {
+    final cs = Theme.of(context).colorScheme;
     if (vm.callHistory.isEmpty) {
-      return const Center(
-        child: Text("No call history yet", style: TextStyle(color: Colors.white70, fontSize: 18)),
+      return Center(
+        child: Text(
+          "No call history yet",
+          style: TextStyle(color: cs.onSurfaceVariant, fontSize: 18),
+        ),
       );
     }
 

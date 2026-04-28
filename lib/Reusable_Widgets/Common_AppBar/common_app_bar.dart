@@ -22,7 +22,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final cs = theme.colorScheme;
 
     return AppBar(
       backgroundColor: bg ?? theme.scaffoldBackgroundColor,
@@ -40,7 +40,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                       // ),
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back, color: Colors.white),
+                        icon: Icon(Icons.arrow_back, color: cs.onSurface),
                       ),
                     ),
                   )
@@ -48,7 +48,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
                       Icons.arrow_back,
-                      color: theme.iconTheme.color ?? Colors.black,
+                      color: theme.iconTheme.color ?? cs.onSurface,
                     ),
                   )
           : null,
@@ -57,7 +57,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w500,
           fontSize: 18,
-          color: appColors.cardBackgroundLight,
+          color: cs.onSurface,
         ),
       ),
       iconTheme: theme.iconTheme,

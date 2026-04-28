@@ -9,6 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Reusable_Widgets/Common_AppBar/common_app_bar.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 
 class DeleteReasonScreen extends StatefulWidget {
   final bool isStaff;
@@ -38,10 +42,12 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
 
   // ✅ CONFIRM DIALOG
   Future<bool?> showDeleteConfirmDialog(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
     return showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       builder: (_) {
         return Center(
           child: Material(
@@ -50,12 +56,12 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
               width: MediaQuery.of(context).size.width * 0.9,
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [Color(0xFF482135), Color(0xFF140c0e)],
-                ),
+                color: cs.surface,
                 borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: cs.outlineVariant.withValues(alpha: 0.45),
+                  width: 0.8,
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -63,13 +69,9 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                   Container(
                     width: 80,
                     height: 80,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [Color(0xFF9D4EDD), Color(0xFFFF5A5F)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: brand.primaryGradient,
                     ),
                     child: const Center(
                       child: Text(
@@ -84,20 +86,20 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const Text(
+                  Text(
                     "Are you sure you want to delete\nthis account?",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: cs.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     "Information related to your account will be kept for 30 days and will be completely purged after no activity for continuous 30 days.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
                   ),
                   const SizedBox(height: 40),
                   Row(
@@ -108,14 +110,18 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                           child: Container(
                             height: 50,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF2A1F23),
+                              color: cs.surfaceContainerHighest.withValues(alpha: 0.35),
                               borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: cs.outlineVariant.withValues(alpha: 0.45),
+                                width: 0.8,
+                              ),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
                                 "Cancel",
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: cs.onSurfaceVariant,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -132,9 +138,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                             height: 50,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF9D4EDD), Color(0xFFFF5A5F)],
-                              ),
+                              gradient: brand.primaryGradient,
                             ),
                             child: const Center(
                               child: Text(
@@ -178,40 +182,21 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF100a0a),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => bondNavigator.backPage(context),
-          child: Container(
-            margin: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF35272d),
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-          ),
-        ),
-        title: const Text(
-          "Delete Account",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: true,
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+
+    return AppScaffold(
+      appBar: const CommonAppBar(
+        title: "Delete Account",
+        usePaddedLeading: true,
+        bg: Colors.transparent,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Consumer<DeleteAccountReasonsVM>(
           builder: (context, vm, _) {
             if (vm.loading && vm.reasons.isEmpty) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
+              return const AppLoader.center();
             }
 
             if (vm.error != null && vm.error!.trim().isNotEmpty) {

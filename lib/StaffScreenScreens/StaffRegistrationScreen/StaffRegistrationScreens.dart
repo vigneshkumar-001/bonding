@@ -1,9 +1,12 @@
-import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
+﻿import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/VerifyOtpStaffScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -61,17 +64,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
       firstDate: DateTime(1950),
       lastDate: DateTime.now().subtract(const Duration(days: 18 * 365)),
       builder: (context, child) {
+        final base = Theme.of(context);
+        final cs = base.colorScheme;
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFB86AF6),
-              onPrimary: Colors.white,
-              surface: Color(0xFF2A1A2A),
-              onSurface: Colors.white,
-            ),
+          data: base.copyWith(
+            colorScheme: cs,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6A6A),
+                foregroundColor: cs.primary,
               ),
             ),
           ),
@@ -129,27 +129,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+
+        return AppScaffold(
           resizeToAvoidBottomInset: true,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
@@ -158,10 +145,10 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     Center(
                       child: AppText(
-                        isLoginMode ? "Staff login" : "Staff registration",
+                        isLoginMode ? "Women login" : "Women registration",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: cs.onSurface,
                       ),
                     ),
 
@@ -170,16 +157,16 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                     AppText(
                       isLoginMode
                           ? "Enter your mobile number to receive an OTP."
-                          : "Join as a verified female staff member and start earning through audio and video calls.",
+                          : "Join as a verified woman and start earning through audio and video calls.",
                       fontSize: 15,
-                      color: const Color(0xFFc7c7cc),
+                      color: cs.onSurfaceVariant,
                       maxLines: 2,
                       textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 24),
 
-                    // ─── Name (Register only) ────────────────────────────────
+                    // â”€â”€â”€ Name (Register only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (!isLoginMode) ...[
                       AppText(
                         "Name:",
@@ -205,7 +192,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 20),
                     ],
 
-                    // ─── Date of Birth (Register only) ───────────────────────
+                    // â”€â”€â”€ Date of Birth (Register only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (!isLoginMode) ...[
                       AppText(
                         "Date Of Birth:",
@@ -241,7 +228,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 20),
                     ],
 
-                    // ─── Mobile Number (Both) ────────────────────────────────
+                    // â”€â”€â”€ Mobile Number (Both) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText(
                       "Mobile number:",
                       color: Colors.white,
@@ -271,7 +258,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       ),
                     ),
 
-                    // ─── Email (Register only) ───────────────────────────────
+                    // â”€â”€â”€ Email (Register only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (!isLoginMode) ...[
                       const SizedBox(height: 20),
                       AppText(
@@ -298,7 +285,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       ),
                     ],
 
-                    // ─── City (Register only) ────────────────────────────────
+                    // â”€â”€â”€ City (Register only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (!isLoginMode) ...[
                       const SizedBox(height: 20),
                       AppText(
@@ -324,7 +311,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       ),
                     ],
 
-                    // ─── Error Message ───────────────────────────────────────
+                    // â”€â”€â”€ Error Message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (vm.errorMessage != null) ...[
                       const SizedBox(height: 16),
                       Center(
@@ -341,7 +328,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 30),
 
-                    // ─── Continue Button ─────────────────────────────────────
+                    // â”€â”€â”€ Continue Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     GestureDetector(
                       onTap: vm.isRegistering
                           ? null
@@ -365,7 +352,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                               );
                               if (success) {
                                 if (isLoginMode) {
-                                  // ✅ Login -> OTP
+                                  // âœ… Login -> OTP
                                   bondNavigator.newPage(
                                     context,
                                     page: LoginOtpStaffScreen(
@@ -373,7 +360,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                     ),
                                   );
                                 } else {
-                                  // ✅ Register -> Verification
+                                  // âœ… Register -> Verification
                                   bondNavigator.newPage(
                                     context,
                                     page: ProfileVerficationScreen(
@@ -450,8 +437,6 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );
@@ -591,7 +576,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     Center(
                       child: AppText(
-                        "Staff registration",
+                        "Women registration",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -601,7 +586,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                     const SizedBox(height: 8),
 
                     AppText(
-                      "Join as a verified female staff member and start earning through audio and video calls.",
+                      "Join as a verified woman and start earning through audio and video calls.",
                       fontSize: 15,
                       color: const Color(0xFFc7c7cc),
                       maxLines: 2,
@@ -610,7 +595,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 24),
 
-                    // ─── Name ──────────────────────────────────────────────────
+                    // â”€â”€â”€ Name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText("Name:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
@@ -630,7 +615,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ─── Date of Birth ────────────────────────────────────────
+                    // â”€â”€â”€ Date of Birth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText("Date Of Birth:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
@@ -660,7 +645,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ─── Mobile Number ────────────────────────────────────────
+                    // â”€â”€â”€ Mobile Number â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText("Mobile number:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
@@ -684,7 +669,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ─── Email ────────────────────────────────────────────────
+                    // â”€â”€â”€ Email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText("Email Address:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
@@ -705,7 +690,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ─── City ─────────────────────────────────────────────────
+                    // â”€â”€â”€ City â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     AppText("City:", color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
@@ -736,7 +721,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     const SizedBox(height: 30),
 
-                    // ─── Continue Button ──────────────────────────────────────
+                    // â”€â”€â”€ Continue Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     GestureDetector(
                       onTap: vm.isRegistering
                           ? null
@@ -772,14 +757,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isRegistering
                               ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
-                              : const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)]),
+                              : brand.primaryGradient,
                         ),
                         child: Center(
                           child: vm.isRegistering
                               ? const SizedBox(
                             height: 24,
                             width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            child: AppLoader(radius: 10, color: Colors.white),
                           )
                               : const Text(
                             "Continue to Verification  →",
@@ -804,3 +789,4 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
     );
   }
 }*/
+

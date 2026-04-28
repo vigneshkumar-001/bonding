@@ -2,6 +2,9 @@ import 'package:bonding_app/BondingScreens/SupportScreen/ViewModel/support_ticke
 import 'package:bonding_app/BondingScreens/SupportScreen/create_support_screen.dart';
 import 'package:bonding_app/BondingScreens/SupportScreen/support_chat_screen.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -51,174 +54,160 @@ class _SupportScreensState extends State<SupportScreens> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF100a0a),
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+
+    return AppScaffold(
       appBar: const CommonAppBar(
         title: 'Support',
         usePaddedLeading: true,
-        bg: Color(0xFF100a0a),
+        bg: Colors.transparent,
       ),
-      body: SafeArea(
-        child: Consumer<SupportTicketListVM>(
-          builder: (context, vm, _) {
-            if (vm.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
-            }
+      body: Consumer<SupportTicketListVM>(
+        builder: (context, vm, _) {
+          if (vm.isLoading) return const AppLoader.center();
 
-            if (vm.errorMessage != null) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Failed to load tickets",
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleMedium?.copyWith(color: Colors.white),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        vm.errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          vm.fetchTickets(isStaff: widget.isStaff); // or false
-                        },
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-
-            if (vm.tickets.isEmpty) {
-              return Center(
-                child: Text(
-                  "No tickets found",
-                  style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                ),
-              );
-            }
-
-            return RefreshIndicator(
-              color: Colors.white,
-              backgroundColor: const Color(0xFF1A1212),
-              onRefresh: vm.refresh,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
-                  vertical: 20,
-                ),
-                itemCount: vm.tickets.length,
-                itemBuilder: (context, index) {
-                  final ticket = vm.tickets[index];
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        bondNavigator.newPage(
-                          context,
-                          page: SupportChatScreen(
-                            ticketId: ticket.id,
-                            subjects: ticket.title,
-                            isStaff: widget.isStaff,
+          if (vm.errorMessage != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Failed to load tickets",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: cs.onSurface,
                           ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color(0xff3F5FF2).withOpacity(0.08),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.08),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            // Status box
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: _statusColor(
-                                  ticket.status,
-                                ).withOpacity(0.12),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.support_agent,
-                                    color: _statusColor(ticket.status),
-                                    size: 28,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    ticket.status,
-                                    style: TextStyle(
-                                      color: _statusColor(ticket.status),
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-
-                            // Ticket info
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppText(
-                                    ticket.title,
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  AppText(
-                                    ticket.description,
-                                    color: const Color(0XFFc7c7cc),
-                                    fontSize: 14,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _formatDate(ticket.createdAt),
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.55),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                },
+                    const SizedBox(height: 8),
+                    Text(
+                      vm.errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => vm.fetchTickets(isStaff: widget.isStaff),
+                      child: const Text("Retry"),
+                    ),
+                  ],
+                ),
               ),
             );
-          },
-        ),
+          }
+
+          if (vm.tickets.isEmpty) {
+            return Center(
+              child: Text(
+                "No tickets found",
+                style: TextStyle(color: cs.onSurfaceVariant),
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            color: cs.primary,
+            backgroundColor: cs.surfaceContainerHighest,
+            onRefresh: vm.refresh,
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+              itemCount: vm.tickets.length,
+              itemBuilder: (context, index) {
+                final ticket = vm.tickets[index];
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      bondNavigator.newPage(
+                        context,
+                        page: SupportChatScreen(
+                          ticketId: ticket.id,
+                          subjects: ticket.title,
+                          isStaff: widget.isStaff,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: cs.surfaceContainerHighest.withValues(alpha: 0.35),
+                        border: Border.all(
+                          color: cs.outlineVariant.withValues(alpha: 0.45),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: _statusColor(ticket.status).withValues(alpha: 0.14),
+                              border: Border.all(
+                                color: _statusColor(ticket.status).withValues(alpha: 0.18),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.support_agent,
+                                  color: _statusColor(ticket.status),
+                                  size: 28,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  ticket.status,
+                                  style: TextStyle(
+                                    color: _statusColor(ticket.status),
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AppText(
+                                  ticket.title,
+                                  color: cs.onSurface,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                const SizedBox(height: 6),
+                                AppText(
+                                  ticket.description,
+                                  color: cs.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _formatDate(ticket.createdAt),
+                                  style: TextStyle(
+                                    color: cs.onSurfaceVariant.withValues(alpha: 0.9),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
       bottomNavigationBar: GestureDetector(
         onTap: () {
@@ -233,10 +222,8 @@ class _SupportScreensState extends State<SupportScreens> {
             height: 60,
             width: double.infinity,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              gradient: const LinearGradient(
-                colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-              ),
+              borderRadius: BorderRadius.circular(12),
+              gradient: brand.primaryGradient,
             ),
             child: const Center(
               child: Text(

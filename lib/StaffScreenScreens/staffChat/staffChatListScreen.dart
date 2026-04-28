@@ -3,6 +3,8 @@ import 'package:bonding_app/APIService/Remote/network/ApiEndPoints.dart';
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/staff_chat_provider_vm.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -72,20 +74,10 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
       return name.contains(query);
     }).toList();
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF140810), Color(0xFF3A152A), Color(0xFF140810)],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
+    final cs = Theme.of(context).colorScheme;
+    return AppScaffold(
+      body: Column(
+        children: [
               // HEADER
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -110,7 +102,7 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                         "Chats",
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: cs.onSurface,
                       ),
                       const Spacer(),
                       _iconBtn(
@@ -164,8 +156,8 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                     }
 
                     return RefreshIndicator(
-                      color: Colors.white,
-                      backgroundColor: const Color(0xFF271c1f),
+                      color: cs.primary,
+                      backgroundColor: cs.surfaceContainerHighest,
                       onRefresh: () async => vm.fetchChatList(reset: true),
                       child: ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(
@@ -254,14 +246,13 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                   },
                 ),
               ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _searchBox() {
+    final cs = Theme.of(context).colorScheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -270,25 +261,23 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
           height: 44,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF282223), Color(0xFF23121a)],
-            ),
+            color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
             border: Border.all(
-              color: Colors.white.withOpacity(0.16),
+              color: cs.outlineVariant.withValues(alpha: 0.45),
               width: 0.8,
             ),
           ),
           child: TextField(
             controller: _searchCtrl,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: cs.onSurface),
             onChanged: (v) => setState(() => q = v),
             decoration: InputDecoration(
               hintText: "Search by name",
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+              hintStyle: TextStyle(color: cs.onSurfaceVariant),
               border: InputBorder.none,
               prefixIcon: Icon(
                 Icons.search,
-                color: Colors.white.withOpacity(0.8),
+                color: cs.onSurfaceVariant,
               ),
               suffixIcon: q.isEmpty
                   ? null
@@ -299,7 +288,7 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
                       }),
                       child: Icon(
                         Icons.clear,
-                        color: Colors.white.withOpacity(0.7),
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
               contentPadding: const EdgeInsets.symmetric(
@@ -314,29 +303,34 @@ class _StaffChatListScreenState extends State<StaffChatListScreen> {
   }
 
   Widget _iconBtn({required IconData icon, required VoidCallback onTap}) {
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.45),
+            width: 0.6,
+          ),
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
+        child: Icon(icon, color: cs.onSurface, size: 22),
       ),
     );
   }
 
   Widget _backBtn() {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF282323),
-        borderRadius: BorderRadius.circular(40),
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(8.0),
-      child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+      child: Icon(Icons.arrow_back, color: cs.onSurface, size: 28),
     );
   }
 }
@@ -348,30 +342,27 @@ class _CenterLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(0.14), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.45),
+            width: 0.6,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(width: 12),
+          children: [
+            AppLoader(radius: 9, color: cs.onSurfaceVariant),
+            const SizedBox(width: 12),
             Text(
               "Loading chats...",
               style: TextStyle(
-                color: Colors.white,
+                color: cs.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -387,19 +378,19 @@ class _TopSmallLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.6),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.45),
+            width: 0.6,
+          ),
         ),
-        child: const SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-        ),
+        child: AppLoader(radius: 8, color: cs.onSurfaceVariant),
       ),
     );
   }
@@ -413,6 +404,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -422,13 +414,13 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.chat_bubble_outline_rounded,
               size: 80,
-              color: Colors.white.withOpacity(0.22),
+              color: cs.onSurfaceVariant.withValues(alpha: 0.45),
             ),
             const SizedBox(height: 14),
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: cs.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
@@ -438,7 +430,7 @@ class _EmptyState extends StatelessWidget {
               subTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.55),
+                color: cs.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -457,31 +449,32 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A151B),
+        color: cs.errorContainer.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.35)),
+        border: Border.all(color: cs.error.withValues(alpha: 0.35)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+          Icon(Icons.error_outline, color: cs.error, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(color: cs.onSurface, fontSize: 13),
             ),
           ),
           const SizedBox(width: 10),
           TextButton(
             onPressed: onRetry,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.redAccent.withOpacity(0.18),
+              foregroundColor: cs.onSurface,
+              backgroundColor: cs.error.withValues(alpha: 0.18),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -514,6 +507,7 @@ class _ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
@@ -522,8 +516,11 @@ class _ChatTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.10), width: 0.6),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.35),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.45),
+            width: 0.6,
+          ),
         ),
         child: Row(
           children: [
@@ -537,8 +534,8 @@ class _ChatTile extends StatelessWidget {
                     userName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: cs.onSurface,
                       fontWeight: FontWeight.w700,
                       fontSize: 15.5,
                     ),
@@ -549,7 +546,7 @@ class _ChatTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.65),
+                      color: cs.onSurfaceVariant,
                       fontSize: 13,
                     ),
                   ),
@@ -564,7 +561,7 @@ class _ChatTile extends StatelessWidget {
                   Text(
                     timeText,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: cs.onSurfaceVariant,
                       fontSize: 12,
                     ),
                   ),
@@ -605,19 +602,20 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final first = userName.isNotEmpty ? userName[0].toUpperCase() : "U";
 
     return CircleAvatar(
       radius: 24,
-      backgroundColor: Colors.white.withOpacity(0.10),
+      backgroundColor: cs.surfaceContainerHighest.withValues(alpha: 0.55),
       backgroundImage: (userImage != null && userImage!.trim().isNotEmpty)
           ? NetworkImage(userImage!)
           : null,
       child: (userImage == null || userImage!.trim().isEmpty)
           ? Text(
               first,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: cs.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             )

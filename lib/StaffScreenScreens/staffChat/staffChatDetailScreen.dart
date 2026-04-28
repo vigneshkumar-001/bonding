@@ -3,10 +3,12 @@
 import 'dart:async';
 import 'package:bonding_app/BondingScreens/BlockedUsers/ViewModel/unblock_user_vm.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
-import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/block_user_vm.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/staff_chat_provider_vm.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,14 +52,14 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   double _beforeMaxExtent = 0;
   double _beforePixels = 0;
 
-  // ✅ local block state
+  // âœ… local block state
   bool _isBlocked = false;
 
   @override
   void initState() {
     super.initState();
 
-    _isBlocked = widget.isBlocked; // ✅ take initial from params
+    _isBlocked = widget.isBlocked; // âœ… take initial from params
 
     _scroll.addListener(_onScroll);
     AppLogger.log.w(
@@ -189,7 +191,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   }
 
   // =========================================================
-  // ✅ BLOCK
+  // âœ… BLOCK
   // =========================================================
   Future<void> _showBlockDialog(BuildContext context) async {
     final TextEditingController reasonCtrl = TextEditingController();
@@ -198,41 +200,42 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
         return AlertDialog(
-          backgroundColor: const Color(0xFF231d1d),
+          backgroundColor: cs.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          title: const Text(
+          title: Text(
             "Block user?",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w700),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 "Do you want to block this user? They won't be able to message you.",
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: cs.onSurfaceVariant),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: reasonCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: cs.onSurface),
                 decoration: InputDecoration(
                   hintText: "Reason (optional)",
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  hintStyle: TextStyle(color: cs.onSurfaceVariant),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
+                  fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.55),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Colors.white.withOpacity(0.12),
+                      color: cs.outlineVariant.withValues(alpha: 0.45),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Colors.white.withOpacity(0.12),
+                      color: cs.outlineVariant.withValues(alpha: 0.45),
                     ),
                   ),
                 ),
@@ -242,23 +245,21 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text(
+              child: Text(
                 "Cancel",
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: cs.onSurfaceVariant),
               ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: cs.error,
+                foregroundColor: cs.onError,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text(
-                "Yes, Block",
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text("Yes, Block"),
             ),
           ],
         );
@@ -277,7 +278,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const AppLoader.center(),
     );
 
     final ok = await blockVm.blockUser(
@@ -304,7 +305,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         ),
       );
 
-      Navigator.pop(context, true); // 🔥 RETURN TRUE
+      Navigator.pop(context, true); // ðŸ”¥ RETURN TRUE
     }
     /*   if (ok) {
       setState(() => _isBlocked = true);
@@ -333,7 +334,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   //   );
   //
   //   final ok = await blockVm.blockUser(
-  //     staffId: widget.staffId, // ✅ use actual staffId
+  //     staffId: widget.staffId, // âœ… use actual staffId
   //     isStaff: true,
   //     userId: widget.userId,
   //     reason: reason.isEmpty ? "No reason" : reason,
@@ -358,7 +359,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   // }
 
   // =========================================================
-  // ✅ UNBLOCK
+  // âœ… UNBLOCK
   // =========================================================
 
   Future<void> _showBlockedUnblockDialog() async {
@@ -413,7 +414,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const AppLoader.center(),
     );
 
     final ok = await unblockVm.unblockUser(
@@ -421,15 +422,15 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
       isStaff: true,
     );
 
-    // ✅ screen disposed? stop here
+    // âœ… screen disposed? stop here
     if (!mounted) return;
 
-    // ✅ close loader safely (only if dialog is open)
+    // âœ… close loader safely (only if dialog is open)
     if (Navigator.of(context, rootNavigator: true).canPop()) {
       Navigator.of(context, rootNavigator: true).pop();
     }
 
-    // ✅ still mounted check again (after pop)
+    // âœ… still mounted check again (after pop)
     if (!mounted) return;
 
     if (ok) {
@@ -442,7 +443,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         ),
       );
 
-      Navigator.pop(context, true); // 🔥 RETURN TRUE
+      Navigator.pop(context, true); // ðŸ”¥ RETURN TRUE
     } else {
       final messenger = ScaffoldMessenger.maybeOf(context);
       messenger?.showSnackBar(
@@ -462,7 +463,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   //   );
   //
   //   final ok = await unblockVm.unblockUser(
-  //     userId: widget.userId, // ⚠️ change to blockedId if backend expects it
+  //     userId: widget.userId, // âš ï¸ change to blockedId if backend expects it
   //     isStaff: true,
   //   );
   //
@@ -504,43 +505,20 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
 
         final inputDisabled = _isBlocked;
 
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+
+        return AppScaffold(
+          body: Column(
+            children: [
                   // ---------------- TOP BAR ----------------
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Row(
                       children: [
-                        GestureDetector(
+                        _TopIconButton(
+                          icon: Icons.arrow_back,
                           onTap: () => bondNavigator.backPage(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
                         ),
                         const SizedBox(width: 16),
                         // CircleAvatar(
@@ -554,17 +532,14 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                         //     size: 28,
                         //   ),
                         // ),
-                        CachedNetworkImage(
+                        _GradientRingAvatar(
                           imageUrl: widget.staffImage,
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                                radius: 22,
-                                backgroundImage: imageProvider,
-                              ),
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.person, color: Colors.white),
+                          fallbackText: widget.userName.isNotEmpty
+                              ? widget.userName.characters.first.toUpperCase()
+                              : "U",
+                          radius: 22,
+                          ringWidth: 2.8,
+                          ringColors: brand.primaryGradient.colors,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -573,8 +548,10 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                             children: [
                               Text(
                                 widget.userName,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: cs.onSurface,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -587,26 +564,34 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                     height: 10,
                                     decoration: BoxDecoration(
                                       color: connected
-                                          ? const Color(0xFF00ed1c)
-                                          : Colors.orange,
+                                          ? brand.online
+                                          : cs.onSurfaceVariant,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                   const SizedBox(width: 6),
-                                  AppText(
-                                    connected ? "Connected" : "Connecting...",
-                                    color: connected
-                                        ? const Color(0xFF00ed1c)
-                                        : Colors.orange,
-                                    fontSize: 13,
+                                  Flexible(
+                                    child: Text(
+                                    connected ? "Online now" : "Connecting...",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: connected
+                                          ? brand.online
+                                          : cs.onSurfaceVariant,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   ),
                                   const SizedBox(width: 10),
                                   if (_isBlocked)
-                                    const Text(
+                                    Text(
                                       "• Blocked",
                                       style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 13,
+                                        color: cs.error,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                 ],
@@ -615,44 +600,40 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                           ),
                         ),
 
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.white,
-                          ),
-                          color: const Color(0xFF35272d),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'restrict',
-                              child: Text(
-                                "Restrict",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: _isBlocked ? 'unblock' : 'block',
-                              child: Text(
-                                _isBlocked ? "Unblock" : "Block",
-                                style: TextStyle(
-                                  color: _isBlocked
-                                      ? const Color(0xFF00ed1c)
-                                      : Colors.red,
-                                ),
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'report',
-                              child: Text(
-                                "Report",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                          onSelected: (value) async {
-                            if (value == 'block') {
+	                        PopupMenuButton<String>(
+	                          color: cs.surface,
+	                          shape: RoundedRectangleBorder(
+	                            borderRadius: BorderRadius.circular(12),
+	                          ),
+	                          itemBuilder: (context) => [
+	                            PopupMenuItem(
+	                              value: 'restrict',
+	                              child: Text(
+	                                "Restrict",
+	                                style: TextStyle(color: cs.onSurface),
+	                              ),
+	                            ),
+	                            PopupMenuItem(
+	                              value: _isBlocked ? 'unblock' : 'block',
+	                              child: Text(
+	                                _isBlocked ? "Unblock" : "Block",
+	                                style: TextStyle(
+	                                  color: _isBlocked
+	                                      ? brand.online
+	                                      : cs.error,
+	                                ),
+	                              ),
+	                            ),
+	                            PopupMenuItem(
+	                              value: 'report',
+	                              child: Text(
+	                                "Report",
+	                                style: TextStyle(color: cs.error),
+	                              ),
+	                            ),
+	                          ],
+		                          onSelected: (value) async {
+		                            if (value == 'block') {
                               await _showBlockDialog(context);
                             } else if (value == 'unblock') {
                               await _showBlockedUnblockDialog();
@@ -662,12 +643,13 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                               );
                             }
                           },
-                        ),
+	                          child: const _TopIconButton(icon: Icons.more_vert),
+	                        ),
                       ],
                     ),
                   ),
 
-                  // ✅ Error Banner
+                  // âœ… Error Banner
                   AnimatedSize(
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeOut,
@@ -697,11 +679,13 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                               key: ValueKey("center_loader"),
                             )
                           : (vm.messages.isEmpty
-                                ? const Center(
+                                ? Center(
                                     key: ValueKey("empty"),
                                     child: Text(
                                       "No messages",
-                                      style: TextStyle(color: Colors.white70),
+                                      style: TextStyle(
+                                        color: cs.onSurfaceVariant,
+                                      ),
                                     ),
                                   )
                                 : ListView.builder(
@@ -714,25 +698,25 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                     ),
                                     itemCount: vm.messages.length + 1,
                                     itemBuilder: (context, index) {
-                                      if (index == 0) {
-                                        return vm.loadingMore
-                                            ? const Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                ),
+                                       if (index == 0) {
+                                         return vm.loadingMore
+                                             ? Padding(
+                                                 padding: EdgeInsets.symmetric(
+                                                   vertical: 8,
+                                                 ),
                                                 child: Center(
                                                   child: SizedBox(
                                                     width: 18,
                                                     height: 18,
                                                     child:
                                                         CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                        ),
+                                                      strokeWidth: 2,
+                                                    ),
                                                   ),
                                                 ),
                                               )
-                                            : const SizedBox(height: 6);
-                                      }
+                                             : const SizedBox(height: 6);
+                                       }
 
                                       final m = vm.messages[index - 1];
                                       final isMine =
@@ -742,6 +726,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                       return _Bubble(
                                         text: m.message ?? "",
                                         isMine: isMine,
+                                        time: m.createdAt,
                                         status: m.status,
                                         onRetry:
                                             (m.status == ChatMsgStatus.failed)
@@ -753,7 +738,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                     ),
                   ),
 
-                  // ✅ BLOCKED STRIP
+                  // âœ… BLOCKED STRIP
                   if (inputDisabled)
                     GestureDetector(
                       onTap: _showBlockedUnblockDialog,
@@ -765,15 +750,15 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2A151B),
+                          color: cs.errorContainer.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.redAccent.withOpacity(0.25),
+                            color: cs.error.withValues(alpha: 0.25),
                           ),
                         ),
                         child: Text(
                           "You blocked ${widget.userName}. Tap to unblock.",
-                          style: const TextStyle(color: Colors.white70),
+                          style: TextStyle(color: cs.onErrorContainer),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -799,13 +784,18 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                     vertical: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF231d1d),
+                                    color: cs.surfaceContainerHighest,
                                     borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: cs.outlineVariant
+                                          .withValues(alpha: 0.7),
+                                      width: 0.7,
+                                    ),
                                   ),
                                   child: TextField(
                                     controller: _text,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: cs.onSurface,
                                       fontSize: 16,
                                     ),
                                     minLines: 1,
@@ -817,7 +807,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                           ? "You blocked this user"
                                           : "Message",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey[500],
+                                        color: cs.onSurfaceVariant,
                                       ),
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.zero,
@@ -838,16 +828,21 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                               : () => _send(vm),
                           child: Opacity(
                             opacity: inputDisabled ? 0.55 : 1,
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFcc529f),
-                                shape: BoxShape.circle,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: brand.primaryGradient,
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                                size: 24,
+                              child: SizedBox(
+                                width: 52,
+                                height: 52,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.send,
+                                    color: cs.onPrimary,
+                                    size: 24,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -855,9 +850,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
+            ],
           ),
         );
       },
@@ -865,7 +858,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   }
 }
 
-// ✅ Center loader
+// âœ… Center loader
 class _CenterMiniLoader extends StatelessWidget {
   const _CenterMiniLoader({super.key});
 
@@ -881,45 +874,68 @@ class _CenterMiniLoader extends StatelessWidget {
   }
 }
 
-// ✅ Bubble
+// âœ… Bubble
 class _Bubble extends StatelessWidget {
   final String text;
   final bool isMine;
+  final DateTime time;
   final ChatMsgStatus? status;
   final VoidCallback? onRetry;
 
   const _Bubble({
     required this.text,
     required this.isMine,
+    required this.time,
     this.status,
     this.onRetry,
   });
 
+  String _fmtTime(DateTime dt) {
+    final h = dt.hour;
+    final m = dt.minute.toString().padLeft(2, '0');
+    final ap = h >= 12 ? "PM" : "AM";
+    final hh = (h % 12 == 0) ? 12 : (h % 12);
+    return "$hh:$m $ap";
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bg = isMine ? const Color(0xFF2A1F2E) : const Color(0xFF23171B);
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+    final fg = isMine ? cs.onPrimary : cs.onSurface;
 
     Widget statusWidget() {
       if (!isMine) return const SizedBox.shrink();
       switch (status) {
         case ChatMsgStatus.sending:
-          return const Padding(
-            padding: EdgeInsets.only(left: 8),
+          return Padding(
+            padding: const EdgeInsets.only(left: 8),
             child: SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: fg.withValues(alpha: 0.9),
+              ),
             ),
           );
         case ChatMsgStatus.failed:
           return GestureDetector(
             onTap: onRetry,
-            child: const Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.error, size: 16, color: Colors.redAccent),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Icon(Icons.error, size: 16, color: cs.error),
             ),
           );
         case ChatMsgStatus.sent:
+          return Padding(
+            padding: const EdgeInsets.only(left: 6),
+            child: Icon(
+              Icons.done_all,
+              size: 12,
+              color: fg.withValues(alpha: 0.9),
+            ),
+          );
         default:
           return const SizedBox.shrink();
       }
@@ -934,29 +950,51 @@ class _Bubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.78,
         ),
         decoration: BoxDecoration(
-          color: bg,
+          gradient: isMine ? brand.primaryGradient : null,
+          color: isMine
+              ? null
+              : cs.surfaceContainerHighest.withValues(alpha: 0.75),
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(15),
-            topRight: const Radius.circular(15),
-            bottomLeft: isMine ? const Radius.circular(15) : Radius.zero,
-            bottomRight: isMine ? Radius.zero : const Radius.circular(15),
+            topLeft: Radius.circular(isMine ? 18 : 0),
+            topRight: Radius.circular(isMine ? 0 : 18),
+            bottomLeft: const Radius.circular(18),
+            bottomRight: const Radius.circular(18),
           ),
-          border: Border.all(color: Colors.white.withOpacity(0.06)),
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.6),
+          ),
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment:
+              isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Flexible(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  height: 1.25,
-                ),
+            Text(
+              text,
+              style: TextStyle(
+                color: fg,
+                fontSize: 15,
+                height: 1.25,
               ),
             ),
-            statusWidget(),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _fmtTime(time),
+                    style: TextStyle(
+                      color: fg.withValues(alpha: 0.75),
+                      fontSize: 8.5,
+                    ),
+                  ),
+                  statusWidget(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -964,7 +1002,7 @@ class _Bubble extends StatelessWidget {
   }
 }
 
-// ✅ Error Banner
+// âœ… Error Banner
 class _ErrorBanner extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -978,31 +1016,32 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A151B),
+        color: cs.errorContainer.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.35)),
+        border: Border.all(color: cs.error.withValues(alpha: 0.35)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+          Icon(Icons.error_outline, color: cs.error, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(color: cs.onSurface, fontSize: 13),
             ),
           ),
           const SizedBox(width: 10),
           TextButton(
             onPressed: onRetry,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.redAccent.withOpacity(0.18),
+              foregroundColor: cs.onSurface,
+              backgroundColor: cs.error.withValues(alpha: 0.18),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -1013,9 +1052,104 @@ class _ErrorBanner extends StatelessWidget {
           const SizedBox(width: 6),
           GestureDetector(
             onTap: onClose,
-            child: const Icon(Icons.close, color: Colors.white70, size: 18),
+            child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 18),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TopIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _TopIconButton({required this.icon, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final child = Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: cs.outlineVariant.withValues(alpha: 0.7),
+          width: 0.6,
+        ),
+      ),
+      child: Icon(icon, color: cs.onSurface, size: 22),
+    );
+
+    if (onTap == null) return child;
+    return GestureDetector(onTap: onTap, child: child);
+  }
+}
+
+class _GradientRingAvatar extends StatelessWidget {
+  final String imageUrl;
+  final String fallbackText;
+  final double radius;
+  final double ringWidth;
+  final List<Color> ringColors;
+
+  const _GradientRingAvatar({
+    required this.imageUrl,
+    required this.fallbackText,
+    required this.radius,
+    required this.ringWidth,
+    required this.ringColors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final outer = radius + ringWidth;
+    final colors = ringColors.isEmpty
+        ? <Color>[cs.primary, cs.secondary, cs.primary]
+        : <Color>[...ringColors, ringColors.first];
+
+    Widget innerAvatar({ImageProvider? provider}) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: cs.surfaceContainerHighest,
+        backgroundImage: provider,
+        child: provider == null
+            ? Text(
+                fallbackText,
+                style: TextStyle(
+                  color: cs.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
+              )
+            : null,
+      );
+    }
+
+    return SizedBox(
+      width: outer * 2,
+      height: outer * 2,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: SweepGradient(colors: colors),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(ringWidth),
+          child: ClipOval(
+            child: imageUrl.trim().isEmpty
+                ? innerAvatar()
+                : CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    imageBuilder: (context, imageProvider) =>
+                        innerAvatar(provider: imageProvider),
+                    placeholder: (_, __) => innerAvatar(),
+                    errorWidget: (_, __, ___) => innerAvatar(),
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -1161,7 +1295,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     if (_userNearBottom) _scrollToBottom();
   }
 
-  // ✅ Maintain position after loading older messages
+  // âœ… Maintain position after loading older messages
   void _maybeMaintainPositionAfterLoadMore(StaffChatProviderVm vm) {
     if (!_maintainPosAfterLoadMore) return;
     if (vm.loadingMore) return; // wait until loadingMore becomes false
@@ -1183,7 +1317,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     });
   }
 
-  // ✅ Auto scroll when NEW message arrives (only if user near bottom)
+  // âœ… Auto scroll when NEW message arrives (only if user near bottom)
   void _maybeAutoScrollOnNewMessage(StaffChatProviderVm vm) {
     final newCount = vm.messages.length;
 
@@ -1281,7 +1415,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
 
     if (confirm != true) return;
 
-    // ✅ call API
+    // âœ… call API
     await _blockUserApi(reasonCtrl.text.trim());
   }
 
@@ -1314,7 +1448,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
         ),
       );
 
-      // ✅ back to previous page
+      // âœ… back to previous page
       bondNavigator.backPage(context);
     } else {
       ScaffoldMessenger.of(
@@ -1487,7 +1621,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                     ),
                   ),
 
-                  // ✅ Error Banner
+                  // âœ… Error Banner
                   AnimatedSize(
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeOut,
@@ -1554,7 +1688,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
 
                                       final m = vm.messages[index - 1];
 
-                                      // ✅ staff side: mine = staff
+                                      // âœ… staff side: mine = staff
                                       final isMine =
                                           (m.senderRole ?? "").toLowerCase() ==
                                           "staff";
@@ -1636,7 +1770,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
   }
 }
 
-// ✅ Center loader
+// âœ… Center loader
 class _CenterMiniLoader extends StatelessWidget {
   const _CenterMiniLoader({super.key});
 
@@ -1652,7 +1786,7 @@ class _CenterMiniLoader extends StatelessWidget {
   }
 }
 
-// ✅ Bubble
+// âœ… Bubble
 class _Bubble extends StatelessWidget {
   final String text;
   final bool isMine;
@@ -1735,7 +1869,7 @@ class _Bubble extends StatelessWidget {
   }
 }
 
-// ✅ Error Banner
+// âœ… Error Banner
 class _ErrorBanner extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -1758,7 +1892,7 @@ class _ErrorBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+          const Icon(Icons.error_outline, color: cs.error, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -1848,7 +1982,7 @@ class _ErrorBanner extends StatelessWidget {
 //     // userVM.updateLocalCoinBalance(newBalance);
 //     // userVM.updateUserCoinBalance(
 //     //   newBalance,
-//     //   "",           // staffId – you can pass widget.conversationID if needed
+//     //   "",           // staffId â€“ you can pass widget.conversationID if needed
 //     //   8,            // coins spent
 //     //   "0",
 //     //   "chat",       // type
@@ -1885,7 +2019,7 @@ class _ErrorBanner extends StatelessWidget {
 //             child: SafeArea(
 //               child: Column(
 //                 children: [
-//                   // ─── Top Bar ────────────────────────────────────────────────
+//                   // â”€â”€â”€ Top Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //                   Padding(
 //                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
 //                     child: Row(
@@ -1969,7 +2103,7 @@ class _ErrorBanner extends StatelessWidget {
 //                     ),
 //                   ),
 //
-//                   // ─── Messages List ──────────────────────────────────────────
+//                   // â”€â”€â”€ Messages List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //                   Expanded(
 //                     child: ZIMKitMessageListView(
 //                       conversationID: widget.conversationID,
@@ -1978,7 +2112,7 @@ class _ErrorBanner extends StatelessWidget {
 //                     ),
 //                   ),
 //
-//                   // ─── Custom Input Bar with Coin Check ──────────────────────
+//                   // â”€â”€â”€ Custom Input Bar with Coin Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //                   Container(
 //                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
 //                     color: Colors.transparent,

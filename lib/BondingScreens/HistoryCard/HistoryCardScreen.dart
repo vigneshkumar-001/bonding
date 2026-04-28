@@ -15,6 +15,10 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Reusable_Widgets/ReuseElevateButton/common_call_button.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
+import 'package:bonding_app/ui/app_background.dart';
+import 'package:bonding_app/ui/staff_hero_card.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -69,21 +73,7 @@ class _HistoryCardState extends State<HistoryCard> {
         }).toList();
 
         return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
+          body: AppBackground(
             child: SafeArea(
               child: Column(
                 children: [
@@ -94,47 +84,72 @@ class _HistoryCardState extends State<HistoryCard> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        Image.asset(
-                          "assets/Images/bonding.png",
-                          height: 32,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Image(
+                                  image: AssetImage("assets/Images/bonding.png"),
+                                  height: 30,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              "Call history",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                         const Spacer(),
 
                         // Balance
-                        GestureDetector(
-                          onTap: () {
-                            bondNavigator.newPage(
-                              context,
-                              page: const WalletScreen(),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFcc529f), Color(0xFFf86460)],
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(10),
+                            onTap: () {
+                              bondNavigator.newPage(
+                                context,
+                                page: const WalletScreen(),
+                              );
+                            },
+                            child: Ink(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  "assets/Images/goldcoin1.png",
-                                  height: 20,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF7B61FF),
+                                    Color(0xFFFF5C93),
+                                  ],
                                 ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  balance.toStringAsFixed(2),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    "assets/Images/goldcoin1.png",
+                                    height: 20,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    balance.toStringAsFixed(2),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -142,19 +157,40 @@ class _HistoryCardState extends State<HistoryCard> {
                         const SizedBox(width: 12),
 
                         // Profile
-                        GestureDetector(
-                          onTap: () => bondNavigator.newPage(
-                            context,
-                            page: const ProfileScreen(backPage: true),
-                          ),
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundImage:
-                                (currentUser?.image != null &&
-                                    currentUser!.image!.isNotEmpty)
-                                ? NetworkImage(currentUser.image!)
-                                : const AssetImage("assets/Images/profile.png")
-                                      as ImageProvider,
+                        Material(
+                          color: Colors.transparent,
+                          shape: const CircleBorder(),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () => bondNavigator.newPage(
+                              context,
+                              page: const ProfileScreen(backPage: true),
+                            ),
+                            child: SizedBox(
+                              width: 36,
+                              height: 36,
+                              child: ClipOval(
+                                child: (currentUser?.image != null &&
+                                        currentUser!.image!.isNotEmpty)
+                                    ? CachedNetworkImage(
+                                        imageUrl: currentUser.image!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) =>
+                                            const CupertinoActivityIndicator(
+                                          radius: 12,
+                                          color: Colors.white70,
+                                        ),
+                                        errorWidget: (_, __, ___) => Image.asset(
+                                          "assets/Images/profile.png",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Image.asset(
+                                        "assets/Images/profile.png",
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -274,7 +310,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                     phone: item.staffPhone,
                                     name: item.staffName,
                                     memberID: item.staffMemberID,
-                                    role: 'Staff',
+                                    role: 'Women',
                                     isLogin: true,
                                     isApproved: "1",
                                     areaOfInterest: const [],
@@ -288,7 +324,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                   ),
                                 );
 
-                                return _historyCard(context, staff, item);
+                                return _historyCardV2(context, staff, item);
                               },
                             ),
                           ),
@@ -299,6 +335,137 @@ class _HistoryCardState extends State<HistoryCard> {
           ),
         );
       },
+    );
+  }
+
+  Widget _historyCardV2(
+    BuildContext context,
+    StaffDataProfile staff,
+    UserCallHistoryItem history,
+  ) {
+    final age = staff.age;
+    final typeLabel = history.callType.name.toUpperCase();
+    final duration = history.callDurationSeconds;
+
+    String? durationLabel() {
+      if (history.callType == CallType.message ||
+          history.callType == CallType.chat) {
+        return null;
+      }
+      if (duration <= 0) return null;
+
+      final mins = duration ~/ 60;
+      final secs = duration % 60;
+
+      if (mins == 0) return "${secs}s";
+      return "${mins}m ${secs}s";
+    }
+
+    final durText = durationLabel();
+    final subtitle =
+        (durText == null || durText.isEmpty) ? typeLabel : "$typeLabel • $durText";
+
+    final title =
+        "${(staff.name).isNotEmpty ? staff.name : history.staffName}${age == null ? "" : " $age"}";
+    final tags = staff.areaOfInterest.map((i) => i.title).toList();
+    final spentText = "Spent: ${history.userSpentAmount} ${history.currency}";
+
+    return StaffHeroCard(
+      seed: history.staffId.isNotEmpty ? history.staffId : staff.id,
+      title: title,
+      subtitle: subtitle,
+      online: staff.isOnline,
+      tags: tags,
+      imageUrl: staff.image ?? history.staffImage,
+      description: spentText,
+      actions: _historyActionsRowV2(context, staff: staff, history: history),
+    );
+  }
+
+  Widget _historyActionsRowV2(
+    BuildContext context, {
+    required StaffDataProfile staff,
+    required UserCallHistoryItem history,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: CommonCallButton(
+            enabled: true,
+            text: "${staff.audioCallRatePerMinute}/min",
+            pricePerMin: staff.audioCallRatePerMinute,
+            isVideoCall: false,
+            targetUserID: staff.memberID,
+            targetUserName: staff.name,
+            targetStaffMongoId: staff.id,
+            isTargetOnline: staff.isOnline,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: CommonCallButton(
+            enabled: true,
+            text: "${staff.videoCallRatePerMinute}/min",
+            pricePerMin: staff.videoCallRatePerMinute,
+            isVideoCall: true,
+            targetUserID: staff.memberID,
+            targetUserName: staff.name,
+            targetStaffMongoId: staff.id,
+            isTargetOnline: staff.isOnline,
+          ),
+        ),
+        const SizedBox(width: 12),
+        SizedBox(
+          height: 44,
+          width: 44,
+          child: Material(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () async {
+                final currentUser = context.read<UserViewModel>().currentUser;
+                if (currentUser == null) return;
+
+                final connected = await ZimConnectionService.ensureConnected(
+                  context,
+                  userId: currentUser.memberID,
+                  userName: currentUser.name ?? "User",
+                );
+                if (!connected) return;
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
+                      create: (_) => ChatProviderVm(
+                        repo: ChatRepository(NetworkApiService()),
+                      )..initChat(
+                        staffId: history.staffId,
+                        userId: history.userId,
+                        isStaff: false,
+                      ),
+                      child: ChatDetailScreen(
+                        isBlocked: false,
+                        staffImage: staff.image ?? history.staffImage ?? '',
+                        staffId: history.staffId,
+                        staffMemberId: staff.memberID,
+                        staffName: history.staffName,
+                        userId: history.userId,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                color: Colors.white70,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -510,15 +677,16 @@ class _HistoryCardState extends State<HistoryCard> {
                                         userId: history.userId,
                                         isStaff: false,
                                       ),
-                                  child: ChatDetailScreen(
-                                    isBlocked: false,
-                                    staffImage:
-                                        staff.image ?? history.staffImage ?? '',
-                                    staffId: history.staffId,
-                                    staffName: history.staffName,
-                                    userId: history.userId,
-                                  ),
-                                ),
+                                   child: ChatDetailScreen(
+                                     isBlocked: false,
+                                     staffImage:
+                                         staff.image ?? history.staffImage ?? '',
+                                     staffId: history.staffId,
+                                     staffMemberId: staff.memberID,
+                                     staffName: history.staffName,
+                                     userId: history.userId,
+                                   ),
+                                 ),
                           ),
                         );
                       },

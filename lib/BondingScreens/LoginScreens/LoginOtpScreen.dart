@@ -3,8 +3,9 @@ import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/ui/app_gradient_button.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../BottomNavBar/BottomNavBar.dart';
@@ -50,31 +51,16 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
+        final colorScheme = Theme.of(context).colorScheme;
+        return AppScaffold(
           resizeToAvoidBottomInset: true,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
+          body: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset(
+                    Image.asset(
                       "assets/Images/bonding.png",
                       height: 35,
                       width: 35,
@@ -92,13 +78,14 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                       "Enter your code",
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                     ),
                     const SizedBox(height: 16),
 
-                    const Text(
-                      "Enter OTP:",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    AppText(
+                      "Enter OTP",
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
                     ),
                     const SizedBox(height: 12),
 
@@ -116,35 +103,35 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         ),
 
                         // Transparent TextField for input
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () => _focusNode.requestFocus(),
-                            child: Container(
-                              height: 70, // Match heart height
-                              color: Colors.transparent,
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _focusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 4,
-                                style: const TextStyle(
-                                  fontSize: 1, // Very small text (invisible)
-                                  color: Colors.transparent,
-                                ),
-                                cursorColor: Colors.transparent,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  counterText: '',
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                onChanged: (_) => setState(() {}),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   top: 0,
+                        //   left: 0,
+                        //   right: 0,
+                        //   child: GestureDetector(
+                        //     onTap: () => _focusNode.requestFocus(),
+                        //     child: Container(
+                        //       height: 70, // Match heart height
+                        //       color: Colors.transparent,
+                        //       child: TextField(
+                        //         controller: _otpController,
+                        //         focusNode: _focusNode,
+                        //         keyboardType: TextInputType.number,
+                        //         maxLength: 4,
+                        //         style: const TextStyle(
+                        //           fontSize: 1, // Very small text (invisible)
+                        //           color: Colors.transparent,
+                        //         ),
+                        //         cursorColor: Colors.transparent,
+                        //         decoration: const InputDecoration(
+                        //           border: InputBorder.none,
+                        //           counterText: '',
+                        //           contentPadding: EdgeInsets.zero,
+                        //         ),
+                        //         onChanged: (_) => setState(() {}),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
@@ -158,8 +145,8 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     // ],
                     const SizedBox(height: 40),
 
-                    GestureDetector(
-                      onTap: vm.isVerifying
+                    AppGradientButton(
+                      onPressed: vm.isVerifying
                           ? null
                           : () async {
                               final otp = _otpController.text.trim();
@@ -247,50 +234,29 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         //   Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
                         // }
                       },*/
-                      child: Container(
-                        height: 50,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          gradient: vm.isVerifying
-                              ? const LinearGradient(
-                                  colors: [Colors.grey, Colors.blueGrey],
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
-                                  ],
-                                ),
-                        ),
-                        child: Center(
-                          child: vm.isVerifying
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
-                              : const Text(
-                                  "Login  →",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
+                      child: vm.isVerifying
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                          : const Text(
+                              "Login →",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                     ),
 
                     const SizedBox(height: 30),
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );

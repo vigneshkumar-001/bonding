@@ -2,6 +2,9 @@ import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/DeleteReasonScre
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart'; // If you use AppText
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart'; // For navigation
+import 'package:bonding_app/Reusable_Widgets/Common_AppBar/common_app_bar.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 
 class DeleteAccountScreen extends StatelessWidget {
   final bool isStaff;
@@ -9,45 +12,24 @@ class DeleteAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(
-        0xFF100a0a,
-      ), // Same background as ProfileScreen
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () {
-            bondNavigator.backPage(context);
-          },
-          child: Container(
-            margin: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF35272d),
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-          ),
-        ),
-        title: const Text(
-          "Delete Account",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: true,
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+
+    return AppScaffold(
+      appBar: const CommonAppBar(
+        title: "Delete Account",
+        usePaddedLeading: true,
+        bg: Colors.transparent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Are you sure want to delete account ?",
               style: TextStyle(
-                color: Colors.white,
+                color: cs.onSurface,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 height: 1.3,
@@ -57,12 +39,14 @@ class DeleteAccountScreen extends StatelessWidget {
 
             // First bullet point
             _buildBulletPoint(
+              context,
               "Information related to your account will be kept for 30 days\nand will be completely purged after no activity for continuous 30 days.",
             ),
             const SizedBox(height: 24),
 
             // Second bullet point
             _buildBulletPoint(
+              context,
               "After the account is deleted, you will no longer be able to log in or use the account, and the account cannot be recovered.",
             ),
 
@@ -81,9 +65,7 @@ class DeleteAccountScreen extends StatelessWidget {
 
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
-                  ),
+                  gradient: brand.primaryGradient,
                 ),
                 alignment: Alignment.center,
                 child: const Text(
@@ -109,25 +91,16 @@ class DeleteAccountScreen extends StatelessWidget {
 
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF241628),
-                      Color(0xFF2c1522),
-                      Color(0xFF321818),
-                    ],
+                  color: cs.surfaceContainerHighest.withValues(alpha: 0.35),
+                  border: Border.all(
+                    color: cs.outlineVariant.withValues(alpha: 0.45),
+                    width: 0.8,
                   ),
                 ),
                 alignment: Alignment.center,
                 child: ShaderMask(
                   shaderCallback: (Rect bounds) {
-                    return const LinearGradient(
-                      colors: [
-                        Color(0xFF9D4EDD),
-                        Color(0xFFFF5A5F),
-                      ], // Same gradient as Continue button
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ).createShader(bounds);
+                    return brand.primaryGradient.createShader(bounds);
                   },
                   child: AppText(
                     "Go back",
@@ -148,7 +121,7 @@ class DeleteAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBulletPoint(String text) {
+  Widget _buildBulletPoint(BuildContext context, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,8 +138,8 @@ class DeleteAccountScreen extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 16,
               height: 1.5,
             ),

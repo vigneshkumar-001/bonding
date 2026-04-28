@@ -3,6 +3,8 @@ import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -35,24 +37,11 @@ class _InterestScreenState extends State<InterestScreen> {
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF5A1F3F),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+        return AppScaffold(
+          safeArea: true,
+          body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
@@ -68,14 +57,17 @@ class _InterestScreenState extends State<InterestScreen> {
                           children: [
                             GestureDetector(
                               onTap: () => bondNavigator.backPage(context),
-                              child: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                color: cs.onSurface,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             AppText(
                               "Select your Interest",
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: cs.onSurface,
                             ),
                           ],
                         ),
@@ -84,7 +76,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         AppText(
                           "Select a Few of your Interest to match with users who have similar things in common.",
                           fontSize: 15,
-                          color: const Color(0xFFc7c7cc),
+                          color: cs.onSurfaceVariant,
                           maxLines: 2,
                         ),
 
@@ -93,7 +85,7 @@ class _InterestScreenState extends State<InterestScreen> {
                           Center(
                             child: Text(
                               vm.interestError!,
-                              style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                              style: TextStyle(color: cs.error, fontSize: 14),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -151,8 +143,13 @@ class _InterestScreenState extends State<InterestScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: selectedCount >= 3 && !vm.isUpdatingInterests
-                              ? const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)])
-                              : const LinearGradient(colors: [Color(0xFF353535), Color(0xFF353535)]),
+                              ? brand.primaryGradient
+                              : LinearGradient(
+                                  colors: [
+                                    cs.surfaceContainerHighest,
+                                    cs.surfaceContainerHighest,
+                                  ],
+                                ),
                         ),
                         child: Center(
                           child: vm.isUpdatingInterests
@@ -163,8 +160,8 @@ class _InterestScreenState extends State<InterestScreen> {
                           )
                               : Text(
                             "Select atleast $selectedCount/3 Interest  →",
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: cs.onPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -175,8 +172,6 @@ class _InterestScreenState extends State<InterestScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
         );
       },
     );

@@ -27,6 +27,7 @@ class ChatProviderVm extends ChangeNotifier {
   StreamSubscription? _subReceive;
   StreamSubscription? _subError;
   StreamSubscription? _subBlocked;
+  StreamSubscription? _subTyping;
 
   bool _joined = false;
 
@@ -34,6 +35,12 @@ class ChatProviderVm extends ChangeNotifier {
   String? _userId;
 
   bool _listenersAttached = false;
+
+  bool _viewerIsStaff = false;
+  bool _isStaffTyping = false;
+  Timer? _typingHideTimer;
+
+  bool get isStaffTyping => _isStaffTyping;
 
   // ============================
   // ✅ INIT
@@ -45,6 +52,7 @@ class ChatProviderVm extends ChangeNotifier {
   }) async {
     _staffId = staffId;
     _userId = userId;
+    _viewerIsStaff = isStaff;
 
     await loadHistory(reset: true, isStaff: isStaff);
 
@@ -255,6 +263,38 @@ class ChatProviderVm extends ChangeNotifier {
       notifyListeners();
     });
 
+    _subTyping ??= _socket.typingStream.listen((data) {
+      if (data is! Map) return;
+      final m = Map<String, dynamic>.from(data);
+
+      final staffId = (m["staffId"] ?? "").toString();
+      final userId = (m["userId"] ?? "").toString();
+      if (staffId != _staffId || userId != _userId) return;
+
+      final role =
+          (m["role"] ?? m["senderRole"] ?? m["from"] ?? "").toString().toLowerCase();
+      final isTyping = (m["isTyping"] == true) ||
+          (m["typing"] == true) ||
+          (m["status"] ?? "").toString().toLowerCase() == "typing";
+
+      // For user chat screen: peer is staff. For staff screen: peer is user.
+      final peerRole = _viewerIsStaff ? "user" : "staff";
+      if (role.isNotEmpty && role != peerRole) return;
+
+      if (isTyping) {
+        _isStaffTyping = true;
+        _typingHideTimer?.cancel();
+        _typingHideTimer = Timer(const Duration(seconds: 2), () {
+          _isStaffTyping = false;
+          notifyListeners();
+        });
+        notifyListeners();
+      } else if (_isStaffTyping) {
+        _isStaffTyping = false;
+        notifyListeners();
+      }
+    });
+
     _subError ??= _socket.chatErrorStream.listen((e) {
       error = e.toString();
       debugPrint("❌ SOCKET ERROR: $error");
@@ -278,6 +318,8 @@ class ChatProviderVm extends ChangeNotifier {
     _subReceive?.cancel();
     _subError?.cancel();
     _subBlocked?.cancel();
+    _subTyping?.cancel();
+    _typingHideTimer?.cancel();
     super.dispose();
   }
 }

@@ -4,6 +4,8 @@ import 'package:bonding_app/BondingScreens/LoginScreens/IdentityScreen/IdentityS
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,26 +25,13 @@ class _AddProfileState extends State<AddProfile> {
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+        return AppScaffold(
+          safeArea: true,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
@@ -66,8 +55,12 @@ class _AddProfileState extends State<AddProfile> {
                           height: 220,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white24, width: 1.2),
-                            color: const Color(0xFF5b2749),
+                            border: Border.all(
+                              color: cs.outlineVariant.withValues(alpha: 0.7),
+                              width: 1.2,
+                            ),
+                            color: cs.surfaceContainerHighest
+                                .withValues(alpha: 0.35),
                             image: vm.selectedProfileImage != null
                                 ? DecorationImage(
                               image: FileImage(vm.selectedProfileImage!),
@@ -90,7 +83,7 @@ class _AddProfileState extends State<AddProfile> {
                         "Add your best photo",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: cs.onSurface,
                       ),
                     ),
 
@@ -100,7 +93,7 @@ class _AddProfileState extends State<AddProfile> {
                       padding: const EdgeInsets.only(left: 12.0),
                       child: AppText(
                         "Bonding is building real dating between real people. At least add one photo of yourself",
-                        color: const Color(0xFFc7c7cc),
+                        color: cs.onSurfaceVariant,
                         fontSize: 16,
                         maxLines: 3,
                       ),
@@ -111,7 +104,7 @@ class _AddProfileState extends State<AddProfile> {
                       Center(
                         child: Text(
                           vm.uploadError!,
-                          style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                          style: TextStyle(color: cs.error, fontSize: 14),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -146,10 +139,13 @@ class _AddProfileState extends State<AddProfile> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isUploading
-                              ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
-                              : const LinearGradient(
-                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                          ),
+                              ? LinearGradient(
+                                  colors: [
+                                    cs.surfaceContainerHighest,
+                                    cs.surfaceContainerHighest,
+                                  ],
+                                )
+                              : brand.primaryGradient,
                         ),
                         child: Center(
                           child: vm.isUploading
@@ -182,16 +178,19 @@ class _AddProfileState extends State<AddProfile> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF251528), Color(0xFF341818)],
+                          color: cs.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.55),
                           ),
                         ),
                         child: Center(
                           child: ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                            ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-                            child:  AppText(
+                            shaderCallback: (bounds) => brand.primaryGradient
+                                .createShader(
+                              Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                            ),
+                            child: AppText(
                               "Skip & Continue",
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -206,8 +205,6 @@ class _AddProfileState extends State<AddProfile> {
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );

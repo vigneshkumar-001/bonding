@@ -2,6 +2,8 @@ import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/HomeScreen.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -19,24 +21,11 @@ class _AllsetScreenState extends State<AllsetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF5A1F3F),
-              Color(0xFF5A1F3F),
-              Color(0xFF140810),
-              Color(0xFF140810),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+    return AppScaffold(
+      safeArea: true,
+      body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
@@ -61,12 +50,12 @@ class _AllsetScreenState extends State<AllsetScreen> {
                             onTap: (){
                               bondNavigator.backPage(context);
                             },
-                            child: Icon(Icons.arrow_back_ios,color: Colors.white,)),
+                            child: Icon(Icons.arrow_back_ios,color: cs.onSurface,)),
                         AppText(
                           "Your Profile Is All Set!",
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: cs.onSurface,
                         ),
                       ],
                     ),
@@ -77,7 +66,7 @@ class _AllsetScreenState extends State<AllsetScreen> {
                     AppText(
                       "You’re ready to start discovering meaningful connections.",
                       fontSize: 15,
-                      color: const Color(0xFFc7c7cc),
+                      color: cs.onSurfaceVariant,
                       maxLines: 2,
                     ),
                   ],
@@ -105,18 +94,13 @@ class _AllsetScreenState extends State<AllsetScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFB86AF6),
-                          Color(0xFFFF6A6A),
-                        ],
-                      ),
+                      gradient: brand.primaryGradient,
                     ),
                     child: Center(
                       child: Text(
                         "Start Discovering  →",
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: cs.onPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -127,8 +111,6 @@ class _AllsetScreenState extends State<AllsetScreen> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 

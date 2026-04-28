@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:bonding_app/theme/brand_theme.dart';
+
 class GradientAppText extends StatelessWidget {
   final String text;
   final double fontSize;
@@ -14,26 +16,16 @@ class GradientAppText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brand = BrandTheme.of(context);
     return ShaderMask(
       shaderCallback: (Rect bounds) {
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          stops: [0.0, 0.2174, 0.5403, 0.8528],
-          colors: [
-            Color(0xFF54d17a),
-            Color(0xFF4ebfbb),
-            Color(0xFF4bade2),
-            Color(0xFF559bff),
-          ],
-        ).createShader(bounds);
+        return brand.primaryGradient.createShader(bounds);
       },
       child: Text(
         text,
         style: TextStyle(
           fontSize: fontSize,
           color: Colors.white,
-          fontFamily: 'BricolageGrotesque',
           fontWeight: fontWeight ?? FontWeight.w300,
         ),
       ),

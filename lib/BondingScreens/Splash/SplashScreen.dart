@@ -17,6 +17,7 @@ import 'package:bonding_app/StaffScreenScreens/StaffSelectInterestScreen/StaffSe
 import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/VerificationApprovedScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationInprogressScreen/VerificationInprogressScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -188,38 +189,21 @@ class _SplashscreenState extends State<Splashscreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Color(0xFF5A1F3F), Color(0xFF3A152A), Color(0xFF140810)],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset("assets/Images/bonding.png", height: 80),
-              const SizedBox(height: 16),
-              // Container(
-              //   width: 140,
-              //   height: 3,
-              //   decoration: BoxDecoration(
-              //     color: Colors.white.withOpacity(0.6),
-              //     borderRadius: BorderRadius.circular(10),
-              //   ),
-              // ),
-              const SizedBox(height: 20),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
-                strokeWidth: 3,
+    final colorScheme = Theme.of(context).colorScheme;
+    return AppScaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset("assets/Images/bonding.png", height: 80),
+            const SizedBox(height: 20),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                colorScheme.onSurfaceVariant,
               ),
-            ],
-          ),
+              strokeWidth: 3,
+            ),
+          ],
         ),
       ),
     );

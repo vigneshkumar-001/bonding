@@ -3,6 +3,7 @@ import 'package:bonding_app/BondingScreens/HistoryCard/HistoryCardScreen.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/HomeScreen.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/ProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/Transactions/TransactionScreen.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -64,75 +65,107 @@ class _MainBottomBarState extends State<MainBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    final brand = BrandTheme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBody: true,
         body: _screens[_selectedIndex],
 
         /// 🔹 Custom Floating Bottom Bar
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF282323),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(14),
-              topRight: Radius.circular(14),
-            ),
-          ),
-          child: SafeArea(
-            child: Container(
-              height: 60,
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navItem("assets/Images/discover.svg", 0),
-                  _navItem("assets/Images/history.svg", 1),
-                  _navItem("assets/Images/chat.svg", 2),
-                  _navItem("assets/Images/trans.svg", 3),
-                  _navItem("assets/Images/profile.svg", 4),
-                ],
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
+          indicatorColor: Colors.transparent,
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) {
+            setState(() => _selectedIndex = index);
+          },
+          destinations: [
+            NavigationDestination(
+              icon: _navIcon(
+                "assets/Images/discover.svg",
+                colorScheme.onSurfaceVariant,
               ),
+              selectedIcon: _selectedNavIcon(
+                "assets/Images/discover.svg",
+                brand: brand,
+              ),
+              label: "Home",
             ),
-          ),
+            NavigationDestination(
+              icon: _navIcon(
+                "assets/Images/history.svg",
+                colorScheme.onSurfaceVariant,
+              ),
+              selectedIcon: _selectedNavIcon(
+                "assets/Images/history.svg",
+                brand: brand,
+              ),
+              label: "History",
+            ),
+            NavigationDestination(
+              icon: _navIcon(
+                "assets/Images/chat.svg",
+                colorScheme.onSurfaceVariant,
+              ),
+              selectedIcon: _selectedNavIcon(
+                "assets/Images/chat.svg",
+                brand: brand,
+              ),
+              label: "Chat",
+            ),
+            NavigationDestination(
+              icon: _navIcon(
+                "assets/Images/trans.svg",
+                colorScheme.onSurfaceVariant,
+              ),
+              selectedIcon: _selectedNavIcon(
+                "assets/Images/trans.svg",
+                brand: brand,
+              ),
+              label: "Wallet",
+            ),
+            NavigationDestination(
+              icon: _navIcon(
+                "assets/Images/profile.svg",
+                colorScheme.onSurfaceVariant,
+              ),
+              selectedIcon: _selectedNavIcon(
+                "assets/Images/profile.svg",
+                brand: brand,
+              ),
+              label: "Profile",
+            ),
+          ],
         ),
       ),
     );
   }
 
   /// 🔹 Bottom Nav Item
-  Widget _navItem(String svgPath, int index) {
-    final bool isActive = _selectedIndex == index;
+  Widget _navIcon(String svgPath, Color color) {
+    return SvgPicture.asset(
+      svgPath,
+      width: 26,
+      height: 26,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: 46,
-        height: 46,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: isActive
-              ? const LinearGradient(
-                  colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                )
-              : null,
-        ),
-        child: Center(
-          child: SvgPicture.asset(
-            svgPath,
-            width: 28,
-            height: 28,
-            colorFilter: ColorFilter.mode(
-              isActive ? Colors.white : Color(0XFFbebdbd),
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
+  Widget _selectedNavIcon(String svgPath, {required BrandTheme brand}) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        gradient: brand.primaryGradient,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: SvgPicture.asset(
+        svgPath,
+        width: 24,
+        height: 24,
+        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
       ),
     );
   }

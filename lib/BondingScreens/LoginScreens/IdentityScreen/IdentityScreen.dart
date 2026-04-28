@@ -3,6 +3,8 @@ import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -42,17 +44,13 @@ class _IdentityScreenState extends State<IdentityScreen> {
       firstDate: DateTime(1950),
       lastDate: DateTime.now().subtract(const Duration(days: 18 * 365)),
       builder: (context, child) {
+        final cs = Theme.of(context).colorScheme;
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFB86AF6),
-              onPrimary: Colors.white,
-              surface: Color(0xFF2A1A2A),
-              onSurface: Colors.white,
-            ),
+            colorScheme: cs,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6A6A),
+                foregroundColor: cs.primary,
               ),
             ),
           ),
@@ -74,27 +72,14 @@ class _IdentityScreenState extends State<IdentityScreen> {
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+        return AppScaffold(
+          safeArea: true,
           resizeToAvoidBottomInset: true,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
@@ -105,17 +90,14 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       children: [
                         GestureDetector(
                           onTap: () => bondNavigator.backPage(context),
-                          child: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                          ),
+                          child: Icon(Icons.arrow_back_ios, color: cs.onSurface),
                         ),
                         const SizedBox(width: 12),
                         AppText(
                           "Identify yourself",
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: cs.onSurface,
                         ),
                       ],
                     ),
@@ -124,7 +106,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     AppText(
                       "Introduce yourself fill out the details so people know about you.",
                       fontSize: 15,
-                      color: const Color(0xFFc7c7cc),
+                      color: cs.onSurfaceVariant,
                       maxLines: 2,
                     ),
 
@@ -149,19 +131,20 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     const SizedBox(height: 30),
                     AppText(
                       "Name:",
-                      color: Colors.white,
+                      color: cs.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: nameController,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: cs.onSurface),
                       decoration: InputDecoration(
                         hintText: "Enter your name",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: TextStyle(color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: const Color(0xFF231d1d),
+                        fillColor: cs.surfaceContainerHighest
+                            .withValues(alpha: 0.55),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
@@ -173,7 +156,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
 
                     AppText(
                       "Birthday:",
-                      color: Colors.white,
+                      color: cs.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -184,12 +167,13 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       onTap: () => _selectDate(context),
                       controller: dobController,
                       readOnly: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: cs.onSurface),
                       decoration: InputDecoration(
                         hintText: "DD/MM/YYYY",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: TextStyle(color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: const Color(0xFF231d1d),
+                        fillColor: cs.surfaceContainerHighest
+                            .withValues(alpha: 0.55),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(12),
                           child: SvgPicture.asset(
@@ -209,7 +193,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
 
                     AppText(
                       "Bio:",
-                      color: Colors.white,
+                      color: cs.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -217,13 +201,14 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     TextField(
                       controller: bioController,
                       maxLines: 4,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: cs.onSurface),
                       decoration: InputDecoration(
                         hintText:
                             "Ex: A coffee lover who enjoys late-night conversations.",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: TextStyle(color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: const Color(0xFF231d1d),
+                        fillColor: cs.surfaceContainerHighest
+                            .withValues(alpha: 0.55),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
@@ -237,10 +222,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       Center(
                         child: Text(
                           vm.bioError!,
-                          style: const TextStyle(
-                            color: Colors.redAccent,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: cs.error, fontSize: 14),
                         ),
                       ),
                     ],
@@ -296,15 +278,13 @@ class _IdentityScreenState extends State<IdentityScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           gradient: vm.isUpdatingBio
-                              ? const LinearGradient(
-                                  colors: [Colors.grey, Colors.blueGrey],
-                                )
-                              : const LinearGradient(
+                              ? LinearGradient(
                                   colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
+                                    cs.surfaceContainerHighest,
+                                    cs.surfaceContainerHighest,
                                   ],
-                                ),
+                                )
+                              : brand.primaryGradient,
                         ),
                         child: Center(
                           child: vm.isUpdatingBio
@@ -316,10 +296,10 @@ class _IdentityScreenState extends State<IdentityScreen> {
                                     strokeWidth: 2.5,
                                   ),
                                 )
-                              : const Text(
+                              : Text(
                                   "Continue  →",
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: cs.onPrimary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -332,8 +312,6 @@ class _IdentityScreenState extends State<IdentityScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );
@@ -348,17 +326,30 @@ class _IdentityScreenState extends State<IdentityScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             gradient: isActive
-                ? const LinearGradient(
-                    colors: [Color(0xFF8f51d1), Color(0xFFc350a9)],
-                  )
+                ? BrandTheme.of(context).primaryGradient
                 : null,
-            color: isActive ? null : const Color(0xFF5a344b),
+            color: isActive
+                ? null
+                : Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.45),
+            border: isActive
+                ? null
+                : Border.all(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outlineVariant
+                        .withValues(alpha: 0.55),
+                  ),
           ),
           child: Center(
             child: Text(
               text,
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.white70,
+                color: isActive
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),

@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Reusable_Widgets/Common_AppBar/common_app_bar.dart';
+import '../../ui/app_loader.dart';
+import '../../ui/app_scaffold.dart';
 import 'ViewModel/privacy_policyVM.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
@@ -23,20 +25,19 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF100A0A),
-      appBar: CommonAppBar(
+    final cs = Theme.of(context).colorScheme;
+
+    return AppScaffold(
+      appBar: const CommonAppBar(
         title: 'Privacy Policy',
         usePaddedLeading: true,
-        bg: Color(0xFF100A0A),
+        bg: Colors.transparent,
       ),
 
       body: Consumer<PrivacyPolicyVM>(
         builder: (context, vm, _) {
           if (vm.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            );
+            return const AppLoader.center();
           }
 
           if (vm.errorMessage != null) {
@@ -48,17 +49,19 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                   children: [
                     Text(
                       "Failed to load Privacy Policy",
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: cs.onSurface,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    Text(vm.errorMessage!, textAlign: TextAlign.center),
+                    Text(
+                      vm.errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.onSurfaceVariant),
+                    ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2A1C1C),
-                        foregroundColor: Colors.white,
-                      ),
                       onPressed: vm.fetchPrivacyPolicy,
                       child: const Text("Retry"),
                     ),
@@ -72,14 +75,14 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
             return Center(
               child: Text(
                 "No Privacy Policy found.",
-                style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                style: TextStyle(color: cs.onSurfaceVariant),
               ),
             );
           }
 
           return RefreshIndicator(
-            color: Colors.white, // ✅ visible on dark
-            backgroundColor: const Color(0xFF1A1212),
+            color: cs.primary,
+            backgroundColor: cs.surfaceContainerHighest,
             onRefresh: vm.refresh,
             child: ListView(
               padding: const EdgeInsets.all(16),
@@ -89,9 +92,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.9,
-                    color: Colors.white.withOpacity(
-                      0.78,
-                    ), // ✅ better readability
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.92),
                   ),
                 ),
               ],
@@ -102,3 +103,4 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
     );
   }
 }
+

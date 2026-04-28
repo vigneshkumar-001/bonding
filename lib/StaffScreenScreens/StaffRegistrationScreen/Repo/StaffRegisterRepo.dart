@@ -44,7 +44,7 @@ class StaffRepository {
       );
 
       if (kDebugMode) {
-        print("Staff Register Response: $response");
+        debugPrint("Register response: $response");
       }
 
       final staffResp = StaffRegisterResponse.fromJson(response);
@@ -74,7 +74,7 @@ class StaffRepository {
       );
 
       if (kDebugMode) {
-        print("Staff ID Verify Response: $response");
+        debugPrint("ID verify response: $response");
       }
 
       final verifyResp = StaffIdVerifyResponse.fromJson(response);
@@ -103,7 +103,7 @@ class StaffRepository {
       );
 
       if (kDebugMode) {
-        print("Update Profile Raw Response: $response");
+        debugPrint("Profile image upload response: $response");
       }
 
       final updateResp = UpdateProfileResponse.fromJson(response);
@@ -132,11 +132,11 @@ class StaffRepository {
       );
 
       if (kDebugMode) {
-        print("Update Area of Interest Response: $response");
+        debugPrint("Interests update response: $response");
       }
 
       final resp = AreaOfInterestResponse.fromJson(response);
-      print("......$resp");
+      if (kDebugMode) debugPrint("Interests update parsed: $resp");
 
       if (resp.isSuccess) {
         return resp;
@@ -156,8 +156,10 @@ class StaffRepository {
         // headers: {'Authorization': 'Bearer $token'},
       );
 
-      print("Get Staff Details Raw Response: $response");
-      AppLogger.log.i("Get Staff Details Raw Response: $response");
+      if (kDebugMode) {
+        debugPrint("Details response: $response");
+        AppLogger.log.i("Details response: $response");
+      }
 
       final staffResp = StaffDetailsResponse.fromJson(response);
 
@@ -182,8 +184,10 @@ class StaffRepository {
         // headers: {'Authorization': 'Bearer ${await AuthService.getToken()}'},
       );
 
-      print("Get Staff Single Data Raw Response: $response");
-AppLogger.log.i("Get Staff Single Data Raw Response: $response");
+      if (kDebugMode) {
+        debugPrint("Single data response: $response");
+        AppLogger.log.i("Single data response: $response");
+      }
       final staffResp = StaffSingleDataResponse.fromJson(response);
 
       if (staffResp.status && staffResp.data != null) {
@@ -203,8 +207,8 @@ AppLogger.log.i("Get Staff Single Data Raw Response: $response");
       );
 
       if (kDebugMode) {
-        print("Staff Call History Response: $response");
-        AppLogger.log.i("Staff Call History Response: $response");
+        debugPrint("Call history response: $response");
+        AppLogger.log.i("Call history response: $response");
       }
 
       final resp = CallHistoryResponse.fromJson(response);
@@ -227,7 +231,7 @@ AppLogger.log.i("Get Staff Single Data Raw Response: $response");
       );
 
       if (kDebugMode) {
-        print("Staff Call Stats Response: $response");
+        debugPrint("Call stats response: $response");
       }
 
       final resp = StaffCallStatsResponse.fromJson(response);
@@ -238,8 +242,8 @@ AppLogger.log.i("Get Staff Single Data Raw Response: $response");
         throw Exception(resp.message ?? "Failed to fetch call stats");
       }
     } catch (e,st) {
-      debugPrint("StaffRepository getStaffCallStats error: $e");
-      AppLogger.log.e('StaffRepository getStaffCallStats error:\n$e,$st');
+      if (kDebugMode) debugPrint("getStaffCallStats error: $e");
+      AppLogger.log.e('getStaffCallStats error:\n$e,$st');
 
       throw Exception("Failed to fetch call stats: $e");
     }
@@ -252,7 +256,7 @@ AppLogger.log.i("Get Staff Single Data Raw Response: $response");
       );
 
       if (kDebugMode) {
-        print("Weekly Call Graph Response: $response");
+        debugPrint("Weekly call graph response: $response");
       }
 
       final resp = StaffWeeklyCallGraphResponse.fromJson(response);

@@ -588,7 +588,9 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
 
         final isApproved = staff.isApproved?.toString() ?? '0';
 
-        print("????????? isApproved: $isApproved (raw: ${staff.isApproved})");
+        if (kDebugMode) {
+          debugPrint("isApproved: $isApproved (raw: ${staff.isApproved})");
+        }
 
         return Scaffold(
           backgroundColor: const Color(0xFF140810),

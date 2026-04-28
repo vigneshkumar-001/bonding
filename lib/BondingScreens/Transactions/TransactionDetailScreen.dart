@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:bonding_app/BondingScreens/Transactions/Model/TransactionHistoryModel.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // for nice date formatting
 
@@ -18,16 +20,35 @@ class TransactionDetailsScreen extends StatelessWidget {
     final isCompleted = transaction.paymentStatus.toLowerCase() == 'paid';
     final isPending = transaction.paymentStatus.toLowerCase() == 'created';
     final formattedDate = DateFormat('dd MMM yyyy, h:mm a').format(transaction.createdAt);
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color(0xFF100a0a),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
+    Widget _buildDetailRow(String label, String value) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: cs.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return AppScaffold(
+      safeArea: true,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
                 // Top Bar
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -36,14 +57,20 @@ class TransactionDetailsScreen extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () => bondNavigator.backPage(context),
-                        child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: cs.onSurface,
+                          size: 24,
+                        ),
                       ),
-                      SizedBox(width: 100,),
-                      AppText(
-                        "Transaction Details",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppText(
+                          "Transaction Details",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: cs.onSurface,
+                        ),
                       ),
 
                     ],
@@ -64,8 +91,8 @@ class TransactionDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       transaction.userName.isNotEmpty ? transaction.userName : "User",
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: cs.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -73,7 +100,7 @@ class TransactionDetailsScreen extends StatelessWidget {
                     Text(
                       "ID: ${transaction.razorpayOrderId.substring(0, 10)}...",
                       style: TextStyle(
-                        color: Colors.grey[500],
+                        color: cs.onSurfaceVariant,
                         fontSize: 14,
                       ),
                     ),
@@ -85,8 +112,8 @@ class TransactionDetailsScreen extends StatelessWidget {
                 // Amount (dynamic)
                 Text(
                   "₹${transaction.totalAmount}",
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: cs.onSurface,
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                   ),
@@ -127,7 +154,7 @@ class TransactionDetailsScreen extends StatelessWidget {
                 Text(
                   formattedDate,
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: cs.onSurfaceVariant,
                     fontSize: 14,
                   ),
                 ),
@@ -141,8 +168,11 @@ class TransactionDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF35272d).withOpacity(0.2),
+                      color: cs.surfaceContainerHighest.withValues(alpha: 0.35),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.45),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,26 +184,29 @@ class TransactionDetailsScreen extends StatelessWidget {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                gradient: brand.primaryGradient,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Center(
-                                child: Icon(Icons.payment, color: Colors.black, size: 32), // Razorpay icon or bank
+                                child: Icon(Icons.payment, color: Colors.white, size: 28), // Razorpay icon or bank
                               ),
                             ),
                             const SizedBox(width: 12),
                             AppText(
                               "Razorpay Payment",
-                              color: Colors.white,
+                              color: cs.onSurface,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
                           ],
                         ),
 
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Divider(color: Colors.grey, thickness: 0.2),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Divider(
+                            color: cs.outlineVariant.withValues(alpha: 0.35),
+                            thickness: 0.6,
+                          ),
                         ),
 
                         // Dynamic Details
@@ -197,32 +230,7 @@ class TransactionDetailsScreen extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
 }

@@ -1,9 +1,12 @@
-import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
+﻿import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -71,29 +74,16 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
-        return Scaffold(
+        final cs = Theme.of(context).colorScheme;
+        final brand = BrandTheme.of(context);
+
+        return AppScaffold(
           resizeToAvoidBottomInset: true,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                     const SizedBox(height: 10),
                     Image.asset(
                       "assets/Images/bonding.png",
@@ -113,7 +103,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                       "Enter your code",
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: cs.onSurface,
                     ),
                     const SizedBox(height: 16),
 
@@ -197,13 +187,13 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 return;
                               }
 
-                              // ✅ IMPORTANT: use the boolean result
+                              // âœ… IMPORTANT: use the boolean result
                               final success = await vm.staffVerifyOtp(
                                 widget.phoneNumber,
                                 otp,
                               );
 
-                              // ✅ If API says invalid OTP, STOP HERE
+                              // âœ… If API says invalid OTP, STOP HERE
                               if (!success) {
                                 Utils.snackBarErrorMessage(
                                   vm.verifyError ?? "Invalid OTP",
@@ -211,7 +201,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 return;
                               }
 
-                              // ✅ success => response must be non-null
+                              // âœ… success => response must be non-null
                               final response = vm.verifyResponse;
                               if (response == null) {
                                 Utils.snackBarErrorMessage(
@@ -246,23 +236,11 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                               ? const LinearGradient(
                                   colors: [Colors.grey, Colors.blueGrey],
                                 )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
-                                  ],
-                                ),
+                              : brand.primaryGradient,
                         ),
                         child: Center(
                           child: vm.isVerifying
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
+                              ? const AppLoader(radius: 10, color: Colors.white)
                               : const Text(
                                   "Confirm  →",
                                   style: TextStyle(
@@ -385,8 +363,6 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
         );
       },
     );
@@ -432,3 +408,4 @@ class HeartOtpDisplay extends StatelessWidget {
     );
   }
 }
+

@@ -1,10 +1,10 @@
-import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
-import 'package:bonding_app/BondingScreens/LoginScreens/LoginScreen.dart';
+﻿import 'package:bonding_app/BondingScreens/LoginScreens/LoginScreen.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/StaffRegistrationScreens.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AccountSelectScreen extends StatefulWidget {
   const AccountSelectScreen({super.key});
@@ -14,30 +14,17 @@ class AccountSelectScreen extends StatefulWidget {
 }
 
 class _AccountSelectScreenState extends State<AccountSelectScreen> {
-  // 0 = none, 1 = User, 2 = Staff
+  // 0 = none, 1 = Men, 2 = Women
   int selectedAccount = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF5A1F3F),
-              Color(0xFF3A152A),
-              Color(0xFF140810),
-              Color(0xFF140810),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
+    final cs = Theme.of(context).colorScheme;
+    final brand = BrandTheme.of(context);
+
+    return AppScaffold(
+      body: Column(
+        children: [
               const SizedBox(height: 20),
 
               // Logo
@@ -45,7 +32,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: SvgPicture.asset(
+                  child: Image.asset(
                     "assets/Images/bonding.png",
                     height: 40,
                   ),
@@ -55,10 +42,10 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
               const SizedBox(height: 40),
 
               // Title
-              const Text(
+              Text(
                 "Choose account type",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: cs.onSurface,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
@@ -72,10 +59,10 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                 children: [
                   // User Card
                   _buildAccountCard(
+                    context: context,
                     height: 120,
-                    imagePath:
-                        "assets/Images/men.png",
-                    label: "men ",
+                    imagePath: "assets/Images/men.png",
+                    label: "Men",
                     isSelected: selectedAccount == 1,
                     onTap: () {
                       setState(() {
@@ -86,11 +73,11 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
 
                   const SizedBox(width: 30),
 
-                  // Staff Card
+                  // Women Card
                   _buildAccountCard(
+                    context: context,
                     height: 120,
-                    imagePath:
-                        "assets/Images/women.png", // Replace with your actual asset
+                    imagePath: "assets/Images/women.png",
                     label: "Women",
                     isSelected: selectedAccount == 2,
                     onTap: () {
@@ -121,7 +108,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                               page: const LoginScreen(),
                             );
                           } else if (selectedAccount == 2) {
-                            // Navigate to Staff page - CHANGE THIS TO YOUR STAFF PAGE
+                            // Navigate to Women (provider) page
                             bondNavigator.newPage(
                               context,
                               page: const StaffRegisterScreen(
@@ -134,18 +121,19 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                     height: 56,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       gradient: selectedAccount == 0
-                          ? const LinearGradient(
-                              colors: [Color(0xFF666666), Color(0xFF888888)],
+                          ? LinearGradient(
+                              colors: [
+                                cs.surfaceContainerHighest.withValues(alpha: 0.6),
+                                cs.surfaceContainerHighest.withValues(alpha: 0.35),
+                              ],
                             )
-                          : const LinearGradient(
-                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                            ),
+                          : brand.primaryGradient,
                     ),
                     child: Center(
                       child: Text(
-                        "Continue  →",
+                        "Continue →",
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -158,34 +146,34 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 
   Widget _buildAccountCard({
+    required BuildContext context,
     required String imagePath,
     required String label,
     required double height,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Color(0XFFf56464) : Color(0XFF5f3550),
+            color: isSelected ? cs.primary : cs.outlineVariant,
             width: 1,
           ),
         ),
         child: Column(
           children: [
             Image.asset(imagePath, height: height),
-            SizedBox(height: 7),
-            AppText(label),
+            const SizedBox(height: 7),
+            AppText(label, color: cs.onSurface),
           ],
         ),
       ),
@@ -193,4 +181,5 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
   }
 }
 
-// Placeholder for Staff Home Screen - replace with your actual staff page
+// Placeholder for Women home screen - replace with your actual page
+

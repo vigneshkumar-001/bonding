@@ -3,6 +3,9 @@ import 'package:bonding_app/BondingScreens/BlockedUsers/ViewModel/unblock_user_v
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Reusable_Widgets/Common_AppBar/common_app_bar.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -92,14 +95,11 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color(0xFF100a0a),
-        child: SafeArea(
-          child: Column(
-            children: [
+    final cs = Theme.of(context).colorScheme;
+
+    return AppScaffold(
+      body: Column(
+        children: [
               /// 🔹 Top Bar
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -109,13 +109,15 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       onTap: () => bondNavigator.backPage(context),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF35272d),
+                          color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(40),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.arrow_back,
-                              color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: cs.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -124,7 +126,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       "Blocked users",
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: cs.onSurface,
                     ),
                   ],
                 ),
@@ -136,21 +138,20 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                 child: Consumer<BlockedUsersListVm>(
                   builder: (context, vm, _) {
                     /// 🔹 Global loading (only for first load)
-                    if (vm.loading  ) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                            color: Colors.white),
-                      );
-                    }
+                    if (vm.loading) return const AppLoader.center();
 
                     /// 🔹 Error
                     if (vm.error != null &&
                         vm.error!.trim().isNotEmpty) {
                       return Center(
-                        child: AppText(
-                          vm.error!,
-                          color: Colors.redAccent,
-                          fontSize: 14,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: AppText(
+                            vm.error!,
+                            color: cs.error,
+                            fontSize: 14,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       );
                     }
@@ -159,14 +160,16 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                     if (vm.users.isEmpty) {
                       return RefreshIndicator(
                         onRefresh: _onRefresh,
+                        color: cs.primary,
+                        backgroundColor: cs.surfaceContainerHighest,
                         child: ListView(
-                          children: const [
-                            SizedBox(height: 120),
+                          children: [
+                            const SizedBox(height: 120),
                             Center(
                               child: Text(
                                 "No blocked users",
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: cs.onSurfaceVariant,
                                   fontSize: 16,
                                 ),
                               ),
@@ -179,6 +182,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                     /// 🔹 List
                     return RefreshIndicator(
                       onRefresh: _onRefresh,
+                      color: cs.primary,
+                      backgroundColor: cs.surfaceContainerHighest,
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0),
@@ -220,17 +225,17 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                 CircleAvatar(
                                   radius: 28,
                                   backgroundColor:
-                                  Colors.white.withOpacity(
-                                      0.10),
+                                  cs.surfaceContainerHighest.withValues(alpha: 0.35),
                                   backgroundImage:
                                   avatarUrl.isNotEmpty
                                       ? NetworkImage(
                                       avatarUrl)
                                       : null,
                                   child: avatarUrl.isEmpty
-                                      ? const Icon(Icons.person,
-                                      color:
-                                      Colors.white70)
+                                      ? Icon(
+                                          Icons.person,
+                                          color: cs.onSurfaceVariant,
+                                        )
                                       : null,
                                 ),
                                 const SizedBox(width: 16),
@@ -243,7 +248,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                     children: [
                                       AppText(
                                         name,
-                                        color: Colors.white,
+                                        color: cs.onSurface,
                                         fontSize: 17,
                                         fontWeight:
                                         FontWeight.w600,
@@ -252,8 +257,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                           height: 4),
                                       AppText(
                                         "Blocked: $blockedDate",
-                                        color:
-                                        const Color(0XFFc7c7cc),
+                                        color: cs.onSurfaceVariant,
                                         fontSize: 14,
                                       ),
                                     ],
@@ -289,27 +293,20 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                          0xFF29090f),
+                                      color: cs.errorContainer.withValues(alpha: 0.25),
                                       borderRadius:
                                       BorderRadius
                                           .circular(12),
+                                      border: Border.all(
+                                        color: cs.error.withValues(alpha: 0.35),
+                                        width: 0.8,
+                                      ),
                                     ),
                                     child: isRowLoading
-                                        ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child:
-                                      CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color:
-                                        Colors.white,
-                                      ),
-                                    )
+                                        ? AppLoader(radius: 9, color: cs.error)
                                         : AppText(
                                       "Unblock",
-                                      color: const Color(
-                                          0xFFf4063a),
+                                      color: cs.error,
                                       fontSize: 14,
                                       fontWeight:
                                       FontWeight.w600,
@@ -327,8 +324,6 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 
@@ -337,37 +332,39 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         required String userName,
         required VoidCallback onYes,
       }) {
+    final cs = Theme.of(context).colorScheme;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF23171B),
+        backgroundColor: cs.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
-        title: const Text(
+        title: Text(
           "Unblock user?",
           style: TextStyle(
-              color: Colors.white,
+              color: cs.onSurface,
               fontWeight: FontWeight.w700),
         ),
         content: Text(
           "Do you want to unblock $userName?",
-          style:
-          const TextStyle(color: Colors.white70),
+          style: TextStyle(color: cs.onSurfaceVariant),
         ),
         actions: [
           TextButton(
             onPressed: () =>
                 Navigator.pop(context),
-            child: const Text("Cancel",
-                style: TextStyle(
-                    color: Colors.white70)),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: cs.onSurfaceVariant),
+            ),
           ),
           TextButton(
             onPressed: onYes,
-            child: const Text("Yes",
-                style: TextStyle(
-                    color: Color(0xFF00ed1c))),
+            child: Text(
+              "Yes",
+              style: TextStyle(color: cs.primary),
+            ),
           ),
         ],
       ),

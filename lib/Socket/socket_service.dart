@@ -36,6 +36,8 @@ class SocketService {
 
   final _chatErrorCtrl = StreamController<dynamic>.broadcast();
 
+  final _typingCtrl = StreamController<dynamic>.broadcast();
+
   final _statusChangedCtrl = StreamController<dynamic>.broadcast();
 
   final _connectionCtrl = StreamController<bool>.broadcast();
@@ -53,6 +55,8 @@ class SocketService {
   Stream<dynamic> get chatBlockedStream => _chatBlockedCtrl.stream;
 
   Stream<dynamic> get chatErrorStream => _chatErrorCtrl.stream;
+
+  Stream<dynamic> get typingStream => _typingCtrl.stream;
 
   Stream<dynamic> get staffStatusChangedStream => _statusChangedCtrl.stream;
 
@@ -431,6 +435,11 @@ class SocketService {
     _socket!.on("chat_joined", (data) => _chatJoinedCtrl.add(data));
 
     _socket!.on("receive_message", (data) => _receiveMessageCtrl.add(data));
+
+    // Optional: typing indicator events (server may emit one of these)
+    _socket!.on("typing", (data) => _typingCtrl.add(data));
+    _socket!.on("staff_typing", (data) => _typingCtrl.add(data));
+    _socket!.on("user_typing", (data) => _typingCtrl.add(data));
 
     _socket!.on("chat_error", (data) => _chatErrorCtrl.add(data));
 

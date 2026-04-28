@@ -16,6 +16,8 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.da
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawRequestScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -46,7 +48,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
   // ✅ NEVER allow empty username
   String _safeName(String? name, String userId) {
     final n = (name ?? '').trim();
-    return n.isNotEmpty ? n : "Staff_$userId";
+    return n.isNotEmpty ? n : "Women_$userId";
   }
 
   String _safeAvatar(String? url) {
@@ -141,7 +143,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
 
     final safeUserName = userName.trim().isNotEmpty
         ? userName.trim()
-        : "Staff_$userId";
+        : "Women_$userId";
 
     ZegoUIKitPrebuiltCallInvitationService().init(
       appID: 725765612,
@@ -203,39 +205,36 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
       builder: (context, vm, child) {
+        final cs = Theme.of(context).colorScheme;
         final staff = vm.currentStaff;
 
-        return Scaffold(
-          backgroundColor: const Color(0xFF120810),
+        return AppScaffold(
           body: RefreshIndicator(
+            color: cs.primary,
+            backgroundColor: cs.surfaceContainerHighest,
             onRefresh: _refreshAllData,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    Color(0xFF5A1F3F),
-                    Color(0xFF3A152A),
-                    Color(0xFF140810),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: vm.isFetchingSingleStaff
-                    ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      )
-                    : vm.singleStaffError != null
-                    ? Center(
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              children: [
+                if (vm.isFetchingSingleStaff)
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.7,
+                    child: const AppLoader.center(),
+                  )
+                else if (vm.singleStaffError != null)
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.7,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               vm.singleStaffError!,
-                              style: const TextStyle(color: Colors.redAccent),
+                              style: TextStyle(color: cs.error),
+                              textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
@@ -244,47 +243,49 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                             ),
                           ],
                         ),
-                      )
-                    : staff == null
-                    ? const Center(
-                        child: Text(
-                          "No profile data",
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        child: Column(
+                      ),
+                    ),
+                  )
+                else if (staff == null)
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.7,
+                    child: Center(
+                      child: Text(
+                        "No profile data",
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: [
+                      _topBar(staff),
+                      const SizedBox(height: 16),
+                      earningsCard(staff),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
                           children: [
-                            _topBar(staff),
-                            const SizedBox(height: 16),
-                            earningsCard(staff),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Row(
-                                children: [
-                                  _actionButton('Withdraw'),
-                                  const SizedBox(width: 12),
-                                  _actionButton(
-                                    'View transactions →',
-                                    outlined: true,
-                                  ),
-                                ],
-                              ),
+                            _actionButton('Withdraw'),
+                            const SizedBox(width: 12),
+                            _actionButton(
+                              'View transactions →',
+                              outlined: true,
                             ),
-                            const SizedBox(height: 20),
-                            _callsSection(),
-                            const SizedBox(height: 16),
-                            _quickLinks(),
-                            const SizedBox(height: 16),
-                            _quickChatAccess(staff),
-                            const SizedBox(height: 100),
                           ],
                         ),
                       ),
-              ),
+                      const SizedBox(height: 20),
+                      _callsSection(),
+                      const SizedBox(height: 16),
+                      _quickLinks(),
+                      const SizedBox(height: 16),
+                      _quickChatAccess(staff),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+              ],
             ),
           ),
         );
@@ -431,10 +432,9 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Consumer<StaffViewModel>(
         builder: (context, vm, child) {
+          final cs = Theme.of(context).colorScheme;
           if (vm.isFetchingWeeklyGraph || vm.isFetchingCallStats) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white70),
-            );
+            return const AppLoader.center();
           }
 
           if (vm.weeklyGraphError != null || vm.callStatsError != null) {
@@ -444,7 +444,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                   vm.weeklyGraphError ??
                       vm.callStatsError ??
                       "Error loading stats",
-                  style: const TextStyle(color: Colors.redAccent),
+                  style: TextStyle(color: cs.error),
                 ),
                 const SizedBox(height: 8),
                 TextButton(
@@ -452,10 +452,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                     vm.fetchWeeklyCallGraph();
                     vm.fetchStaffCallStats();
                   },
-                  child: const Text(
-                    "Retry",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: Text("Retry", style: TextStyle(color: cs.primary)),
                 ),
               ],
             );

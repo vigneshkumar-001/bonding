@@ -3,6 +3,9 @@ import 'package:bonding_app/StaffScreenScreens/StaffDashBoardScreen/DashBoardScr
 import 'package:bonding_app/StaffScreenScreens/StaffProfileScreen/staffProfileScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
+import 'package:bonding_app/theme/brand_theme.dart';
+import 'package:bonding_app/ui/app_loader.dart';
+import 'package:bonding_app/ui/app_scaffold.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -73,11 +76,15 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
 
         /// 🔹 Custom Floating Bottom Bar
         bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF282323),
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(14),
               topRight: Radius.circular(14),
+            ),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
+              width: 0.8,
             ),
           ),
           child: SafeArea(
@@ -103,6 +110,8 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
   /// 🔹 Bottom Nav Item
   Widget _navItem(String svgPath, int index) {
     final bool isActive = _selectedIndex == index;
+    final brand = BrandTheme.of(context);
+    final cs = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () {
@@ -116,11 +125,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
         height: 46,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: isActive
-              ? const LinearGradient(
-            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-          )
-              : null,
+          gradient: isActive ? brand.primaryGradient : null,
         ),
         child: Center(
           child: SvgPicture.asset(
@@ -128,7 +133,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
             width: 28,
             height: 28,
             colorFilter: ColorFilter.mode(
-              isActive ? Colors.white : const Color(0XFFbebdbd),
+              isActive ? Colors.white : cs.onSurfaceVariant,
               BlendMode.srcIn,
             ),
           ),
@@ -143,12 +148,7 @@ class _ChatLoadingPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF140810),
-      body: Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
-    );
+    return const AppScaffold(body: AppLoader.center());
   }
 }
 
