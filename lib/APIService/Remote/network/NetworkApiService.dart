@@ -18,6 +18,82 @@ void _debugLog(Object? message) {
 }
 
 class NetworkApiService extends BaseApiService {
+  dynamic _decodeJsonResponseOrThrow(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+    final contentType = response.headers['content-type'] ?? '';
+    final trimmed = body.trim();
+
+    final looksLikeJson =
+        contentType.contains('application/json') ||
+        trimmed.startsWith('{') ||
+        trimmed.startsWith('[');
+
+    if (looksLikeJson) {
+      try {
+        final decoded = jsonDecode(body);
+        if (statusCode >= 400) {
+          _throwForHttpStatus(statusCode, decoded);
+        }
+        return decoded;
+      } catch (_) {
+        // Fall through to status-based handling.
+      }
+    }
+
+    if (statusCode == 503 ||
+        trimmed.contains('503 Service Unavailable') ||
+        trimmed.contains('<title>503')) {
+      throw FetchDataException(
+        'Server is temporarily unavailable. Please try again later.',
+      );
+    }
+
+    if (statusCode >= 500) {
+      throw FetchDataException('Server error. Please try again later.');
+    }
+
+    if (statusCode == 401 || statusCode == 403) {
+      throw UnauthorisedException('Your session expired. Please login again.');
+    }
+
+    if (statusCode >= 400) {
+      throw BadRequestException('Request failed. Please try again.');
+    }
+
+    throw FetchDataException('Unexpected server response. Please try again.');
+  }
+
+  Never _throwForHttpStatus(int statusCode, dynamic jsonBody) {
+    String message = 'Request failed. Please try again.';
+
+    if (jsonBody is Map) {
+      final m = jsonBody;
+      final dynamic msg =
+          m['message'] ?? m['error'] ?? m['errors'] ?? m['detail'];
+      if (msg is String && msg.trim().isNotEmpty) {
+        message = msg.trim();
+      }
+    }
+
+    if (statusCode == 401 || statusCode == 403) {
+      throw UnauthorisedException(message);
+    }
+    if (statusCode == 400 || statusCode == 422) {
+      throw BadRequestException(message);
+    }
+    if (statusCode == 503) {
+      throw FetchDataException(
+        'Server is temporarily unavailable. Please try again later.',
+      );
+    }
+    if (statusCode >= 500) {
+      throw FetchDataException('Server error. Please try again later.');
+    }
+
+    throw FetchDataException(message);
+  }
+
   @override
   Future getResponse(String url) async {
     _debugLog("efcdececdecc");
@@ -473,9 +549,9 @@ class NetworkApiService extends BaseApiService {
             _debugLog('📥 Response Headers: ${response.headers}');
             _debugLog('📥 Response Body:');
 
-            try {
-              responseJson = jsonDecode(response.body);
+            responseJson = _decodeJsonResponseOrThrow(response);
 
+            try {
               // Pretty print JSON response
               final encoder = JsonEncoder.withIndent('  ');
               _debugLog(encoder.convert(responseJson));
@@ -518,11 +594,7 @@ class NetworkApiService extends BaseApiService {
                   }
                 }
               }
-            } catch (e) {
-              // If not JSON, print as text
-              responseJson = response.body;
-              _debugLog(response.body);
-            }
+            } catch (_) {}
 
             _debugLog('=' * 60 + '\n');
           })
@@ -599,9 +671,9 @@ class NetworkApiService extends BaseApiService {
             _debugLog('📥 Response Headers: ${response.headers}');
             _debugLog('📥 Response Body:');
 
-            try {
-              responseJson = jsonDecode(response.body);
+            responseJson = _decodeJsonResponseOrThrow(response);
 
+            try {
               // Pretty print JSON response
               final encoder = JsonEncoder.withIndent('  ');
               _debugLog(encoder.convert(responseJson));
@@ -644,11 +716,7 @@ class NetworkApiService extends BaseApiService {
                   }
                 }
               }
-            } catch (e) {
-              // If not JSON, print as text
-              responseJson = response.body;
-              _debugLog(response.body);
-            }
+            } catch (_) {}
 
             _debugLog('=' * 60 + '\n');
           })

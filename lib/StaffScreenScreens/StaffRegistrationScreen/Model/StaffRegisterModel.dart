@@ -24,5 +24,8 @@ class StaffRegisterResponse {
     );
   }
 
-  bool get isSuccess => status && otp != null && otpExpiresTime != null;
+  // Some endpoints return only `{status, message}` (no OTP). Treat `status=true` as success.
+  bool get isSuccess => status;
+
+  bool get hasOtp => otp != null && otp!.isNotEmpty;
 }

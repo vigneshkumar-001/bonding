@@ -1,0 +1,13 @@
+## Copy this file to `android/key.properties` (DO NOT commit it) and fill values.
+##
+## This is your Play Console *upload* keystore (NOT the Google Play app signing key).
+## Example:
+## storeFile=../keystores/my-upload-keystore.jks
+## storePassword=********
+## keyAlias=upload
+## keyPassword=********
+
+storeFile=
+storePassword=
+keyAlias=
+keyPassword=

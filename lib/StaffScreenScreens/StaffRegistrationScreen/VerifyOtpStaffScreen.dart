@@ -1,4 +1,4 @@
-﻿import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
+import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
@@ -27,31 +27,15 @@ class LoginOtpStaffScreen extends StatefulWidget {
 class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  bool _keyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   final vm = Provider.of<LoginViewModel>(context, listen: false);
-    //
-    //   if (vm.autoOtp != null) {
-    //     _otpController.text = vm.autoOtp!;
-    //     setState(() {}); // refresh hearts
-    //   }
-    //
-    //   _focusNode.requestFocus();
-    // });
-  }
-
-  void _handleOtpFill() {
-    final vm = Provider.of<LoginViewModel>(context, listen: false);
-
-    if (vm.autoOtp != null && _otpController.text != vm.autoOtp) {
-      _otpController.text = vm.autoOtp!;
-      setState(() {});
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+      SystemChannels.textInput.invokeMethod('TextInput.show');
+    });
   }
 
   @override
@@ -84,176 +68,167 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                    const SizedBox(height: 10),
-                    Image.asset(
-                      "assets/Images/bonding.png",
-                      height: 35,
-                      width: 35,
-                    ),
-                    const SizedBox(height: 30),
-                    Center(
-                      child: Image.asset(
-                        "assets/Images/phone1.png",
-                        width: 280,
+                const SizedBox(height: 10),
+                Image.asset("assets/Images/bonding.png", height: 35, width: 35),
+                const SizedBox(height: 30),
+                Center(
+                  child: Image.asset("assets/Images/phone1.png", width: 280),
+                ),
+                const SizedBox(height: 30),
+
+                AppText(
+                  "Enter your code",
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+                const SizedBox(height: 16),
+
+                const Text(
+                  "Enter OTP:",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+
+                // OTP Input Section
+                Column(
+                  children: [
+                    // Hidden TextField for input
+                    SizedBox(
+                      height: 1,
+                      child: TextField(
+                        cursorColor: Colors.transparent,
+                        controller: _otpController,
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        keyboardType: TextInputType.number,
+                        maxLength: 4,
+                        style: const TextStyle(
+                          fontSize: 1,
+                          color: Colors.transparent,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          counterText: '',
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (_) => setState(() {}),
                       ),
                     ),
-                    const SizedBox(height: 30),
 
-                    AppText(
-                      "Enter your code",
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
 
-                    const Text(
-                      "Enter OTP:",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // OTP Input Section
-                    Column(
+                    // Heart Display (Clickable)
+                    Row(
                       children: [
-                        // Hidden TextField for input
-                        SizedBox(
-                          height: 1,
-                          child: TextField(
-                            cursorColor: Colors.transparent,
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _openKeyboard,
+                          child: HeartOtpDisplay(
+                            length: 4,
                             controller: _otpController,
-                            focusNode: _focusNode,
-                            autofocus: true,
-                            keyboardType: TextInputType.number,
-                            maxLength: 4,
-                            style: const TextStyle(
-                              fontSize: 1,
-                              color: Colors.transparent,
-                            ),
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              counterText: '',
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            onChanged: (_) => setState(() {}),
                           ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        // Heart Display (Clickable)
-                        Row(
-                          children: [
-                            GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: _openKeyboard,
-                              child: HeartOtpDisplay(
-                                length: 4,
-                                controller: _otpController,
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
+                  ],
+                ),
 
-                    // if (vm.verifyError != null) ...[
-                    //   const SizedBox(height: 16),
-                    //   Text(
-                    //     vm.verifyError!,
-                    //     style: const TextStyle(color: Colors.redAccent, fontSize: 14),
-                    //     textAlign: TextAlign.center,
-                    //   ),
-                    // ],
-                    const SizedBox(height: 40),
+                // if (vm.verifyError != null) ...[
+                //   const SizedBox(height: 16),
+                //   Text(
+                //     vm.verifyError!,
+                //     style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ],
+                const SizedBox(height: 40),
 
-                    // Login Button
-                    GestureDetector(
-                      onTap: vm.isVerifying
-                          ? null
-                          : () async {
-                              final otp = _otpController.text.trim();
+                // Login Button
+                GestureDetector(
+                  onTap: vm.isVerifying
+                      ? null
+                      : () async {
+                          final otp = _otpController.text.trim();
 
-                              if (otp.isEmpty) {
-                                Utils.snackBarErrorMessage(
-                                  "Please enter the OTP",
-                                );
-                                return;
-                              }
-                              if (!_isValidOtp(otp)) {
-                                Utils.snackBarErrorMessage(
-                                  "Please enter all 4 digits",
-                                );
-                                return;
-                              }
+                          if (otp.isEmpty) {
+                            Utils.snackBarErrorMessage("Please enter the OTP");
+                            return;
+                          }
+                          if (!_isValidOtp(otp)) {
+                            Utils.snackBarErrorMessage(
+                              "Please enter all 4 digits",
+                            );
+                            return;
+                          }
 
-                              // âœ… IMPORTANT: use the boolean result
-                              final success = await vm.staffVerifyOtp(
-                                widget.phoneNumber,
-                                otp,
-                              );
+                          // âœ… IMPORTANT: use the boolean result
+                          final success = await vm.staffVerifyOtp(
+                            widget.phoneNumber,
+                            otp,
+                          );
 
-                              // âœ… If API says invalid OTP, STOP HERE
-                              if (!success) {
-                                Utils.snackBarErrorMessage(
-                                  vm.verifyError ?? "Invalid OTP",
-                                );
-                                return;
-                              }
+                          // âœ… If API says invalid OTP, STOP HERE
+                          if (!success) {
+                            Utils.snackBarErrorMessage(
+                              vm.verifyError ?? "Invalid OTP",
+                            );
+                            return;
+                          }
 
-                              // âœ… success => response must be non-null
-                              final response = vm.verifyResponse;
-                              if (response == null) {
-                                Utils.snackBarErrorMessage(
-                                  "Something went wrong. Please try again.",
-                                );
-                                return;
-                              }
+                          // âœ… success => response must be non-null
+                          final response = vm.verifyResponse;
+                          if (response == null) {
+                            Utils.snackBarErrorMessage(
+                              "Something went wrong. Please try again.",
+                            );
+                            return;
+                          }
 
-                              final isLogin = response.user?.isLogin ?? false;
+                          final isLogin = response.user?.isLogin ?? false;
 
-                              if (isLogin) {
-                                bondNavigator.newPageRemoveUntil(
-                                  context,
-                                  page: const StaffBottomBar(),
-                                );
-                              } else {
-                                bondNavigator.newPage(
-                                  context,
-                                  page: StaffRegisterScreen(
-                                    mode: StaffAuthMode.register,
-                                    prefillPhone: widget.phoneNumber,
-                                  ),
-                                );
-                              }
-                            },
-                      child: Container(
-                        height: 50,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          gradient: vm.isVerifying
-                              ? const LinearGradient(
-                                  colors: [Colors.grey, Colors.blueGrey],
-                                )
-                              : brand.primaryGradient,
-                        ),
-                        child: Center(
-                          child: vm.isVerifying
-                              ? const AppLoader(radius: 10, color: Colors.white)
-                              : const Text(
-                                  "Confirm  →",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
+                          if (isLogin) {
+                            bondNavigator.newPageRemoveUntil(
+                              context,
+                              page: const StaffBottomBar(),
+                            );
+                          } else {
+                            bondNavigator.newPage(
+                              context,
+                              page: StaffRegisterScreen(
+                                mode: StaffAuthMode.register,
+                                prefillPhone: widget.phoneNumber,
+                              ),
+                            );
+                          }
+                        },
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      gradient: vm.isVerifying
+                          ? const LinearGradient(
+                              colors: [Colors.grey, Colors.blueGrey],
+                            )
+                          : brand.primaryGradient,
                     ),
+                    child: Center(
+                      child: vm.isVerifying
+                          ? const AppLoader(radius: 10, color: Colors.white)
+                          : const Text(
+                              "Confirm  →",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
 
-                    /*GestureDetector(
+                /*GestureDetector(
                       onTap: vm.isVerifying
                           ? null
                           : () async {
@@ -344,25 +319,25 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                         ),
                       ),
                     ),*/
-                    const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-                    // Keyboard Toggle Button (Optional)
-                    Center(
-                      child: TextButton(
-                        onPressed: _openKeyboard,
-                        child: const Text(
-                          "Tap to open keyboard",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
+                // Keyboard Toggle Button (Optional)
+                Center(
+                  child: TextButton(
+                    onPressed: _openKeyboard,
+                    child: const Text(
+                      "Tap to open keyboard",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -408,4 +383,3 @@ class HeartOtpDisplay extends StatelessWidget {
     );
   }
 }
-

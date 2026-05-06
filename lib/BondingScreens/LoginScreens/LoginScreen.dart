@@ -95,18 +95,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    if (vm.errorMessage != null) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        vm.errorMessage!,
-                        style: TextStyle(
-                          color: colorScheme.error,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-
                     const SizedBox(height: 30),
 
                     AppGradientButton(
@@ -138,8 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   page: LoginOtpScreen(phoneNumber: phone),
                                 );
                               } else {
-                                Utils.snackBarErrorMessage(
-                                  "Failed to send OTP",
+                                Utils.topError(
+                                  vm.errorMessage ?? "Failed to send OTP",
                                 );
                               }
                             },

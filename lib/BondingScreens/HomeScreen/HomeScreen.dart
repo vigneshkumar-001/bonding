@@ -35,9 +35,7 @@ import 'package:bonding_app/theme/brand_theme.dart';
 import 'package:bonding_app/ui/app_loader.dart';
 import 'package:bonding_app/ui/staff_hero_card.dart';
 
-const int _zegoAppId = 725765612;
-const String _zegoAppSign =
-    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
+import 'package:bonding_app/config/zego_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -164,12 +162,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final statuses = await permissions.request();
 
     final micGranted = statuses[Permission.microphone]?.isGranted ?? false;
-    final camGranted = !isVideoCall ||
-        (statuses[Permission.camera]?.isGranted ?? false);
+    final camGranted =
+        !isVideoCall || (statuses[Permission.camera]?.isGranted ?? false);
     if (micGranted && camGranted) return true;
 
-    final blocked = (statuses[Permission.microphone]?.isPermanentlyDenied ??
-            false) ||
+    final blocked =
+        (statuses[Permission.microphone]?.isPermanentlyDenied ?? false) ||
         (statuses[Permission.microphone]?.isRestricted ?? false) ||
         (isVideoCall &&
             ((statuses[Permission.camera]?.isPermanentlyDenied ?? false) ||
@@ -258,8 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       await ZegoUIKitPrebuiltCallInvitationService().init(
         plugins: [plugin],
-        appID: _zegoAppId,
-        appSign: _zegoAppSign,
+        appID: zegoAppId,
+        appSign: zegoAppSign,
         userID: user.memberID.trim(),
         userName: (user.name ?? "User").trim(),
         notificationConfig: ZegoCallInvitationNotificationConfig(
@@ -564,10 +562,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               children: const [
                                 Image(
-                                  image: AssetImage("assets/Images/bonding.png"),
+                                  image: AssetImage(
+                                    "assets/Images/bonding.png",
+                                  ),
                                   height: 30,
                                 ),
-                              
                               ],
                             ),
                             const SizedBox(height: 4),
@@ -577,8 +576,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 8,
                                   height: 8,
                                   decoration: BoxDecoration(
-                                    color:
-                                        ready ? Colors.green : Colors.white54,
+                                    color: ready
+                                        ? Colors.green
+                                        : Colors.white54,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -651,22 +651,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 36,
                               height: 36,
                               child: ClipOval(
-                                child: (currentUser?.image != null &&
+                                child:
+                                    (currentUser?.image != null &&
                                         currentUser!.image!.isNotEmpty)
-                                     ? CachedNetworkImage(
-                                         imageUrl: currentUser.image!,
-                                         fit: BoxFit.cover,
-                                         placeholder: (_, __) => AppLoader(
-                                           radius: 12,
-                                           color: Theme.of(context)
-                                               .colorScheme
-                                               .onSurfaceVariant,
-                                         ),
-                                         errorWidget: (_, __, ___) => Image.asset(
-                                           "assets/Images/profile.png",
-                                           fit: BoxFit.cover,
-                                         ),
-                                       )
+                                    ? CachedNetworkImage(
+                                        imageUrl: currentUser.image!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) => AppLoader(
+                                          radius: 12,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                        errorWidget: (_, __, ___) =>
+                                            Image.asset(
+                                              "assets/Images/profile.png",
+                                              fit: BoxFit.cover,
+                                            ),
+                                      )
                                     : Image.asset(
                                         "assets/Images/profile.png",
                                         fit: BoxFit.cover,
@@ -690,10 +692,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   staffVM.staffFetchError!,
-                                   style: TextStyle(
-                                     color: Theme.of(context).colorScheme.error,
-                                   ),
-                                 ),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: staffVM.fetchStaffDetails,
@@ -1307,60 +1309,60 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
                 return;
               }
-                    if (!isTargetOnline) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("User is offline")),
-                      );
-                      return;
-                    }
+              if (!isTargetOnline) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("User is offline")),
+                );
+                return;
+              }
 
-                    if (balance < pricePerMin) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => WalletScreen()),
-                      );
-                      Utils.snackBarErrorMessage("Insufficient balance");
+              if (balance < pricePerMin) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => WalletScreen()),
+                );
+                Utils.snackBarErrorMessage("Insufficient balance");
 
-                      return;
-                    }
+                return;
+              }
 
-                    if (!await _ensureCallPermissions(isVideoCall: isVideoCall)) {
-                      return;
-                    }
+              if (!await _ensureCallPermissions(isVideoCall: isVideoCall)) {
+                return;
+              }
 
-                    _maxAllowedSeconds = (balance ~/ pricePerMin) * 60;
+              _maxAllowedSeconds = (balance ~/ pricePerMin) * 60;
 
-                    final success = await _sendInviteWithLogs(
-                      targetUserID: targetUserID,
-                      targetUserName: targetUserName,
-                      isVideoCall: isVideoCall,
-                      pricePerMin: pricePerMin,
-                    );
+              final success = await _sendInviteWithLogs(
+                targetUserID: targetUserID,
+                targetUserName: targetUserName,
+                isVideoCall: isVideoCall,
+                pricePerMin: pricePerMin,
+              );
 
-                    if (!success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Failed to send invitation")),
-                      );
-                      return;
-                    }
+              if (!success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Failed to send invitation")),
+                );
+                return;
+              }
 
-                    setState(() {
-                      _pendingCall = true;
-                      _staffId = targetStaffId;
-                      _currentCallPricePerMin = pricePerMin;
-                      _isCurrentCallVideo = isVideoCall;
+              setState(() {
+                _pendingCall = true;
+                _staffId = targetStaffId;
+                _currentCallPricePerMin = pricePerMin;
+                _isCurrentCallVideo = isVideoCall;
 
-                      _wasCallReallyConnected = false;
-                      _callStartTime = null;
-                      _notInRoomCount = 0;
-                    });
+                _wasCallReallyConnected = false;
+                _callStartTime = null;
+                _notInRoomCount = 0;
+              });
 
-                    logI(
-                      "TRACK",
-                      "Pending call started -> target=$targetUserID staffID=$targetStaffId",
-                    );
-                    _startInviteTimeoutTimer();
-                  },
+              logI(
+                "TRACK",
+                "Pending call started -> target=$targetUserID staffID=$targetStaffId",
+              );
+              _startInviteTimeoutTimer();
+            },
             child: Opacity(
               opacity: canTap ? 1.0 : 0.55,
               child: Ink(
@@ -1397,7 +1399,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
 }
 
 class _Tag extends StatelessWidget {
@@ -1424,4 +1425,3 @@ class _Tag extends StatelessWidget {
     );
   }
 }
-

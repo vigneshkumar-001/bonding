@@ -6,6 +6,7 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/ui/app_gradient_button.dart';
 import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../BottomNavBar/BottomNavBar.dart';
@@ -26,15 +27,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
   @override
   void initState() {
     super.initState();
-    // Delay to ensure context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vm = Provider.of<LoginViewModel>(context, listen: false);
-
-      if (vm.autoOtp != null) {
-        _otpController.text = vm.autoOtp!;
-        setState(() {}); // refresh hearts
-      }
       _focusNode.requestFocus();
+      SystemChannels.textInput.invokeMethod('TextInput.show');
     });
   }
 
@@ -47,6 +42,11 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
 
   bool _isValidOtp(String otp) => RegExp(r'^\d{4}$').hasMatch(otp);
 
+  void _openKeyboard() {
+    _focusNode.requestFocus();
+    SystemChannels.textInput.invokeMethod('TextInput.show');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
@@ -55,132 +55,116 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
         return AppScaffold(
           resizeToAvoidBottomInset: true,
           body: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Image.asset("assets/Images/bonding.png", height: 35, width: 35),
+                const SizedBox(height: 30),
+                Center(
+                  child: Image.asset("assets/Images/phone1.png", width: 280),
+                ),
+                const SizedBox(height: 30),
+
+                AppText(
+                  "Enter your code",
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+                const SizedBox(height: 16),
+
+                AppText(
+                  "Enter OTP",
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+                const SizedBox(height: 12),
+
+                // This is the key part: A transparent TextField positioned over the hearts
+                Column(
                   children: [
-                    const SizedBox(height: 10),
-                    Image.asset(
-                      "assets/Images/bonding.png",
-                      height: 35,
-                      width: 35,
-                    ),
-                    const SizedBox(height: 30),
-                    Center(
-                      child: Image.asset(
-                        "assets/Images/phone1.png",
-                        width: 280,
+                    // Hidden TextField to capture input & show keyboard
+                    SizedBox(
+                      height: 1,
+                      child: TextField(
+                        controller: _otpController,
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(4),
+                        ],
+                        style: const TextStyle(
+                          fontSize: 1,
+                          color: Colors.transparent,
+                        ),
+                        cursorColor: Colors.transparent,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          counterText: '',
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (_) => setState(() {}),
                       ),
                     ),
-                    const SizedBox(height: 30),
-
-                    AppText(
-                      "Enter your code",
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _openKeyboard,
+                      child: HeartOtpDisplay(length: 4, controller: _otpController),
                     ),
-                    const SizedBox(height: 16),
+                  ],
+                ),
 
-                    AppText(
-                      "Enter OTP",
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                    const SizedBox(height: 12),
+                // if (vm.verifyError != null) ...[
+                //   const SizedBox(height: 16),
+                //   Text(
+                //     vm.verifyError!,
+                //     style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ],
+                const SizedBox(height: 40),
 
-                    // This is the key part: A transparent TextField positioned over the hearts
-                    Stack(
-                      children: [
-                        // Heart display (non-interactive)
-                        Row(
-                          children: [
-                            HeartOtpDisplay(
-                              length: 4,
-                              controller: _otpController,
-                            ),
-                          ],
-                        ),
+                AppGradientButton(
+                  onPressed: vm.isVerifying
+                      ? null
+                      : () async {
+                          final otp = _otpController.text.trim();
 
-                        // Transparent TextField for input
-                        // Positioned(
-                        //   top: 0,
-                        //   left: 0,
-                        //   right: 0,
-                        //   child: GestureDetector(
-                        //     onTap: () => _focusNode.requestFocus(),
-                        //     child: Container(
-                        //       height: 70, // Match heart height
-                        //       color: Colors.transparent,
-                        //       child: TextField(
-                        //         controller: _otpController,
-                        //         focusNode: _focusNode,
-                        //         keyboardType: TextInputType.number,
-                        //         maxLength: 4,
-                        //         style: const TextStyle(
-                        //           fontSize: 1, // Very small text (invisible)
-                        //           color: Colors.transparent,
-                        //         ),
-                        //         cursorColor: Colors.transparent,
-                        //         decoration: const InputDecoration(
-                        //           border: InputBorder.none,
-                        //           counterText: '',
-                        //           contentPadding: EdgeInsets.zero,
-                        //         ),
-                        //         onChanged: (_) => setState(() {}),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    ),
+                          if (!_isValidOtp(otp)) {
+                            Utils.snackBarErrorMessage(
+                              "Enter valid 4 digit OTP",
+                            );
+                            return;
+                          }
 
-                    // if (vm.verifyError != null) ...[
-                    //   const SizedBox(height: 16),
-                    //   Text(
-                    //     vm.verifyError!,
-                    //     style: const TextStyle(color: Colors.redAccent, fontSize: 14),
-                    //     textAlign: TextAlign.center,
-                    //   ),
-                    // ],
-                    const SizedBox(height: 40),
+                          await vm.verifyOtp(widget.phoneNumber, otp);
 
-                    AppGradientButton(
-                      onPressed: vm.isVerifying
-                          ? null
-                          : () async {
-                              final otp = _otpController.text.trim();
+                          if (!mounted) return;
 
-                              if (otp.length != 4) {
-                                Utils.snackBarErrorMessage(
-                                  "Enter valid 4 digit OTP",
-                                );
-                                return;
-                              }
+                          final response = vm.verifyResponse;
 
-                              await vm.verifyOtp(widget.phoneNumber, otp);
+                          if (response != null && response.isSuccess) {
+                            final isLogin = response.user?.isLogin ?? false;
 
-                              if (!mounted) return;
+                            bondNavigator.newPageRemoveUntil(
+                              context,
+                              page: isLogin
+                                  ? const MainBottomBar()
+                                  : const AddProfile(),
+                            );
+                          } else {
+                            Utils.snackBarErrorMessage(
+                              "Invalid OTP. Please try again.",
+                            );
+                          }
+                        },
 
-                              final response = vm.verifyResponse;
-
-                              if (response != null && response.isSuccess) {
-                                final isLogin = response.user?.isLogin ?? false;
-
-                                bondNavigator.newPageRemoveUntil(
-                                  context,
-                                  page: isLogin
-                                      ? const MainBottomBar()
-                                      : const AddProfile(),
-                                );
-                              } else {
-                                Utils.snackBarErrorMessage(
-                                  "Invalid OTP. Please try again.",
-                                );
-                              }
-                            },
-
-                      /* onTap: vm.isVerifying
+                  /* onTap: vm.isVerifying
                           ? null
                           : () async {
                         final otp = _otpController.text.trim();
@@ -234,29 +218,29 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         //   Utils.snackBarErrorMessage("Invalid OTP. Please try again.");
                         // }
                       },*/
-                      child: vm.isVerifying
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.5,
-                              ),
-                            )
-                          : const Text(
-                              "Login →",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                    ),
-
-                    const SizedBox(height: 30),
-                  ],
+                  child: vm.isVerifying
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          "Login →",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                 ),
-              ),
+
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
         );
       },
     );

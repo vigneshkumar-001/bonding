@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Local secrets / per-developer defines
+dart_defines.json
+android/key.properties

@@ -43,6 +43,12 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
     if (widget.prefillPhone != null && widget.prefillPhone!.trim().isNotEmpty) {
       phoneController.text = widget.prefillPhone!.trim();
     }
+
+    // Clear any previous error shown from earlier sessions (provider persists across logout/login).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<StaffViewModel>().clearErrors();
+    });
   }
 
   @override
@@ -177,6 +183,9 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: nameController,
+                        onChanged: (_) {
+                          if (vm.errorMessage != null) vm.clearErrors();
+                        },
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           hintText: "Enter your name",
@@ -238,6 +247,9 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: phoneController,
+                      onChanged: (_) {
+                        if (vm.errorMessage != null) vm.clearErrors();
+                      },
                       keyboardType: TextInputType.phone,
                       maxLength: 10,
                       readOnly:
@@ -270,6 +282,9 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: emailController,
+                        onChanged: (_) {
+                          if (vm.errorMessage != null) vm.clearErrors();
+                        },
                         keyboardType: TextInputType.emailAddress,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
@@ -297,6 +312,9 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: cityController,
+                        onChanged: (_) {
+                          if (vm.errorMessage != null) vm.clearErrors();
+                        },
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           hintText: "Enter your city",
@@ -350,6 +368,8 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                     ? ""
                                     : dobController.text.trim(),
                               );
+
+                              if (!mounted) return;
                               if (success) {
                                 if (isLoginMode) {
                                   // âœ… Login -> OTP

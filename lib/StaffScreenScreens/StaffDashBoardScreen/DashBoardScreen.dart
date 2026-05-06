@@ -18,6 +18,7 @@ import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
 import 'package:bonding_app/ui/app_loader.dart';
 import 'package:bonding_app/ui/app_scaffold.dart';
+import 'package:bonding_app/config/zego_config.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -146,11 +147,8 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
         : "Women_$userId";
 
     ZegoUIKitPrebuiltCallInvitationService().init(
-      appID: 725765612,
-      // appID: 467997506,
-      appSign:
-          "1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4",
-      // "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+      appID: zegoAppId,
+      appSign: zegoAppSign,
       userID: userId,
       userName: safeUserName, // ✅ NEVER EMPTY
       plugins: [ZegoUIKitSignalingPlugin()],
@@ -814,9 +812,8 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
     if (_zegoInitialized) return;
 
     ZegoUIKitPrebuiltCallInvitationService().init(
-      appID: 467997506,
-      appSign:
-          "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+      appID: zegoAppId,
+      appSign: zegoAppSign,
       userID: staff.memberID,
       userName: staff.name ?? "Staff",
       plugins: [ZegoUIKitSignalingPlugin()],

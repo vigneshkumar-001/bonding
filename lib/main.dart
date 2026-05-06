@@ -38,6 +38,7 @@ import 'BondingScreens/Chat/Repository/chat_repository.dart';
 
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/Repo/StaffRegisterRepo.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
+import 'package:flutter/foundation.dart';
 
 // ✅ IMPORTANT: keep ONLY ONE import (lowercase folder)
 
@@ -47,32 +48,36 @@ import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
-const int _zegoAppId = 725765612;
-const String _zegoAppSign =
-    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
+import 'package:bonding_app/config/zego_config.dart';
 
+import 'package:bonding_app/app/navigator_key.dart';
+// Release build (example):
+// flutter build appbundle --release --dart-define=ZEGO_APP_ID=... --dart-define=ZEGO_APP_SIGN=...
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (_zegoAppId == 0 || _zegoAppSign.isEmpty) {
-    throw StateError(
-      'Missing ZEGO config. Provide --dart-define=ZEGO_APP_ID and --dart-define=ZEGO_APP_SIGN.',
+  if (kReleaseMode) {
+    assertZegoConfig();
+  } else if (zegoAppId == 0 || zegoAppSign.isEmpty) {
+    debugPrint(
+      'ZEGO config missing. Calls/chat may not work. Provide --dart-define=ZEGO_APP_ID=... --dart-define=ZEGO_APP_SIGN=...',
     );
   }
 
   ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
 
-  ZegoUIKit().initLog();
+  // Zego reporter/log init can crash on some OEM builds (native SIGSEGV).
+  // Keep logs in debug only.
+  if (kDebugMode) {
+    ZegoUIKit().initLog();
+  }
 
   // ZIMKit().init(
-  //   appID: 467997506,
-  //   appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+  //   appID: 123,
+  //   appSign: "YOUR_APP_SIGN",
   // );
-  ZIMKit().init(
-    appID: _zegoAppId,
-    appSign: _zegoAppSign,
-  );
+  if (zegoAppId != 0 && zegoAppSign.isNotEmpty) {
+    ZIMKit().init(appID: zegoAppId, appSign: zegoAppSign);
+  }
 
   runApp(const MyApp());
 }
@@ -92,8 +97,9 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
-            themeMode:
-                themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            themeMode: themeController.isDarkMode
+                ? ThemeMode.dark
+                : ThemeMode.light,
             home: const Splashscreen(),
           );
         },
@@ -137,9 +143,8 @@ List<SingleChildWidget> getAllProviders() {
       create: (_) => TicketHistoryVM(SettingsRepository()),
     ),
     ChangeNotifierProvider(
-      create: (context) => BlockUserVM(
-        repo: ChatRepository(context.read<NetworkApiService>()),
-      ),
+      create: (context) =>
+          BlockUserVM(repo: ChatRepository(context.read<NetworkApiService>())),
     ),
     ChangeNotifierProvider(
       create: (context) => DeleteAccountReasonsVM(
@@ -186,9 +191,7 @@ List<SingleChildWidget> getAllProviders() {
       create: (context) => UserRepository(context.read<NetworkApiService>()),
     ),
 
-    ChangeNotifierProvider<CallController>(
-      create: (_) => CallController(),
-    ),
+    ChangeNotifierProvider<CallController>(create: (_) => CallController()),
     ChangeNotifierProvider<UserViewModel>(
       create: (context) => UserViewModel(context.read<UserRepository>()),
       lazy: true,
@@ -202,12 +205,9 @@ List<SingleChildWidget> getAllProviders() {
       create: (context) => StaffRepository(context.read<NetworkApiService>()),
     ),
     ChangeNotifierProvider<StaffViewModel>(
-      
       create: (context) => StaffViewModel(context.read<StaffRepository>()),
     ),
   ];
-
-
 }
 
 // import 'package:bondin.   g_app/APIService/Remote/network/NetworkApiService.dart';
@@ -253,9 +253,9 @@ List<SingleChildWidget> getAllProviders() {
 //   // Optional: init logs for debugging
 //   ZegoUIKit().initLog();
 //   ZIMKit().init(
-//     appID: 467997506, // ← your real AppID
+//     appID: 123, // ← your real AppID
 //     appSign:
-//         "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252", // ← your real AppSign
+//         "YOUR_APP_SIGN", // ← your real AppSign
 //   );
 //   runApp(const MyApp());
 // }

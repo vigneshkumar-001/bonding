@@ -36,6 +36,7 @@ class _SplashscreenState extends State<Splashscreen>
     super.initState();
     _checkLoginAndStatus();
   }
+
   final socketService = SocketService();
   Future<void> _checkLoginAndStatus() async {
     // Show splash for a moment (branding/animation)
@@ -59,11 +60,33 @@ class _SplashscreenState extends State<Splashscreen>
     final userVM = Provider.of<UserViewModel>(context, listen: false);
     final staffVM = Provider.of<StaffViewModel>(context, listen: false);
 
-    await Future.wait([
-      userVM.fetchUserDetails(),
-      staffVM.fetchStaffSingleData(),
-      socketService.connectStaff(staffVM.currentStaff?.memberID?? ''),
-    ]);
+    try {
+      await Future.wait([
+        userVM.fetchUserDetails(),
+        staffVM.fetchStaffSingleData(),
+      ]).timeout(const Duration(seconds: 20));
+    } catch (e, st) {
+      AppLogger.log.e("Splash fetch failed: $e", stackTrace: st);
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SplashScreen2()),
+      );
+      return;
+    }
+
+    // Connect socket only after we have the latest staff details.
+    final memberId = staffVM.currentStaff?.memberID?.trim() ?? '';
+    if (memberId.isNotEmpty) {
+      try {
+        await socketService
+            .connectStaff(memberId)
+            .timeout(const Duration(seconds: 10));
+      } catch (e, st) {
+        AppLogger.log.w("Socket connect skipped: $e");
+        AppLogger.log.w("Socket connect stack: $st");
+      }
+    }
 
     if (!mounted) return;
 
@@ -94,14 +117,55 @@ class _SplashscreenState extends State<Splashscreen>
     AppLogger.log.w("Role detected: $role");
     AppLogger.log.w("Form Status raw: ${formStatusStr ?? 'NULL'}");
 
-    final status = int.tryParse(formStatusStr ?? '0') ?? 0;
-    print("Parsed status: $status");
+    final formStatusNormalized = (formStatusStr ?? '').trim();
+    final hasFormStatus =
+        formStatusNormalized.isNotEmpty &&
+        formStatusNormalized.toLowerCase() != 'null';
+    final int? status = hasFormStatus
+        ? int.tryParse(formStatusNormalized)
+        : null;
+    print("Parsed status: ${status?.toString() ?? 'NULL'}");
 
     // ────────────────────────────────────────────────
     // STAFF FLOW (only isApproved matters here)
     // ────────────────────────────────────────────────
     if (role == 'staff') {
-      if (status <= 0 || status == null) {
+      // If backend doesn't send formStatus, fall back to isApproved to avoid
+      // incorrectly sending already-registered staff to onboarding screens.
+      if (status == null) {
+        final approval = staff?.isApproved?.toString().trim().toLowerCase();
+
+        if (approval == '1') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const StaffBottomBar()),
+          );
+          return;
+        }
+
+        if (approval == '2' ||
+            approval == 'declined' ||
+            approval == 'not approved') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const VerificationUnsuccessScreen(),
+            ),
+          );
+          return;
+        }
+
+        // Pending/unknown approval state: keep them in verification flow.
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const VerificationInprogressScreen(),
+          ),
+        );
+        return;
+      }
+
+      if (status <= 0) {
         // Not even basic registration completed
         Navigator.pushReplacement(
           context,
@@ -117,7 +181,8 @@ class _SplashscreenState extends State<Splashscreen>
         );
       } else if (status == 2) {
         // Documents submitted → now check approval status
-        final approval = staff!.isApproved?.toLowerCase().trim() ?? 'pending';
+        final approval =
+            staff?.isApproved?.toString().trim().toLowerCase() ?? 'pending';
 
         if (approval == '1') {
           // Approved → go to dashboard

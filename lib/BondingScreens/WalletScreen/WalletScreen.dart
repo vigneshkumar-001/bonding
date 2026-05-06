@@ -7,10 +7,12 @@ import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/ViewModel/P
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
+import 'package:bonding_app/config/razorpay_config.dart';
 import 'package:bonding_app/theme/brand_theme.dart';
 import 'package:bonding_app/ui/app_loader.dart';
 import 'package:bonding_app/ui/app_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -45,6 +47,14 @@ class _WalletScreenState extends State<WalletScreen> {
 
   void _openCheckout(PaymentPackage package) {
     final vm = context.read<WalletViewModel>();
+    if (kReleaseMode) {
+      assertRazorpayConfig();
+    } else if (razorpayKey.isEmpty) {
+      Utils.snackBarErrorMessage(
+        'Missing Razorpay key (RAZORPAY_KEY). Add --dart-define=RAZORPAY_KEY=...',
+      );
+      return;
+    }
 
     final amountInRupees = int.tryParse(package.amount.toString()) ?? 0;
     final coins = int.tryParse(package.coin) ?? 0;
@@ -62,23 +72,20 @@ class _WalletScreenState extends State<WalletScreen> {
         final orderId = response.data?.deposit?.razorpayOrderId;
 
         final options = {
-          // 'key': 'rzp_test_S8pViJJW5CVujd',
-          'key': 'rzp_test_SKfjxkHfwHHcrY',
+          'key': razorpayKey,
           'amount': amountInRupees * 100,
           'name': 'Twoofus',
           'description': '${package.coin} Coins Package',
           'order_id': orderId,
-          'prefill': {
-            'contact': '9952225025',
-            'email': 'user@example.com',
-          },
           'external': {
             'wallets': ['phonepe'],
           },
           'theme': {'color': '#cc529f'},
         };
 
-        AppLogger.log.w(options);
+        if (kDebugMode) {
+          AppLogger.log.w(options);
+        }
 
         try {
           _razorpay.open(options);
@@ -474,13 +481,11 @@ class _WalletScreenState extends State<WalletScreen> {
 //             final orderId = response.data?.deposit?.razorpayOrderId;
 //
 //             var options = {
-//               // 'key': 'rzp_test_S8pViJJW5CVujd',
-//               'key': 'rzp_test_SKfjxkHfwHHcrY',
-//               'amount': amountInRupees * 100, // Razorpay expects paise
+//               'key': '...',
+//               'amount': amountInRupees * 100,
 //               'name': 'Twoofus',
 //               'description': '${package.coin} Coins Package',
 //               'order_id': orderId,
-//               'prefill': {'contact': '9952225025', 'email': 'user@example.com'},
 //               'external': {
 //                 'wallets': ['phonepe'],
 //               },

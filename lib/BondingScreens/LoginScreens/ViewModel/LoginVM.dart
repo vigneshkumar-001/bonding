@@ -54,11 +54,32 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst("Exception: ", "");
+      _errorMessage = _toUserMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
     }
+  }
+
+  String _toUserMessage(Object error) {
+    var msg = error.toString();
+
+    msg = msg.replaceFirst('Exception: ', '');
+    msg = msg.replaceFirst('Error During Communication: ', '');
+    msg = msg.replaceFirst('Invalid Request: ', '');
+    msg = msg.replaceFirst('Unauthorised Request: ', '');
+
+    if (msg.contains('503 Service Unavailable') || msg.contains('<title>503')) {
+      return 'Server is temporarily unavailable. Please try again later.';
+    }
+
+    if (msg.contains("type 'String' is not a subtype")) {
+      return 'Server error. Please try again later.';
+    }
+
+    msg = msg.trim();
+    if (msg.isEmpty) return 'Something went wrong. Please try again.';
+    return msg;
   }
 
 /*  Future<bool> verifyOtp(String phone, String otp) async {
