@@ -209,7 +209,7 @@ class SocketService {
     }
 
     if (fixedStaffId.startsWith("BON")) {
-      _chatErrorCtrl.add({"message": "Staff not registered yet. Retry join."});
+      _chatErrorCtrl.add({"message": "Women not registered yet. Retry join."});
 
       return;
     }
@@ -247,7 +247,7 @@ class SocketService {
     }
 
     if (fixedStaffId.startsWith("BON")) {
-      onAck({"ok": false, "message": "Staff not registered yet"});
+      onAck({"ok": false, "message": "Women not registered yet"});
 
       return;
     }
@@ -711,7 +711,7 @@ class SocketService {
 
     if (fixedStaffId.startsWith("BON")) {
       AppLogger.log.e("⛔ join_chat blocked: staff mongo id not ready");
-      _chatErrorCtrl.add({"message": "Staff not registered yet. Retry join."});
+      _chatErrorCtrl.add({"message": "Women not registered yet. Retry join."});
       return;
     }
 
@@ -747,7 +747,7 @@ class SocketService {
     }
 
     if (fixedStaffId.startsWith("BON")) {
-      onAck({"ok": false, "message": "Staff not registered yet"});
+      onAck({"ok": false, "message": "Women not registered yet"});
       return;
     }
 

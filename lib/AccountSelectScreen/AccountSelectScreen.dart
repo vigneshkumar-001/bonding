@@ -1,5 +1,6 @@
 import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/LoginScreen.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/StaffRegistrationScreens.dart';
@@ -23,18 +24,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF5A1F3F),
-              Color(0xFF3A152A),
-              Color(0xFF140810),
-              Color(0xFF140810),
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -74,9 +64,8 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                   // User Card
                   _buildAccountCard(
                     height: 120,
-                    imagePath:
-                        "assets/Images/men.png",
-                    label: "men ",
+                    imagePath: "assets/Images/men.png",
+                    label: "Men",
                     isSelected: selectedAccount == 1,
                     onTap: () {
                       setState(() {
@@ -140,9 +129,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                           ? const LinearGradient(
                               colors: [Color(0xFF666666), Color(0xFF888888)],
                             )
-                          : const LinearGradient(
-                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                            ),
+                          : Apptheme.buttonGradient,
                     ),
                     child: Center(
                       child: Text(
@@ -186,7 +173,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
           children: [
             Image.asset(imagePath, height: height),
             SizedBox(height: 7),
-            AppText(label),
+            AppText(label, color: Colors.white, fontWeight: FontWeight.w600),
           ],
         ),
       ),

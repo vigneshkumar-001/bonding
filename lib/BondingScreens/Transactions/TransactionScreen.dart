@@ -5,6 +5,7 @@ import 'package:bonding_app/BondingScreens/Transactions/ViewModel/TransactionHis
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // for date formatting
@@ -40,7 +41,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             color: const Color(0xFF100a0a),
             child: SafeArea(
               child: vm.isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                  ? const Center(child: AppLoadingIndicator(color: Colors.white))
                   : vm.errorMessage != null
                   ? Center(
                 child: Column(

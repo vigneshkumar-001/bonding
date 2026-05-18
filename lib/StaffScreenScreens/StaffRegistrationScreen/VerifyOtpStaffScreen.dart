@@ -5,6 +5,7 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -262,7 +263,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                               ? const SizedBox(
                                   height: 24,
                                   width: 24,
-                                  child: CircularProgressIndicator(
+                                  child: const AppLoadingIndicator(
                                     color: Colors.white,
                                     strokeWidth: 2.5,
                                   ),
@@ -354,7 +355,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                               ? const SizedBox(
                                   height: 24,
                                   width: 24,
-                                  child: CircularProgressIndicator(
+                                  child: const AppLoadingIndicator(
                                     color: Colors.white,
                                     strokeWidth: 2.5,
                                   ),

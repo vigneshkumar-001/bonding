@@ -9,6 +9,7 @@ import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/block_user_vm
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/staff_chat_provider_vm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bonding_app/BondingScreens/Chat/Model/chat_message_model.dart';
@@ -277,7 +278,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await blockVm.blockUser(
@@ -413,7 +414,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await unblockVm.unblockUser(
@@ -561,7 +562,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                             backgroundImage: imageProvider,
                           ),
                           placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                          const AppLoadingIndicator(),
                           errorWidget: (context, url, error) =>
                           const Icon(Icons.person, color: Colors.white),
                         ),
@@ -721,7 +722,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                                     width: 18,
                                                     height: 18,
                                                     child:
-                                                        CircularProgressIndicator(
+                                                        const AppLoadingIndicator(
                                                           strokeWidth: 2,
                                                         ),
                                                   ),
@@ -871,7 +872,7 @@ class _CenterMiniLoader extends StatelessWidget {
       child: SizedBox(
         width: 26,
         height: 26,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: const AppLoadingIndicator(radius: 10),
       ),
     );
   }
@@ -904,7 +905,7 @@ class _Bubble extends StatelessWidget {
             child: SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: const AppLoadingIndicator(radius: 10),
             ),
           );
         case ChatMsgStatus.failed:
@@ -1290,7 +1291,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await blockVm.blockUser(
@@ -1539,7 +1540,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                                     width: 18,
                                                     height: 18,
                                                     child:
-                                                        CircularProgressIndicator(
+                                                        const AppLoadingIndicator(
                                                           strokeWidth: 2,
                                                         ),
                                                   ),
@@ -1642,7 +1643,7 @@ class _CenterMiniLoader extends StatelessWidget {
       child: SizedBox(
         width: 26,
         height: 26,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: const AppLoadingIndicator(radius: 10),
       ),
     );
   }
@@ -1675,7 +1676,7 @@ class _Bubble extends StatelessWidget {
             child: SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: const AppLoadingIndicator(radius: 10),
             ),
           );
         case ChatMsgStatus.failed:

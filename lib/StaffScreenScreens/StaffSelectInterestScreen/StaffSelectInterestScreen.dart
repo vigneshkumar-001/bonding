@@ -1,9 +1,11 @@
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +28,8 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
 
   List<bool> selectedCategories = List.filled(6, false);
 
-  int get selectedCount => selectedCategories.where((selected) => selected).length;
+  int get selectedCount =>
+      selectedCategories.where((selected) => selected).length;
 
   bool get canProceed => selectedCount >= 3;
 
@@ -106,25 +109,33 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               gradient: isSelected
-                                  ? const LinearGradient(
-                                colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
+                                  ? Apptheme.buttonGradient
                                   : null,
-                              color: isSelected ? null : const Color(0xFF231d1d),
-                              borderRadius: BorderRadius.circular(8), // pill shape
+                              color: isSelected
+                                  ? null
+                                  : const Color(0xFF231d1d),
+                              borderRadius: BorderRadius.circular(
+                                8,
+                              ), // pill shape
                               border: !isSelected
-                                  ? Border.all(color: Colors.white.withOpacity(0.2), width: 1)
+                                  ? Border.all(
+                                      color: Colors.white.withOpacity(0.2),
+                                      width: 1,
+                                    )
                                   : null,
                             ),
                             child: Text(
                               categories[index],
                               style: TextStyle(
-                                color: isSelected ? Colors.white : Colors.grey[400],
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[400],
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -142,7 +153,10 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                       Center(
                         child: Text(
                           vm.interestError!,
-                          style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 14,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -156,54 +170,71 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                         onTap: vm.isUpdatingInterests || !canProceed
                             ? null
                             : () async {
-                          final success = await vm.updateStaffAreaOfInterest(
-                            categories
-                                .asMap()
-                                .entries
-                                .where((entry) => selectedCategories[entry.key])
-                                .map((entry) => entry.value)
-                                .toList(),
-                          );
+                                final success = await vm
+                                    .updateStaffAreaOfInterest(
+                                      categories
+                                          .asMap()
+                                          .entries
+                                          .where(
+                                            (entry) =>
+                                                selectedCategories[entry.key],
+                                          )
+                                          .map((entry) => entry.value)
+                                          .toList(),
+                                    );
 
-                          if (success) {
-                            Utils.snackBar("Interests saved successfully!");
-                            bondNavigator.newPage(
-                              context,
-                              page: const StaffBottomBar(),
-                            );
-                          } else {
-                            Utils.snackBarErrorMessage(
-                              vm.interestError ?? "Failed to save interests. Try again.",
-                            );
-                          }
-                        },
+                                if (success) {
+                                  Utils.snackBar(
+                                    "Interests saved successfully!",
+                                  );
+                                  bondNavigator.newPage(
+                                    context,
+                                    page: const StaffBottomBar(),
+                                  );
+                                } else {
+                                  Utils.snackBarErrorMessage(
+                                    vm.interestError ??
+                                        "Failed to save interests. Try again.",
+                                  );
+                                }
+                              },
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             gradient: canProceed && !vm.isUpdatingInterests
-                                ? const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)])
-                                : const LinearGradient(colors: [Color(0xFF353535), Color(0xFF353535)]),
+                                ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFFB86AF6),
+                                      Color(0xFFFF6A6A),
+                                    ],
+                                  )
+                                : const LinearGradient(
+                                    colors: [
+                                      Color(0xFF353535),
+                                      Color(0xFF353535),
+                                    ],
+                                  ),
                           ),
                           child: Center(
                             child: vm.isUpdatingInterests
                                 ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.5,
-                              ),
-                            )
+                                    height: 24,
+                                    width: 24,
+                                    child: const AppLoadingIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
                                 : Text(
-                              canProceed
-                                  ? "Continue → ($selectedCount selected)"
-                                  : "Select at least 3 interests",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                                    canProceed
+                                        ? "Continue → ($selectedCount selected)"
+                                        : "Select at least 3 interests",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),

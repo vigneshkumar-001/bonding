@@ -5,6 +5,8 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.da
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
 
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +49,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
     final staffVM = context.watch<StaffViewModel>();
     final staff = staffVM.currentStaff; // StaffSingleProfile?
     // final staffId = (staff?.memberID ?? "").trim();
-    final staffMongoId = (staff?.id ?? staff?. id ?? "").toString().trim();
+    final staffMongoId = (staff?.id ?? staff?.id ?? "").toString().trim();
     // ✅ Build screens here (NOT as a fixed field)
     final screens = <Widget>[
       const BondingDashboardPage(),
@@ -56,10 +58,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
       // ✅ Chat screen needs staffId
       staffMongoId.isEmpty
           ? const _ChatLoadingPlaceholder()
-          : StaffChatListScreen(
-        backPage: false,
-        staffId: staffMongoId,
-      ),
+          : StaffChatListScreen(backPage: false, staffId: staffMongoId),
 
       const WithdrawHistory(backPage: false),
       const StaffProfileScreen(backPage: false),
@@ -74,7 +73,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
         /// 🔹 Custom Floating Bottom Bar
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF282323),
+            color: Color(0xFF141018),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(14),
               topRight: Radius.circular(14),
@@ -82,15 +81,15 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
           ),
           child: SafeArea(
             child: SizedBox(
-              height: 60,
+              height: 72,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _navItem("assets/Images/discover.svg", 0),
-                  _navItem("assets/Images/history.svg", 1),
-                  _navItem("assets/Images/chat.svg", 2),
-                  _navItem("assets/Images/trans.svg", 3),
-                  _navItem("assets/Images/profile.svg", 4),
+                  _navItem("assets/Images/discover.svg", "Home", 0),
+                  _navItem("assets/Images/history.svg", "History", 1),
+                  _navItem("assets/Images/chat.svg", "Chat", 2),
+                  _navItem("assets/Images/trans.svg", "Wallet", 3),
+                  _navItem("assets/Images/profile.svg", "Profile", 4),
                 ],
               ),
             ),
@@ -101,7 +100,7 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
   }
 
   /// 🔹 Bottom Nav Item
-  Widget _navItem(String svgPath, int index) {
+  Widget _navItem(String svgPath, String label, int index) {
     final bool isActive = _selectedIndex == index;
 
     return GestureDetector(
@@ -110,28 +109,43 @@ class _StaffBottomBarState extends State<StaffBottomBar> {
           _selectedIndex = index;
         });
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: 46,
-        height: 46,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: isActive
-              ? const LinearGradient(
-            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-          )
-              : null,
-        ),
-        child: Center(
-          child: SvgPicture.asset(
-            svgPath,
-            width: 28,
-            height: 28,
-            colorFilter: ColorFilter.mode(
-              isActive ? Colors.white : const Color(0XFFbebdbd),
-              BlendMode.srcIn,
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: isActive ? Apptheme.buttonGradient : null,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  svgPath,
+                  width: 26,
+                  height: 26,
+                  colorFilter: ColorFilter.mode(
+                    isActive ? Colors.white : const Color(0xFF8B8B8B),
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isActive ? Colors.white : const Color(0xFF8B8B8B),
+                fontSize: 12,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -145,13 +159,10 @@ class _ChatLoadingPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFF140810),
-      body: Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      body: Center(child: AppLoadingIndicator(color: Colors.white)),
     );
   }
 }
-
 
 // import 'package:bonding_app/BondingScreens/Chat/ChatListScreen.dart';
 // import 'package:bonding_app/BondingScreens/HistoryCard/HistoryCardScreen.dart';

@@ -1,4 +1,5 @@
 import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/DeleteReasonScreen.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart'; // If you use AppText
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart'; // For navigation
@@ -81,9 +82,7 @@ class DeleteAccountScreen extends StatelessWidget {
 
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
-                  ),
+                  gradient: Apptheme.buttonGradient,
                 ),
                 alignment: Alignment.center,
                 child: const Text(

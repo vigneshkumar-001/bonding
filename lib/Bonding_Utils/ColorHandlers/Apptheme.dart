@@ -2,22 +2,143 @@ import 'package:bonding_app/Bonding_Utils/ColorHandlers/AppColors.dart';
 import 'package:flutter/material.dart';
 
 class Apptheme {
+  static const Color buttonGradientStart = Color(0xFFB86AF6);
+  static const Color buttonGradientEnd = Color(0xFFFF6A6A);
+  static const List<Color> buttonGradientColors = [
+    buttonGradientStart,
+    buttonGradientEnd,
+  ];
+  static const LinearGradient buttonGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: buttonGradientColors,
+  );
+
+  // App dark palette (matches current UI direction)
+  static const Color bg0 = Color(0xFF140810);
+  static const Color bg1 = Color(0xFF3A152A);
+  static const Color bg2 = Color(0xFF5A1F3F);
+  static const Color surface = Color(0xFF1E1325);
+  static const Color surface2 = Color(0xFF24162C);
+  static const Color outline = Color(0x33FFFFFF);
+  static const Color text = Color(0xFFFFFFFF);
+  static const Color textMuted = Color(0xB3FFFFFF);
+
+  static const LinearGradient backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [bg0, bg1, bg0, bg0],
+  );
+
   /// light theme Color
   static final lightThemeData = ThemeData(
+    useMaterial3: true,
     bottomAppBarTheme: const BottomAppBarThemeData(
       color: Color(0xFFD4D4D4),
     ), // Set bottom app bar color to gray
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      surfaceBright: appColors.bgTextLight, // Set your background color here
+    // Force the app to look consistent even if light theme is used somewhere.
+    colorScheme: const ColorScheme.dark().copyWith(
+      primary: buttonGradientStart,
+      secondary: buttonGradientEnd,
+      surface: surface,
+      onSurface: text,
+      outline: outline,
     ),
-    appBarTheme: AppBarTheme(backgroundColor: appColors.appPrimaryColorLight),
-    scaffoldBackgroundColor: appColors.appPrimaryColorLight,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: text,
+      elevation: 0,
+      centerTitle: false,
+    ),
+    scaffoldBackgroundColor: Colors.transparent,
 
     fontFamily: "LexendDeca",
-    primaryColor: appColors.appPrimaryColorLight,
-    primaryColorLight: appColors.appBodyColorLight1,
-    primaryColorDark: appColors.appBodyColorLight2,
-    iconTheme: IconThemeData(color: appColors.iconColorLight),
+    primaryColor: bg0,
+    primaryColorLight: bg1,
+    primaryColorDark: bg2,
+    iconTheme: const IconThemeData(color: text),
+
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: buttonGradientStart,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+        disabledForegroundColor: Colors.white.withOpacity(0.75),
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: buttonGradientStart,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+        disabledForegroundColor: Colors.white.withOpacity(0.75),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: buttonGradientStart,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: buttonGradientStart,
+        side: BorderSide(color: buttonGradientStart.withOpacity(0.9)),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF141018),
+      selectedItemColor: buttonGradientEnd,
+      unselectedItemColor: Color(0xFF8B8B8B),
+      showUnselectedLabels: true,
+      type: BottomNavigationBarType.fixed,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: const Color(0xFF141018),
+      indicatorColor: surface2,
+      labelTextStyle: WidgetStateProperty.all(
+        const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: buttonGradientEnd);
+        }
+        return const IconThemeData(color: Color(0xFF8B8B8B));
+      }),
+    ),
+    cardTheme: CardThemeData(
+      color: surface2,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    ),
+    dividerTheme: const DividerThemeData(color: outline),
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: Color(0xFF201424),
+      contentTextStyle: TextStyle(color: text),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: surface2,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: outline),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: buttonGradientStart),
+      ),
+      hintStyle: const TextStyle(color: textMuted),
+      labelStyle: const TextStyle(color: textMuted),
+    ),
 
     primarySwatch: MaterialColor(
       appColors.lightPrimaryColor,
@@ -139,22 +260,31 @@ class Apptheme {
 
   /// Dark Theme Color
   static final darkThemeData = ThemeData(
-    appBarTheme: AppBarTheme(backgroundColor: appColors.appPrimartColorDark),
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      surfaceBright: appColors.bgTextDark,
-      surface: appColors.bgTextDark,
+    useMaterial3: true,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: text,
+      elevation: 0,
+      centerTitle: false,
     ),
-    scaffoldBackgroundColor: appColors.appPrimartColorDark,
+    colorScheme: const ColorScheme.dark().copyWith(
+      primary: buttonGradientStart,
+      secondary: buttonGradientEnd,
+      surface: surface,
+      onSurface: text,
+      outline: outline,
+    ),
+    scaffoldBackgroundColor: Colors.transparent,
     fontFamily: "LexendDeca",
-    primaryColor: appColors.appPrimartColorDark,
-    iconTheme: IconThemeData(color: appColors.iconColorDark),
-    primaryColorLight: appColors.appBodyColorDark1,
-    primaryColorDark: appColors.appBodyColorDark2,
+    primaryColor: bg0,
+    iconTheme: const IconThemeData(color: text),
+    primaryColorLight: bg1,
+    primaryColorDark: bg2,
     primarySwatch: MaterialColor(
       appColors.darkPrimaryColor,
       appColors.darkSwatchColor,
     ),
-    cardColor: appColors.cardBackgroundDark,
+    cardColor: surface2,
     // backgroundColor: appColors.bgTextDark,
     hintColor: appColors.hintTextDark,
     shadowColor: Color(0xFF364153),
@@ -169,8 +299,89 @@ class Apptheme {
     chipTheme: ChipThemeData(backgroundColor: appColors.SwapArrowRoundDark),
     disabledColor: appColors.hintdark,
     bottomAppBarTheme: BottomAppBarThemeData(
-      color: Color(0xFF262737),
+      color: const Color(0xFF141018),
     ), // Set bottom app bar color to black
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF141018),
+      selectedItemColor: buttonGradientEnd,
+      unselectedItemColor: Color(0xFF8B8B8B),
+      showUnselectedLabels: true,
+      type: BottomNavigationBarType.fixed,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: const Color(0xFF141018),
+      indicatorColor: surface2,
+      labelTextStyle: WidgetStateProperty.all(
+        const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: buttonGradientEnd);
+        }
+        return const IconThemeData(color: Color(0xFF8B8B8B));
+      }),
+    ),
+    cardTheme: CardThemeData(
+      color: surface2,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    ),
+    dividerTheme: const DividerThemeData(color: outline),
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: Color(0xFF201424),
+      contentTextStyle: TextStyle(color: text),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: surface2,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: outline),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: buttonGradientStart),
+      ),
+      hintStyle: const TextStyle(color: textMuted),
+      labelStyle: const TextStyle(color: textMuted),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: buttonGradientStart,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+        disabledForegroundColor: Colors.white.withOpacity(0.75),
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: buttonGradientStart,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+        disabledForegroundColor: Colors.white.withOpacity(0.75),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: buttonGradientStart,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: buttonGradientStart,
+        side: BorderSide(color: buttonGradientStart.withOpacity(0.9)),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
     textTheme: TextTheme(
       labelLarge: TextStyle(
         color: appColors.textDark,

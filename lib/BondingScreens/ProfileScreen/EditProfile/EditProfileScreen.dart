@@ -5,9 +5,11 @@ import 'package:bonding_app/BondingScreens/AuthService.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/Model/UserDataModel.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -114,19 +116,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // ✅ ONE PRINT: what is being sent
       print(
-          'SENDING -> URL: ${request.url}\n'
-              'HEADERS: ${{
-            ...request.headers,
-            // don’t leak full token in logs
-            if (request.headers.containsKey("Authorization")) "Authorization": "Bearer ***",
-          }}\n'
-              'FIELDS: ${request.fields}\n'
-              'FILES: ${request.files.map((f) => {
-            "field": f.field,
-            "filename": f.filename,
-            "length": f.length,
-            "contentType": f.contentType?.toString(),
-          }).toList()}\n'
+        'SENDING -> URL: ${request.url}\n'
+        'HEADERS: ${{
+          ...request.headers,
+          // don’t leak full token in logs
+          if (request.headers.containsKey("Authorization")) "Authorization": "Bearer ***",
+        }}\n'
+        'FIELDS: ${request.fields}\n'
+        'FILES: ${request.files.map((f) => {"field": f.field, "filename": f.filename, "length": f.length, "contentType": f.contentType?.toString()}).toList()}\n',
       );
 
       final streamedResponse = await request.send();
@@ -134,8 +131,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // ✅ ONE PRINT: response
       print(
-          'RESPONSE <- ${response.statusCode}\n'
-              'BODY: ${response.body}\n'
+        'RESPONSE <- ${response.statusCode}\n'
+        'BODY: ${response.body}\n',
       );
 
       if (response.statusCode == 200) {
@@ -157,7 +154,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return null;
     }
   }
-/*  Future<String?> _uploadImage(File imageFile) async {
+
+  /*  Future<String?> _uploadImage(File imageFile) async {
     try {
       final token = await AuthService.getToken() ?? "";
 
@@ -206,7 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return null;
     }
   }*/
-   Future<void> _updateProfile() async {
+  Future<void> _updateProfile() async {
     final userVM = context.read<UserViewModel>();
     final user = userVM.currentUser;
 
@@ -254,17 +252,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         if (userVM.isLoading || user == null) {
           return const Scaffold(
-            backgroundColor: Color(0xFF100a0a),
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+            backgroundColor: Colors.transparent,
+            body: Center(child: AppLoadingIndicator(color: Colors.white)),
           );
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFF100a0a),
+          backgroundColor: Colors.transparent,
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            color: const Color(0xFF100a0a),
             child: SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -537,16 +534,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     width: MediaQuery.of(context).size.width * 0.55,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
-                      ),
+                      gradient: Apptheme.buttonGradient,
                     ),
                     alignment: Alignment.center,
                     child: _isUpdating || userVM.isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(
+                            child: const AppLoadingIndicator(
                               color: Colors.white,
                               strokeWidth: 2,
                             ),

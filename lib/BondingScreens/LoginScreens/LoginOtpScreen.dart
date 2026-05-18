@@ -3,7 +3,9 @@ import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -55,18 +57,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
+            decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -117,35 +108,36 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         ),
 
                         // Transparent TextField for input
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () => _focusNode.requestFocus(),
-                            child: Container(
-                              height: 70, // Match heart height
-                              color: Colors.transparent,
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _focusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 4,
-                                style: const TextStyle(
-                                  fontSize: 1, // Very small text (invisible)
-                                  color: Colors.transparent,
-                                ),
-                                cursorColor: Colors.transparent,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  counterText: '',
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                onChanged: (_) => setState(() {}),
-                              ),
-                            ),
-                          ),
-                        ),
+                      //   Positioned(
+                      //     top: 0,
+                      //     left: 0,
+                      //     right: 0,
+                      //     child: GestureDetector(
+                      //       onTap: () => _focusNode.requestFocus(),
+                      //       child: Container(
+                      //         height: 70, // Match heart height
+                      //         color: Colors.transparent,
+                      //         child: TextField(
+                      //           controller: _otpController,
+                      //           focusNode: _focusNode,
+                      //           keyboardType: TextInputType.number,
+                      //           maxLength: 4,
+                      //           style: const TextStyle(
+                      //             fontSize: 1, // Very small text (invisible)
+                      //             color: Colors.transparent,
+                      //           ),
+                      //           cursorColor: Colors.transparent,
+                      //           decoration: const InputDecoration(
+                      //             border: InputBorder.none,
+                      //             counterText: '',
+                      //             contentPadding: EdgeInsets.zero,
+                      //           ),
+                      //           onChanged: (_) => setState(() {}),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // 
                       ],
                     ),
 
@@ -269,7 +261,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                               ? const SizedBox(
                                   height: 24,
                                   width: 24,
-                                  child: CircularProgressIndicator(
+                                  child: const AppLoadingIndicator(
                                     color: Colors.white,
                                     strokeWidth: 2.5,
                                   ),

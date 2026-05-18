@@ -6,8 +6,10 @@ import 'package:bonding_app/BondingScreens/SupportScreen/ViewModel/support_ticke
 import 'package:bonding_app/BondingScreens/SupportScreen/ViewModel/support_ticket_vm.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/AppColors.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/StaffScreenScreens/SupportScreen/support_chat_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart' as http_parser;
 import 'package:image_picker/image_picker.dart';
@@ -18,10 +20,6 @@ import '../../Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import '../../Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import '../../Reusable_Widgets/BondingNavigator.dart';
 import '../../Reusable_Widgets/Common_AppBar/common_app_bar.dart';
-
-
-
-
 
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
@@ -87,16 +85,18 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
       // Add auth header
       request.headers['Authorization'] = 'Bearer $token';
 
-      // ❌ TEMP DISABLE: file attach to multipart (HIDE form-data)
+      // âŒ TEMP DISABLE: file attach to multipart (HIDE form-data)
       final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg';
       final extension = mimeType.split('/').last;
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        imageFile.path,
-        filename: 'profile.$extension',
-        contentType: http_parser.MediaType('image', extension),
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image',
+          imageFile.path,
+          filename: 'profile.$extension',
+          contentType: http_parser.MediaType('image', extension),
+        ),
+      );
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
@@ -126,7 +126,7 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
   }
 
   Future<void> _updateProfile() async {
-    if (_isUpdating) return; // ✅ prevent double click
+    if (_isUpdating) return; // âœ… prevent double click
 
     final userVM = context.read<SupportTicketVM>();
 
@@ -221,11 +221,11 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF100a0a),
+      backgroundColor: Colors.transparent,
       appBar: CommonAppBar(
         title: 'Raise Ticket',
         usePaddedLeading: true,
-        bg: const Color(0xFF100a0a),
+        bg: Colors.transparent,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -437,7 +437,7 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
               GestureDetector(
                 onTap: _isUpdating
                     ? null
-                    : _updateProfile, // ✅ disable while loading
+                    : _updateProfile, // âœ… disable while loading
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
@@ -448,21 +448,18 @@ class _CreateSupportScreenState extends State<CreateSupportScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      gradient: LinearGradient(
-                        colors: _isUpdating
-                            ? [
-                                Colors.grey.shade700,
-                                Colors.grey.shade600,
-                              ] // ✅ muted while loading
-                            : const [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                      ),
+                      gradient: _isUpdating
+                          ? const LinearGradient(
+                              colors: [Color(0xFF6B6B6B), Color(0xFF505050)],
+                            )
+                          : Apptheme.buttonGradient,
                     ),
                     child: Center(
                       child: _isUpdating
                           ? const SizedBox(
                               height: 22,
                               width: 22,
-                              child: CircularProgressIndicator(
+                              child: const AppLoadingIndicator(
                                 strokeWidth: 2,
                                 color: Colors.white,
                               ),

@@ -16,6 +16,7 @@ import 'package:bonding_app/Reusable_Widgets/ReuseElevateButton/common_call_butt
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -222,7 +223,7 @@ class _HistoryCardState extends State<HistoryCard> {
                   Expanded(
                     child: historyVM.isLoading
                         ? const Center(
-                            child: CircularProgressIndicator(
+                            child: const AppLoadingIndicator(
                               color: Colors.white,
                             ),
                           )

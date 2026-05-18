@@ -33,6 +33,7 @@ import 'package:bonding_app/BondingScreens/Transactions/ViewModel/TransactionHis
 import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/Repository/PaymentRepo.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/ViewModel/PaymentVM.dart';
 import 'BondingScreens/Chat/Repository/chat_repository.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/Repo/StaffRegisterRepo.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
@@ -46,9 +47,12 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
-const int _zegoAppId = 725765612;
+// const int _zegoAppId = 725765612;
+const int _zegoAppId = 2073142303;
 const String _zegoAppSign =
-    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
+    'cb2e20977165308bab891c28a97e12100ed429d9469846955090e008435ad3b1';
+// const String _zegoAppSign =
+//     '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,64 +81,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const buttonGradientStart = Color(0xFFB86AF6);
-    const buttonGradientEnd = Color(0xFFFF6A6A);
-
     return MultiProvider(
       providers: getAllProviders(),
       child: MaterialApp(
         navigatorKey: navigatorKey,
         title: 'TwoOfUs',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: buttonGradientStart)
-              .copyWith(
-                primary: buttonGradientStart,
-                secondary: buttonGradientEnd,
-              ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: buttonGradientStart,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
-              disabledForegroundColor: Colors.white.withOpacity(0.75),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+        theme: Apptheme.lightThemeData,
+        darkTheme: Apptheme.darkThemeData,
+        themeMode: ThemeMode.dark,
+        builder: (context, child) {
+          final safeChild = child ?? const SizedBox.shrink();
+          return DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: Apptheme.backgroundGradient,
             ),
-          ),
-          filledButtonTheme: FilledButtonThemeData(
-            style: FilledButton.styleFrom(
-              backgroundColor: buttonGradientStart,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
-              disabledForegroundColor: Colors.white.withOpacity(0.75),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: buttonGradientStart,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              textStyle: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: buttonGradientStart,
-              side: BorderSide(color: buttonGradientStart.withOpacity(0.9)),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ),
+            child: safeChild,
+          );
+        },
         home: const Splashscreen(),
       ),
     );

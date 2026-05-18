@@ -3,6 +3,7 @@ import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/staff_chat_provider_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
@@ -361,7 +362,7 @@ class _CenterLoader extends StatelessWidget {
             SizedBox(
               width: 18,
               height: 18,
-              child: CircularProgressIndicator(
+              child: const AppLoadingIndicator(
                 strokeWidth: 2,
                 color: Colors.white,
               ),
@@ -397,7 +398,7 @@ class _TopSmallLoader extends StatelessWidget {
         child: const SizedBox(
           width: 16,
           height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          child: const AppLoadingIndicator(radius: 10, color: Colors.white),
         ),
       ),
     );

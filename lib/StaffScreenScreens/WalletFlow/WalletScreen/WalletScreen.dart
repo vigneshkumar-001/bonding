@@ -7,6 +7,7 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawRequestScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -32,17 +33,19 @@ class _StaffWalletScreenState extends State<StaffWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WalletViewModel>(  // or StaffViewModel
+    return Consumer<WalletViewModel>(
+      // or StaffViewModel
       builder: (context, vm, child) {
         final staffVM = context.read<StaffViewModel>();
         final staff = staffVM.currentStaff;
-        final totalBalance = staff!.pendingBalance??"0";
+        final totalBalance = staff!.pendingBalance ?? "0";
         String headerYear = DateFormat('yyyy').format(DateTime.now());
         String headerMonth = DateFormat('MMMM').format(DateTime.now());
 
         if (vm.withdrawHistory.isNotEmpty) {
-          final latest = vm.withdrawHistory
-              .reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+          final latest = vm.withdrawHistory.reduce(
+            (a, b) => a.createdAt.isAfter(b.createdAt) ? a : b,
+          );
           headerYear = DateFormat('yyyy').format(latest.createdAt);
           headerMonth = DateFormat('MMMM').format(latest.createdAt);
         }
@@ -50,199 +53,237 @@ class _StaffWalletScreenState extends State<StaffWalletScreen> {
         // final pendingBalance = vm.currentStaff?.pendingBalance ?? 0.0;
 
         return Scaffold(
-            backgroundColor: const Color(0xFF100a0a),
-            body: SafeArea(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
             child: vm.isLoadingWithdraw
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
-            : vm.withdrawError != null
-        ? Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-        Text(vm.withdrawError!, style: const TextStyle(color: Colors.redAccent)),
-        const SizedBox(height: 16),
-        ElevatedButton(
-        onPressed: vm.fetchStaffWithdrawHistory,
-        child: const Text("Retry"),
-        ),
-        ],
-        ),
-        )
-            : Column(
-        children: [
-        // 🔹 Header
-        Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-        children: [
-        GestureDetector(
-        onTap: () => bondNavigator.backPage(context),
-        child: Container(
-        decoration: BoxDecoration(
-        color: const Color(0xFF35272d),
-        borderRadius: BorderRadius.circular(40),
-        ),
-        child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Icon(Icons.arrow_back, color: Colors.white, size: 28),
-        ),
-        ),
-        ),
-        const Spacer(),
-        Image.asset(
-          "assets/Images/appLogo.png",
-          height: 32,
-          fit: BoxFit.contain,
-        ),
-        const Spacer(),
-        const SizedBox(width: 30),
-        ],
-        ),
-        ),
+                ? const Center(child: AppLoadingIndicator(color: Colors.white))
+                : vm.withdrawError != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          vm.withdrawError!,
+                          style: const TextStyle(color: Colors.redAccent),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: vm.fetchStaffWithdrawHistory,
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      // 🔹 Header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => bondNavigator.backPage(context),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF35272d),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            Image.asset(
+                              "assets/Images/appLogo.png",
+                              height: 32,
+                              fit: BoxFit.contain,
+                            ),
+                            const Spacer(),
+                            const SizedBox(width: 30),
+                          ],
+                        ),
+                      ),
 
-        // 🔹 Balance Card (dynamic)
-        Stack(
-        alignment: Alignment.center,
-        children: [
-        Image.asset(
-        "assets/Images/walletframe.png",
-        width: double.infinity,
-        fit: BoxFit.cover,
-        ),
-        Positioned(
-        top: 30,
-        child: Column(
-        children: [
-        const Text(
-        "Total balance",
-        style: TextStyle(color: Colors.white70, fontSize: 14),
-        ),
-        const SizedBox(height: 6),
-        Text(
-        "₹$totalBalance",
-        style: const TextStyle(
-        color: Colors.white,
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        ],
-        ),
-        ),
-        // Tabs at bottom
-        Positioned(
-        bottom: 12,
-        left: 16,
-        right: 16,
-        child: Row(
-        children: [
-        _tab("Total balance", _selectedTab == 0, onTap: () => setState(() => _selectedTab = 0)),
-        _tab("Pending payo...", _selectedTab == 1, onTap: () => setState(() => _selectedTab = 1)),
-        _tab("Completed p...", _selectedTab == 2, onTap: () => setState(() => _selectedTab = 2)),
-        ],
-        ),
-        ),
-        ],
-        ),
+                      // 🔹 Balance Card (dynamic)
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/Images/walletframe.png",
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                          Positioned(
+                            top: 30,
+                            child: Column(
+                              children: [
+                                const Text(
+                                  "Total balance",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  "₹$totalBalance",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Tabs at bottom
+                          Positioned(
+                            bottom: 12,
+                            left: 16,
+                            right: 16,
+                            child: Row(
+                              children: [
+                                _tab(
+                                  "Total balance",
+                                  _selectedTab == 0,
+                                  onTap: () => setState(() => _selectedTab = 0),
+                                ),
+                                _tab(
+                                  "Pending payo...",
+                                  _selectedTab == 1,
+                                  onTap: () => setState(() => _selectedTab = 1),
+                                ),
+                                _tab(
+                                  "Completed p...",
+                                  _selectedTab == 2,
+                                  onTap: () => setState(() => _selectedTab = 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
 
-        const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-        // 🔹 Withdraw Button
-        GestureDetector(
-        onTap: () {
-        bondNavigator.newPage(context, page: const WithdrawalRequestScreen());
-        },
-        child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        height: 45,
-        decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: const LinearGradient(
-        colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-        ),
-        ),
-        child: const Center(
-        child: Text(
-        "withdraw",
-        style: TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        ),
-        ),
-        ),
-        ),
-        ),
+                      // 🔹 Withdraw Button
+                      GestureDetector(
+                        onTap: () {
+                          bondNavigator.newPage(
+                            context,
+                            page: const WithdrawalRequestScreen(),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          height: 45,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "withdraw",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
 
-        const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-        // 🔹 List Header (dynamic month/year)
-        Container(
-        color: const Color(0xFF282323),
-        child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-        children: [
-        Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        AppText(
-          headerYear, // TODO: dynamic from first txn date or current year
-        color: Colors.white70,
-        ),
-        AppText(
-          headerMonth, // TODO: dynamic
-        color: Colors.white,
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        ),
-        ],
-        ),
-        const Spacer(),
-        Text(
-        "₹${vm.withdrawHistory.fold<double>(0.0, (sum, txn) => sum + txn.amount)}",
-        style: const TextStyle(
-        color: Colors.green,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        ],
-        ),
-        ),
-        ),
+                      // 🔹 List Header (dynamic month/year)
+                      Container(
+                        color: const Color(0xFF282323),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AppText(
+                                    headerYear, // TODO: dynamic from first txn date or current year
+                                    color: Colors.white70,
+                                  ),
+                                  AppText(
+                                    headerMonth, // TODO: dynamic
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              Text(
+                                "₹${vm.withdrawHistory.fold<double>(0.0, (sum, txn) => sum + txn.amount)}",
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-        const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-        // 🔹 Transaction List (dynamic withdrawals)
-        Expanded(
-        child: vm.withdrawHistory.isEmpty
-        ? const Center(
-        child: Text(
-        "No withdrawals yet",
-        style: TextStyle(color: Colors.white70, fontSize: 18),
-        ),
-        )
-            : ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: vm.withdrawHistory.length,
-        itemBuilder: (context, index) {
+                      // 🔹 Transaction List (dynamic withdrawals)
+                      Expanded(
+                        child: vm.withdrawHistory.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  "No withdrawals yet",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                itemCount: vm.withdrawHistory.length,
+                                itemBuilder: (context, index) {
+                                  final txn = vm.withdrawHistory[index];
 
-        final txn = vm.withdrawHistory[index];
-
-
-        return _TransactionItem(
-        title: txn.upi != null && txn.upi!.isNotEmpty ? "UPI transfer" : "Bank transfer",
-        status: txn.status.toLowerCase(),
-        amount: "₹${txn.amount}",
-        date: DateFormat('dd MMMM').format(txn.createdAt),
+                                  return _TransactionItem(
+                                    title:
+                                        txn.upi != null && txn.upi!.isNotEmpty
+                                        ? "UPI transfer"
+                                        : "Bank transfer",
+                                    status: txn.status.toLowerCase(),
+                                    amount: "₹${txn.amount}",
+                                    date: DateFormat(
+                                      'dd MMMM',
+                                    ).format(txn.createdAt),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+          ),
         );
-        },
-        ),
-        ),
-        ],
-        )));
-        },
+      },
     );
   }
 
@@ -307,11 +348,7 @@ class _TransactionItem extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppText(
-                title,
-                color: Colors.white,
-                fontSize: 16,
-              ),
+              AppText(title, color: Colors.white, fontSize: 16),
               Row(
                 children: [
                   AppText(
@@ -319,21 +356,13 @@ class _TransactionItem extends StatelessWidget {
                     color: isPending ? Colors.orange : Colors.green,
                     fontSize: 14,
                   ),
-                  AppText(
-                    " · $date",
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+                  AppText(" · $date", color: Colors.white70, fontSize: 14),
                 ],
               ),
             ],
           ),
           const Spacer(),
-          AppText(
-            amount,
-            color: Colors.white,
-            fontSize: 16,
-          ),
+          AppText(amount, color: Colors.white, fontSize: 16),
         ],
       ),
     );

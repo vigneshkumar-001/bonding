@@ -11,6 +11,7 @@ import 'package:bonding_app/StaffScreenScreens/SupportScreen/support_screen.dart
 import 'package:bonding_app/StaffScreenScreens/WalletFlow/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -32,19 +33,19 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
     return Consumer<StaffViewModel>(
       builder: (context, staffVM, child) {
         final staff = staffVM.currentStaff;
-        final staffData = staffVM. staffData;
+        final staffData = staffVM.staffData;
 
         // Loading / error states
         if (staffVM.isFetchingSingleStaff) {
           return const Scaffold(
-            backgroundColor: Color(0xFF100a0a),
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+            backgroundColor: Colors.transparent,
+            body: Center(child: AppLoadingIndicator(color: Colors.white)),
           );
         }
 
         if (staff == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF100a0a),
+            backgroundColor: Colors.transparent,
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -65,11 +66,10 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFF100a0a),
+          backgroundColor: Colors.transparent,
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            color: const Color(0xFF100a0a),
             child: SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -143,7 +143,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       child: ClipOval(
                         child: staff.image != null && staff.image!.isNotEmpty
                             ? Image.network(
-                                staff.image?? '',
+                                staff.image ?? '',
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
                                     Image.asset(
@@ -162,7 +162,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
 
                     // Staff Name
                     Text(
-                      staff.name ?? "Staff",
+                      staff.name ?? "Women",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -206,7 +206,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               onTap: () {
                                 bondNavigator.newPage(
                                   context,
-                                  page: const SupportScreens(isStaff: true,),
+                                  page: const SupportScreens(isStaff: true),
                                 );
                                 // TODO: Navigate to staff help/support screen
                               },
@@ -227,7 +227,10 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               onTap: () {
                                 bondNavigator.newPage(
                                   context,
-                                  page:   AccountSettingsScreen(isStaff: true,userId: staff.id,),
+                                  page: AccountSettingsScreen(
+                                    isStaff: true,
+                                    userId: staff.id,
+                                  ),
                                 );
                               },
                             ),
@@ -326,7 +329,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       child: Row(
                         children: [
                           RichText(
-                            text:   TextSpan(
+                            text: TextSpan(
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -334,7 +337,7 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               children: [
                                 TextSpan(text: "Need Help? please contact "),
                                 TextSpan(
-                                  text: staffData?.supportEmail?? '',
+                                  text: staffData?.supportEmail ?? '',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500,

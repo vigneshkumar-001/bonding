@@ -18,6 +18,7 @@ import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zego_uikit/zego_uikit.dart';
@@ -226,7 +227,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
               child: SafeArea(
                 child: vm.isFetchingSingleStaff
                     ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                        child: const AppLoadingIndicator(color: Colors.white),
                       )
                     : vm.singleStaffError != null
                     ? Center(
@@ -437,7 +438,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
         builder: (context, vm, child) {
           if (vm.isFetchingWeeklyGraph || vm.isFetchingCallStats) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.white70),
+              child: const AppLoadingIndicator(color: Colors.white70),
             );
           }
 
@@ -825,7 +826,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       appSign:
           "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
       userID: staff.memberID,
-      userName: staff.name ?? "Staff",
+      userName: staff.name ?? "Women",
       plugins: [ZegoUIKitSignalingPlugin()],
       notificationConfig: ZegoCallInvitationNotificationConfig(
         androidNotificationConfig: ZegoAndroidNotificationConfig(
@@ -898,7 +899,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
               child: SafeArea(
                 child: vm.isFetchingSingleStaff
                     ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                        child: const AppLoadingIndicator(color: Colors.white),
                       )
                     : vm.singleStaffError != null
                     ? Center(
@@ -1148,7 +1149,7 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
         builder: (context, vm, child) {
           if (vm.isFetchingWeeklyGraph || vm.isFetchingCallStats) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.white70),
+              child: const AppLoadingIndicator(color: Colors.white70),
             );
           }
 

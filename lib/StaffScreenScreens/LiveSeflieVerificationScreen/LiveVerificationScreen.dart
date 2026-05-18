@@ -9,6 +9,7 @@ import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/Verifi
 import 'package:bonding_app/StaffScreenScreens/VerificationInprogressScreen/VerificationInprogressScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -184,7 +185,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
+                  const AppLoadingIndicator(color: Colors.white),
                   SizedBox(height: 16),
                   Text("Loading profile...", style: TextStyle(color: Colors.white70)),
                 ],
@@ -352,7 +353,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                         ? const SizedBox(
                       height: 28,
                       width: 28,
-                      child: CircularProgressIndicator(
+                      child: const AppLoadingIndicator(
                         color: Colors.white,
                         strokeWidth: 3,
                       ),
@@ -581,7 +582,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
+                  const AppLoadingIndicator(color: Colors.white),
                   SizedBox(height: 16),
                   Text("Loading profile...", style: TextStyle(color: Colors.white70)),
                 ],
@@ -752,7 +753,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                         ? const SizedBox(
                       height: 28,
                       width: 28,
-                      child: CircularProgressIndicator(
+                      child: const AppLoadingIndicator(
                         color: Colors.white,
                         strokeWidth: 3,
                       ),

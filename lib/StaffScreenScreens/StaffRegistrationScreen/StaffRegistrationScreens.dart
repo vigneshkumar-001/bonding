@@ -1,10 +1,12 @@
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/VerifyOtpStaffScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -135,16 +137,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
+              gradient: Apptheme.backgroundGradient,
             ),
             child: SafeArea(
               child: SingleChildScrollView(
@@ -162,7 +155,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     Center(
                       child: AppText(
-                        isLoginMode ? "Staff login" : "Staff registration",
+                        isLoginMode ? "Women login" : "Women registration",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -381,7 +374,6 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                   bondNavigator.newPage(
                                     context,
                                     page: ProfileVerficationScreen(
-
                                       // add any other data you need
                                     ),
                                   );
@@ -420,19 +412,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                               ? const LinearGradient(
                                   colors: [Colors.grey, Colors.blueGrey],
                                 )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
-                                  ],
-                                ),
+                              : Apptheme.buttonGradient,
                         ),
                         child: Center(
                           child: vm.isRegistering
                               ? const SizedBox(
                                   height: 24,
                                   width: 24,
-                                  child: CircularProgressIndicator(
+                                  child: const AppLoadingIndicator(
                                     color: Colors.white,
                                     strokeWidth: 2.5,
                                   ),
@@ -572,18 +559,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
+            decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -600,7 +576,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
                     Center(
                       child: AppText(
-                        "Staff registration",
+                        "Women registration",
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -781,14 +757,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isRegistering
                               ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
-                              : const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)]),
+                              : Apptheme.buttonGradient,
                         ),
                         child: Center(
                           child: vm.isRegistering
                               ? const SizedBox(
                             height: 24,
                             width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            child: const AppLoadingIndicator(color: Colors.white),
                           )
                               : const Text(
                             "Continue to Verification  →",

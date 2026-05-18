@@ -12,6 +12,7 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // If still loading or no user, show loading or fallback
         if (userVM.isLoading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+            body: const Center(child: AppLoadingIndicator(color: Colors.white)),
           );
         }
 

@@ -2,8 +2,10 @@ import 'package:bonding_app/BondingScreens/SupportScreen/ViewModel/support_ticke
 import 'package:bonding_app/BondingScreens/SupportScreen/create_support_screen.dart';
 import 'package:bonding_app/BondingScreens/SupportScreen/support_chat_screen.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -52,18 +54,18 @@ class _SupportScreensState extends State<SupportScreens> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF100a0a),
+      backgroundColor: Colors.transparent,
       appBar: const CommonAppBar(
         title: 'Support',
         usePaddedLeading: true,
-        bg: Color(0xFF100a0a),
+        bg: Colors.transparent,
       ),
       body: SafeArea(
         child: Consumer<SupportTicketListVM>(
           builder: (context, vm, _) {
             if (vm.isLoading) {
               return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: const AppLoadingIndicator(color: Colors.white),
               );
             }
 
@@ -110,7 +112,7 @@ class _SupportScreensState extends State<SupportScreens> {
 
             return RefreshIndicator(
               color: Colors.white,
-              backgroundColor: const Color(0xFF1A1212),
+              backgroundColor: Apptheme.surface,
               onRefresh: vm.refresh,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(

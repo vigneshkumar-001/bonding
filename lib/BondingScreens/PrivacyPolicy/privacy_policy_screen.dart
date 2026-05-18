@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../Reusable_Widgets/Common_AppBar/common_app_bar.dart';
@@ -35,7 +36,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
         builder: (context, vm, _) {
           if (vm.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
+              child: const AppLoadingIndicator(color: Colors.white),
             );
           }
 

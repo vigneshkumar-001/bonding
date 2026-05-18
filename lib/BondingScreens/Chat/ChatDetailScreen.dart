@@ -8,8 +8,10 @@ import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ViewModel/block_user_vm.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 class ChatDetailScreen extends StatefulWidget {
@@ -229,7 +231,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await blockVm.blockUser(
@@ -311,7 +313,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await unblockVm.unblockUser(
@@ -362,15 +364,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                ],
-              ),
+              gradient: Apptheme.backgroundGradient,
             ),
             child: SafeArea(
               child: Column(
@@ -405,7 +399,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                 backgroundImage: imageProvider,
                               ),
                           placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
+                              const AppLoadingIndicator(),
                           errorWidget: (context, url, error) =>
                               const Icon(Icons.person, color: Colors.white),
                         ),
@@ -682,7 +676,7 @@ class _CenterMiniLoader extends StatelessWidget {
       child: SizedBox(
         width: 26,
         height: 26,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: const AppLoadingIndicator(radius: 10),
       ),
     );
   }
@@ -720,7 +714,7 @@ class _MessageList extends StatelessWidget {
                     child: SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: const AppLoadingIndicator(radius: 10),
                     ),
                   ),
                 )
@@ -826,7 +820,7 @@ class _Bubble extends StatelessWidget {
             child: SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: const AppLoadingIndicator(radius: 10),
             ),
           );
         case ChatMsgStatus.failed:
@@ -1095,7 +1089,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoadingIndicator()),
     );
 
     final ok = await blockVm.blockUser(
@@ -1145,17 +1139,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
+            decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
             child: SafeArea(
               child: Column(
                 children: [
@@ -1410,7 +1394,7 @@ class _CenterMiniLoader extends StatelessWidget {
       child: SizedBox(
         width: 26,
         height: 26,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: const AppLoadingIndicator(radius: 10),
       ),
     );
   }
@@ -1449,7 +1433,7 @@ class _MessageList extends StatelessWidget {
                     child: SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: const AppLoadingIndicator(radius: 10),
                     ),
                   ),
                 )
@@ -1555,7 +1539,7 @@ class _Bubble extends StatelessWidget {
             child: SizedBox(
               width: 12,
               height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: const AppLoadingIndicator(radius: 10),
             ),
           );
         case ChatMsgStatus.failed:

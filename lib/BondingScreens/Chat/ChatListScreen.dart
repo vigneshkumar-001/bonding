@@ -1,6 +1,7 @@
 // lib/BondingScreens/Chat/UserChatListScreen.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
@@ -11,6 +12,7 @@ import 'package:bonding_app/BondingScreens/Chat/ViewModel/chat_provider_vm.dart'
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart'; // ✅ to get currentUser.id
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 
 class UserChatListScreen extends StatefulWidget {
   final bool backPage;
@@ -79,7 +81,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
             final query = q.trim().toLowerCase();
             if (query.isEmpty) return true;
 
-            final name = (c.staff?.name ?? "Staff").toLowerCase();
+            final name = (c.staff?.name ?? "Women").toLowerCase();
             return name.contains(query);
           }).toList();
 
@@ -88,15 +90,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
               width: double.infinity,
               height: double.infinity,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF140810),
-                    Color(0xFF3A152A),
-                    Color(0xFF140810),
-                  ],
-                ),
+                gradient: Apptheme.backgroundGradient,
               ),
               child: SafeArea(
                 child: Column(
@@ -190,7 +184,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                           return RefreshIndicator(
                             color: Colors.white,
-                            backgroundColor: const Color(0xFF271c1f),
+                            backgroundColor: Apptheme.surface,
                             onRefresh: () async => vm.fetch(reset: true),
                             child: ListView.builder(
                               physics: const AlwaysScrollableScrollPhysics(
@@ -210,7 +204,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                                 final c = list[i - 1];
 
-                                final staffName = c.staff?.name ?? "Staff";
+                                final staffName = c.staff?.name ?? "Women";
                                 final staffId = (c.staffId ?? "").toString();
                                 final isBlocked = (c.isBlocked ?? false);
                                 final userId =
@@ -392,7 +386,7 @@ class _CenterLoader extends StatelessWidget {
             const SizedBox(
               width: 18,
               height: 18,
-              child: CircularProgressIndicator(
+              child: const AppLoadingIndicator(
                 strokeWidth: 2,
                 color: Colors.white,
               ),
@@ -428,7 +422,7 @@ class _TopSmallLoader extends StatelessWidget {
         child: const SizedBox(
           width: 16,
           height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          child: const AppLoadingIndicator(radius: 10, color: Colors.white),
         ),
       ),
     );
@@ -709,7 +703,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
       if (query.isEmpty) return true;
 
       // ✅ user list response has "staff" object
-      final name = (c.staff?.name ?? "Staff").toLowerCase();
+      final name = (c.staff?.name ?? "Women").toLowerCase();
       return name.contains(query);
     }).toList();
 
@@ -821,7 +815,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
 
                           final c = list[i - 1];
 
-                          final staffName = c.staff?.name ?? "Staff";
+                          final staffName = c.staff?.name ?? "Women";
                           final staffId = c.staffId; // ✅ staff mongo id
                           final staffImage = c.staff?.image ?? "";
 
@@ -959,7 +953,7 @@ class _CenterLoader extends StatelessWidget {
             const SizedBox(
               width: 18,
               height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              child: const AppLoadingIndicator(radius: 10, color: Colors.white),
             ),
             const SizedBox(width: 12),
             Text(
@@ -989,7 +983,7 @@ class _TopSmallLoader extends StatelessWidget {
         child: const SizedBox(
           width: 16,
           height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          child: const AppLoadingIndicator(radius: 10, color: Colors.white),
         ),
       ),
     );

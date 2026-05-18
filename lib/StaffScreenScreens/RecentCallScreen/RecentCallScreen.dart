@@ -7,6 +7,7 @@ import 'package:bonding_app/StaffScreenScreens/RecentCallScreen/Model/recentCall
 import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 class RecentCallsPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _RecentCallsPageState extends State<RecentCallsPage> {
             ),
             child: SafeArea(
               child: vm.isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                  ? const Center(child: AppLoadingIndicator(color: Colors.white))
                   : vm.errorMessage != null
                   ? Center(
                 child: Column(

@@ -5,7 +5,9 @@ import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/Model/delete_acc
 import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/ViewModel/delete_account_reasons_vm.dart';
 import 'package:bonding_app/BondingScreens/DeleteAccountScreeen/ViewModel/delete_account_vm.dart';
 import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
@@ -179,7 +181,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF100a0a),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -210,7 +212,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
           builder: (context, vm, _) {
             if (vm.loading && vm.reasons.isEmpty) {
               return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: const AppLoadingIndicator(color: Colors.white),
               );
             }
 
@@ -277,16 +279,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          gradient: isSelected
-                              ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFF8d51d2),
-                                    Color(0xFFf8655f),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                )
-                              : null,
+                          gradient: isSelected ? Apptheme.buttonGradient : null,
                           color: isSelected
                               ? null
                               : const Color(0xFF35272d).withOpacity(0.6),
@@ -331,7 +324,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                               context: context,
                               barrierDismissible: false,
                               builder: (_) => const Center(
-                                child: CircularProgressIndicator(
+                                child: const AppLoadingIndicator(
                                   color: Colors.white,
                                 ),
                               ),
@@ -390,9 +383,7 @@ class _DeleteReasonScreenState extends State<DeleteReasonScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF8d51d2), Color(0xFFf8655f)],
-                          ),
+                          gradient: Apptheme.buttonGradient,
                         ),
                         alignment: Alignment.center,
                         child: const Text(

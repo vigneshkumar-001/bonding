@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -236,7 +238,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
       return const SizedBox(
         height: 14,
         width: 14,
-        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+        child: const AppLoadingIndicator(radius: 10, color: Colors.white70),
       );
     }
 
@@ -359,7 +361,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
           child: const SizedBox(
             height: 18,
             width: 18,
-            child: CircularProgressIndicator(
+            child: const AppLoadingIndicator(
               strokeWidth: 2,
               color: Colors.white70,
             ),
@@ -389,11 +391,11 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: Colors.transparent,
       appBar: CommonAppBar(
         title: 'Chat With Support',
         usePaddedLeading: true,
-        bg: _bg,
+        bg: Colors.transparent,
       ),
       body: SafeArea(
         child: Column(
@@ -450,7 +452,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                   // ✅ only first loader
                   if (vm.isLoading && vm.messages.isEmpty) {
                     return const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
+                      child: const AppLoadingIndicator(color: Colors.white),
                     );
                   }
 
@@ -597,9 +599,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                           width: 42,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
-                            ),
+                            gradient: Apptheme.buttonGradient,
                           ),
                           child: IconButton(
                             onPressed: _sendMessage,

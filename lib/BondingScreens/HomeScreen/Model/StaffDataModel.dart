@@ -24,10 +24,11 @@ class StaffDetailsResponse {
       callRates: json['callRates'] is Map<String, dynamic>
           ? CallRates.fromJson(json['callRates'] as Map<String, dynamic>)
           : null,
-      data: (json['data'] as List<dynamic>?)
-          ?.whereType<Map<String, dynamic>>()
-          .map(StaffDataProfile.fromJson)
-          .toList() ??
+      data:
+          (json['data'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map(StaffDataProfile.fromJson)
+              .toList() ??
           const <StaffDataProfile>[],
     );
   }
@@ -86,6 +87,7 @@ class StaffDataProfile {
   final String? idType;
   final String? formStatus;
   final String? image;
+  final String? bio;
 
   /// Presence
   final bool isOnline;
@@ -129,12 +131,14 @@ class StaffDataProfile {
     this.idType,
     this.formStatus,
     this.image,
+    this.bio,
     this.lastSeen,
     this.socketId,
   });
 
   factory StaffDataProfile.fromJson(Map<String, dynamic> json) {
-    DateTime? _dt(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
+    DateTime? _dt(dynamic v) =>
+        v == null ? null : DateTime.tryParse(v.toString());
 
     return StaffDataProfile(
       id: json['_id']?.toString() ?? '',
@@ -156,10 +160,11 @@ class StaffDataProfile {
       isLogin: json['isLogin'] == true,
       isApproved: json['isApproved']?.toString() ?? '0',
 
-      areaOfInterest: (json['areaOfInterest'] as List<dynamic>?)
-          ?.whereType<Map<String, dynamic>>()
-          .map(InterestItem.fromJson)
-          .toList() ??
+      areaOfInterest:
+          (json['areaOfInterest'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map(InterestItem.fromJson)
+              .toList() ??
           const <InterestItem>[],
 
       createdAt: _dt(json['createdAt']),
@@ -169,6 +174,7 @@ class StaffDataProfile {
       idType: json['IDtype']?.toString(),
       formStatus: json['formStatus']?.toString(),
       image: json['image']?.toString(),
+      bio: json['bio']?.toString(),
 
       isOnline: json['isOnline'] == true,
       lastSeen: _dt(json['lastSeen']),
@@ -176,8 +182,10 @@ class StaffDataProfile {
 
       audioCallAmount: (json['audio_call_amount'] as num?)?.toInt() ?? 0,
       videoCallAmount: (json['video_call_amount'] as num?)?.toInt() ?? 0,
-      audioCallRatePerMinute: (json['audioCallRatePerMinute'] as num?)?.toInt() ?? 0,
-      videoCallRatePerMinute: (json['videoCallRatePerMinute'] as num?)?.toInt() ?? 0,
+      audioCallRatePerMinute:
+          (json['audioCallRatePerMinute'] as num?)?.toInt() ?? 0,
+      videoCallRatePerMinute:
+          (json['videoCallRatePerMinute'] as num?)?.toInt() ?? 0,
       currency: json['currency']?.toString() ?? 'INR',
     );
   }
@@ -240,7 +248,8 @@ class StaffDataProfile {
     final now = DateTime.now();
 
     var a = now.year - birth.year;
-    if (now.month < birth.month || (now.month == birth.month && now.day < birth.day)) {
+    if (now.month < birth.month ||
+        (now.month == birth.month && now.day < birth.day)) {
       a--;
     }
     return a >= 0 ? a : null;
@@ -253,9 +262,7 @@ class InterestItem {
   const InterestItem({required this.title});
 
   factory InterestItem.fromJson(Map<String, dynamic> json) {
-    return InterestItem(
-      title: json['title']?.toString() ?? '',
-    );
+    return InterestItem(title: json['title']?.toString() ?? '');
   }
 }
 

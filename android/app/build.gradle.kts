@@ -8,6 +8,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.io.FileInputStream
+import java.util.Properties
+
 android {
     namespace = "com.fenizo.twoofus"
     compileSdk = flutter.compileSdkVersion
@@ -33,16 +36,32 @@ android {
         versionName = flutter.versionName
     }
 
+    val keystoreProperties = Properties()
+    val keystorePropertiesFile = rootProject.file("key.properties")
+    val hasReleaseKeystore = keystorePropertiesFile.exists()
 
-        buildTypes {
-            release {
-                signingConfig = signingConfigs.getByName("debug")
+    if (hasReleaseKeystore) {
+        FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+    }
 
-
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
             }
+        }
+    }
 
-
-
+    buildTypes {
+        release {
+            // If key.properties is missing, keep debug signing so local debug builds won't break.
+            signingConfig =
+                if (hasReleaseKeystore) signingConfigs.getByName("release")
+                else signingConfigs.getByName("debug")
+        }
     }
 }
 

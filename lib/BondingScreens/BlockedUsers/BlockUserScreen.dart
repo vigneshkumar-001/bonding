@@ -4,6 +4,7 @@ import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
@@ -138,7 +139,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                     /// 🔹 Global loading (only for first load)
                     if (vm.loading  ) {
                       return const Center(
-                        child: CircularProgressIndicator(
+                        child: const AppLoadingIndicator(
                             color: Colors.white),
                       );
                     }
@@ -300,7 +301,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                       width: 18,
                                       height: 18,
                                       child:
-                                      CircularProgressIndicator(
+                                      const AppLoadingIndicator(
                                         strokeWidth: 2,
                                         color:
                                         Colors.white,
@@ -509,7 +510,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                     // loading
                     if (vm.loading ) {
                       return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                        child: const AppLoadingIndicator(color: Colors.white),
                       );
                     }
 
@@ -667,7 +668,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                         ? const SizedBox(
                                             width: 18,
                                             height: 18,
-                                            child: CircularProgressIndicator(
+                                            child: const AppLoadingIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white,
                                             ),

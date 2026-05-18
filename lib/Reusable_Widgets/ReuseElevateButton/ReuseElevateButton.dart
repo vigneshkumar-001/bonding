@@ -1,5 +1,6 @@
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/ReuseContainer/ReuseContainer.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
 
 class ReuseElevatedButton extends StatelessWidget {
@@ -36,7 +37,7 @@ class ReuseElevatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const defaultGradient = [Color(0xFFB86AF6), Color(0xFFFF6A6A)];
+    final defaultGradient = Apptheme.buttonGradientColors;
     final effectiveGradient =
         gradientColors ?? (buttonColor == null ? defaultGradient : null);
     return GestureDetector(
@@ -128,6 +129,9 @@ class ReuseElevatedBorderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultGradient = Apptheme.buttonGradientColors;
+    final effectiveBorderGradient = gradientColors ?? defaultGradient;
+    final effectiveTextGradient = textGradientColors ?? defaultGradient;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -136,13 +140,11 @@ class ReuseElevatedBorderButton extends StatelessWidget {
 
         // OUTER BORDER GRADIENT
         decoration: BoxDecoration(
-          gradient: gradientColors != null
-              ? LinearGradient(
-                  colors: gradientColors!,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                )
-              : null,
+          gradient: LinearGradient(
+            colors: effectiveBorderGradient,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
           borderRadius: borderRadius ?? BorderRadius.circular(6),
         ),
 
@@ -156,11 +158,11 @@ class ReuseElevatedBorderButton extends StatelessWidget {
               borderRadius: borderRadius ?? BorderRadius.circular(6),
             ),
             child: Center(
-              child: textGradientColors != null
+              child: effectiveTextGradient.isNotEmpty
                   ? ShaderMask(
                       shaderCallback: (bounds) {
                         return LinearGradient(
-                          colors: textGradientColors!,
+                          colors: effectiveTextGradient,
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ).createShader(

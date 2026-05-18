@@ -8,6 +8,7 @@ import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel
 import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/VerificationApprovedScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
         if (staff == null) {
           return const Scaffold(
             backgroundColor: Color(0xFF140810),
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+            body: const Center(child: AppLoadingIndicator(color: Colors.white)),
           );
         }
 

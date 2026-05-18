@@ -17,6 +17,7 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 
@@ -209,12 +210,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _zegoInitializing = true;
       logI("ZEGO_INIT", "init start -> user=${user.memberID}");
 
-        await ZegoUIKitPrebuiltCallInvitationService().init(
-          plugins: [plugin],
-          appID: _zegoAppId,
-          appSign: _zegoAppSign,
-          userID: user.memberID.trim(),
-          userName: (user.name ?? "User").trim(),
+      await ZegoUIKitPrebuiltCallInvitationService().init(
+        plugins: [plugin],
+        appID: _zegoAppId,
+        appSign: _zegoAppSign,
+        userID: user.memberID.trim(),
+        userName: (user.name ?? "User").trim(),
         notificationConfig: ZegoCallInvitationNotificationConfig(
           androidNotificationConfig: ZegoAndroidNotificationConfig(
             channelID: "ZegoUIKit",
@@ -500,16 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
+              gradient: Apptheme.backgroundGradient,
             ),
             child: SafeArea(
               child: Column(
@@ -528,15 +520,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               image: AssetImage("assets/Images/appLogo.png"),
                               height: 32,
                             ),
-                            SizedBox(width: 10),
-                            Text(
-                              "TwoOfUs",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                            // SizedBox(width: 10),
+                            // Text(
+                            //   "TwoOfUs",
+                            //   style: TextStyle(
+                            //     color: Colors.white,
+                            //     fontSize: 18,
+                            //     fontWeight: FontWeight.w700,
+                            //   ),
+                            // ),
                           ],
                         ),
                         const Spacer(),
@@ -551,10 +543,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFcc529f), Color(0xFFf86460)],
-                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              gradient: Apptheme.buttonGradient,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -576,21 +573,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                         GestureDetector(
-                           onTap: () => bondNavigator.newPage(
-                             context,
-                             page: const ProfileScreen(backPage: true),
-                           ),
-                           child: _TappableAvatar(
-                             radius: 18,
-                             name: currentUser?.name ?? "User",
-                             imageUrl: currentUser?.image,
-                             heroTag: "user-avatar",
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
+                        GestureDetector(
+                          onTap: () => bondNavigator.newPage(
+                            context,
+                            page: const ProfileScreen(backPage: true),
+                          ),
+                          child: _TappableAvatar(
+                            radius: 18,
+                            name: currentUser?.name ?? "User",
+                            imageUrl: currentUser?.image,
+                            heroTag: "user-avatar",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 12),
 
@@ -650,7 +647,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         : staffVM.staffList.isEmpty
                         ? const Center(
                             child: Text(
-                              "No staff available",
+                              "No women available",
                               style: TextStyle(color: Colors.white70),
                             ),
                           )
@@ -807,10 +804,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _customCallButton(
                       enabled: ready,
                       text: "${staff.audioCallRatePerMinute}/min",
-                      pricePerMin: 20,
+                      pricePerMin: staff.audioCallRatePerMinute,
                       isVideoCall: false,
                       targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Staff",
+                      targetUserName: staff.name ?? "Women",
                       targetStaffId: staff.id,
                       isTargetOnline: staff.isOnline,
                     ),
@@ -820,10 +817,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _customCallButton(
                       enabled: ready,
                       text: "${staff.videoCallRatePerMinute}/min",
-                      pricePerMin: 60,
+                      pricePerMin: staff.videoCallRatePerMinute,
                       isVideoCall: true,
                       targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Staff",
+                      targetUserName: staff.name ?? "Women",
                       targetStaffId: staff.id,
                       isTargetOnline: staff.isOnline,
                     ),
@@ -903,9 +900,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
                       color: Colors.black.withOpacity(0.28),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.14),
-                      ),
+                      border: Border.all(color: Colors.white.withOpacity(0.14)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -949,7 +944,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Bio / Description
               AppText(
-                "No bio available yet...",
+                (staff.bio != null && staff.bio!.trim().isNotEmpty)
+                    ? staff.bio!.trim()
+                    : "Helping you navigate life with clarity and care...",
                 color: Colors.white,
                 fontSize: 15,
                 maxLines: 3,
@@ -964,10 +961,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _customCallButton(
                       enabled: ready,
                       text: "${staff.audioCallRatePerMinute}/min",
-                      pricePerMin: 20,
+                      pricePerMin: staff.audioCallRatePerMinute,
                       isVideoCall: false,
                       targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Staff",
+                      targetUserName: staff.name ?? "Women",
                       targetStaffId: staff.id,
                       isTargetOnline: staff.isOnline,
                     ),
@@ -977,10 +974,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _customCallButton(
                       enabled: ready,
                       text: "${staff.videoCallRatePerMinute}/min",
-                      pricePerMin: 60,
+                      pricePerMin: staff.videoCallRatePerMinute,
                       isVideoCall: true,
                       targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Staff",
+                      targetUserName: staff.name ?? "Women",
                       targetStaffId: staff.id,
                       isTargetOnline: staff.isOnline,
                     ),
@@ -1006,7 +1003,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       final staffId = staff.id; // staff mongo _id
                       final userId = currentUser.id; // user mongo _id
-                      final staffName = staff.name ?? "Staff";
+                      final staffName = staff.name ?? "Women";
 
                       Navigator.push(
                         context,
@@ -1033,8 +1030,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
 
-                    child: Center(
-                      child: Image.asset("assets/Images/chaticon.png"),
+                    child: Container(
+                      height: 44,
+                      width: 44,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white.withOpacity(0.06),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.14),
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          "assets/Images/chaticon.png",
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1147,9 +1159,11 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (balance < pricePerMin) {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => WalletScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => WalletScreen()),
+              );
               Utils.snackBarErrorMessage("Insufficient balance");
-
 
               return;
             }
@@ -1205,10 +1219,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               height: 44,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF9251d0), Color(0xFFf56463)],
-                ),
+                borderRadius: BorderRadius.circular(14),
+                color: Colors.white.withOpacity(0.06),
+                border: Border.all(color: Colors.white.withOpacity(0.14)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1292,10 +1305,7 @@ class _TappableAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasImage = _isValidNetworkImageUrl(imageUrl);
     final size = radius * 2;
-    final fallback = _AvatarFallback(
-      size: size,
-      initial: _initial(name),
-    );
+    final fallback = _AvatarFallback(size: size, initial: _initial(name));
 
     final avatar = ClipOval(
       child: SizedBox(
@@ -1333,10 +1343,7 @@ class _TappableAvatar extends StatelessWidget {
 
     final hero = Hero(
       tag: heroTag,
-      child: Material(
-        type: MaterialType.transparency,
-        child: avatar,
-      ),
+      child: Material(type: MaterialType.transparency, child: avatar),
     );
 
     if (!hasImage) return hero;
@@ -1354,9 +1361,10 @@ class _TappableAvatar extends StatelessWidget {
                 title: name,
               );
             },
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
           ),
         );
       },
@@ -1442,10 +1450,7 @@ class _TappableMediaBanner extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.38),
-                ],
+                colors: [Colors.transparent, Colors.black.withOpacity(0.38)],
               ),
             ),
           ),
@@ -1469,9 +1474,10 @@ class _TappableMediaBanner extends StatelessWidget {
                 title: safeName,
               );
             },
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
           ),
         );
       },
@@ -1517,10 +1523,7 @@ class _AvatarFallback extends StatelessWidget {
   final double size;
   final String initial;
 
-  const _AvatarFallback({
-    required this.size,
-    required this.initial,
-  });
+  const _AvatarFallback({required this.size, required this.initial});
 
   @override
   Widget build(BuildContext context) {
