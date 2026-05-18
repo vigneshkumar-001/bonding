@@ -2,7 +2,6 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/ReuseContainer/ReuseContainer.dart';
 import 'package:flutter/material.dart';
 
-
 class ReuseElevatedButton extends StatelessWidget {
   final String text;
   final double? width;
@@ -37,6 +36,9 @@ class ReuseElevatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const defaultGradient = [Color(0xFFB86AF6), Color(0xFFFF6A6A)];
+    final effectiveGradient =
+        gradientColors ?? (buttonColor == null ? defaultGradient : null);
     return GestureDetector(
       onTap: onTap,
       child: ReuseContainer(
@@ -50,16 +52,16 @@ class ReuseElevatedButton extends StatelessWidget {
           ),
 
           /// 🔥 APPLY GRADIENT IF PROVIDED
-          gradient: gradientColors != null
+          gradient: effectiveGradient != null
               ? LinearGradient(
-                  colors: gradientColors!,
+                  colors: effectiveGradient,
                   begin: Alignment.centerLeft, // Horizontal START
                   end: Alignment.centerRight,
                 )
               : null,
 
           /// 🔥 IF NO GRADIENT → FALLBACK COLOR
-          color: gradientColors == null ? buttonColor ?? Colors.white : null,
+          color: effectiveGradient == null ? buttonColor ?? Colors.white : null,
 
           // boxShadow: [
           //   BoxShadow(
@@ -80,8 +82,8 @@ class ReuseElevatedButton extends StatelessWidget {
                 fontSize: fontSize ?? 17,
                 fontWeight: FontWeight.w600,
               ),
-              SizedBox(width: 10),
-              icon ?? SizedBox(),
+              if (icon != null) const SizedBox(width: 10),
+              icon ?? const SizedBox(),
             ],
           ),
         ),

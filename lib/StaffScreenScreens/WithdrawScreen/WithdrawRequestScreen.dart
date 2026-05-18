@@ -9,6 +9,7 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/Model/BankDetailMo
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/StaffWithdrawScreen.dart';
 
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -119,7 +120,7 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
               ),
               child: SafeArea(
                 child: vm.isFetchingBankDetails
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                    ? const Center(child: AppLoadingIndicator(color: Colors.white))
                     : SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Column(
@@ -382,7 +383,7 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
         ? const SizedBox(
         height: 24,
         width: 24,
-        child: CircularProgressIndicator(
+        child: const AppLoadingIndicator(
         color: Colors.white,
         strokeWidth: 3,
         ),

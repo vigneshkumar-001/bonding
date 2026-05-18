@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Apptheme {
   /// light theme Color
   static final lightThemeData = ThemeData(
-    bottomAppBarTheme: BottomAppBarTheme(
+    bottomAppBarTheme: const BottomAppBarThemeData(
       color: Color(0xFFD4D4D4),
     ), // Set bottom app bar color to gray
     colorScheme: ColorScheme.fromSwatch().copyWith(

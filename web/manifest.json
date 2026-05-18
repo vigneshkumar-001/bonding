@@ -1,6 +1,6 @@
 {
-    "name": "bonding_app",
-    "short_name": "bonding_app",
+    "name": "TwoOfUs",
+    "short_name": "TwoOfUs",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

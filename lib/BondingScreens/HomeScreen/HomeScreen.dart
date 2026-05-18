@@ -15,12 +15,12 @@ import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -521,9 +521,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          "assets/Images/bonding.svg",
-                          height: 32,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Image(
+                              image: AssetImage("assets/Images/appLogo.png"),
+                              height: 32,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "TwoOfUs",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                         const Spacer(),
                         GestureDetector(
@@ -562,24 +576,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () => bondNavigator.newPage(
-                            context,
-                            page: const ProfileScreen(backPage: true),
-                          ),
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundImage:
-                                (currentUser?.image != null &&
-                                    currentUser!.image!.isNotEmpty)
-                                ? NetworkImage(currentUser.image!)
-                                : const AssetImage("assets/Images/profile.png")
-                                      as ImageProvider,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                         GestureDetector(
+                           onTap: () => bondNavigator.newPage(
+                             context,
+                             page: const ProfileScreen(backPage: true),
+                           ),
+                           child: _TappableAvatar(
+                             radius: 18,
+                             name: currentUser?.name ?? "User",
+                             imageUrl: currentUser?.image,
+                             heroTag: "user-avatar",
+                           ),
+                         ),
+                       ],
+                     ),
+                   ),
 
                   const SizedBox(height: 12),
 
@@ -615,9 +626,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: staffVM.isFetchingStaff
                         ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
+                            child: AppLoadingIndicator(color: Colors.white),
                           )
                         : staffVM.staffFetchError != null
                         ? Center(
@@ -835,6 +844,8 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     final age = _calculateAgeFromDOB(staff.dob ?? '');
     final isOnline = staff.isOnline;
+    final staffHeroTag =
+        "staff-media-${staff.id.isNotEmpty ? staff.id : staff.name}";
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -860,64 +871,64 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Media (tap for full preview)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: _TappableMediaBanner(
+                  height: 170,
+                  name: staff.name,
+                  imageUrl: staff.image,
+                  heroTag: staffHeroTag,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Name + status
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(
-                        "${staff.name ?? 'Unknown'}, ${age ?? '23'}",
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.circle,
-                            size: 10,
-                            color: isOnline ? Colors.green : Colors.red,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            isOnline ? "Online" : "Offline",
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Row(
-                      //   children: const [
-                      //     Icon(Icons.circle, size: 8, color: Colors.green),
-                      //     SizedBox(width: 6),
-                      //     Text(
-                      //       "Tamil", // ← can be dynamic from staff model later
-                      //       style: TextStyle(
-                      //         color: Colors.white70,
-                      //         fontSize: 12,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                    ],
+                  Expanded(
+                    child: AppText(
+                      "${staff.name.isNotEmpty ? staff.name : 'Unknown'}, ${age ?? '23'}",
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundImage:
-                        (staff.image != null && staff.image!.isNotEmpty)
-                        ? NetworkImage(staff.image!)
-                        : const AssetImage("assets/Images/videocallprofile.png")
-                              as ImageProvider,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(999),
+                      color: Colors.black.withOpacity(0.28),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.14),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 10,
+                          color: isOnline ? Colors.green : Colors.red,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isOnline ? "Online" : "Offline",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 10),
 
               // Tags / Interests
               SingleChildScrollView(
@@ -1244,6 +1255,364 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {
       return null;
     }
+  }
+}
+
+class _TappableAvatar extends StatelessWidget {
+  final double radius;
+  final String name;
+  final String? imageUrl;
+  final String heroTag;
+
+  const _TappableAvatar({
+    required this.radius,
+    required this.name,
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  static String _initial(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return "?";
+    return trimmed.substring(0, 1).toUpperCase();
+  }
+
+  static bool _isValidNetworkImageUrl(String? url) {
+    if (url == null) return false;
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return false;
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null) return false;
+    if (!uri.isAbsolute) return false;
+    if (uri.scheme != "http" && uri.scheme != "https") return false;
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = _isValidNetworkImageUrl(imageUrl);
+    final size = radius * 2;
+    final fallback = _AvatarFallback(
+      size: size,
+      initial: _initial(name),
+    );
+
+    final avatar = ClipOval(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: hasImage
+            ? Image.network(
+                imageUrl!.trim(),
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.medium,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      fallback,
+                      Center(
+                        child: SizedBox(
+                          width: radius,
+                          height: radius,
+                          child: AppLoadingIndicator(
+                            radius: 10,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => fallback,
+              )
+            : fallback,
+      ),
+    );
+
+    final hero = Hero(
+      tag: heroTag,
+      child: Material(
+        type: MaterialType.transparency,
+        child: avatar,
+      ),
+    );
+
+    if (!hasImage) return hero;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return _AvatarPreviewPage(
+                imageUrl: imageUrl!.trim(),
+                heroTag: heroTag,
+                title: name,
+              );
+            },
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      },
+      child: hero,
+    );
+  }
+}
+
+class _TappableMediaBanner extends StatelessWidget {
+  final double height;
+  final String? name;
+  final String? imageUrl;
+  final String heroTag;
+
+  const _TappableMediaBanner({
+    required this.height,
+    required this.name,
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  static String _initial(String? name) {
+    final trimmed = (name ?? "").trim();
+    if (trimmed.isEmpty) return "?";
+    return trimmed.substring(0, 1).toUpperCase();
+  }
+
+  static bool _isValidNetworkImageUrl(String? url) {
+    if (url == null) return false;
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return false;
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null) return false;
+    if (!uri.isAbsolute) return false;
+    if (uri.scheme != "http" && uri.scheme != "https") return false;
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = _isValidNetworkImageUrl(imageUrl);
+    final rawName = (name ?? "").trim();
+    final safeName = rawName.isEmpty ? "User" : rawName;
+    final initial = _initial(safeName);
+
+    final banner = SizedBox(
+      height: height,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (hasImage)
+            Hero(
+              tag: heroTag,
+              child: Image.network(
+                imageUrl!.trim(),
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.medium,
+                errorBuilder: (context, error, stackTrace) {
+                  return _MediaFallback(initial: initial);
+                },
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      _MediaFallback(initial: initial),
+                      Center(
+                        child: AppLoadingIndicator(
+                          radius: 12,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            )
+          else
+            _MediaFallback(initial: initial),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.38),
+                ],
+              ),
+            ),
+          ),
+          // Name overlay removed (as requested)
+        ],
+      ),
+    );
+
+    if (!hasImage) return banner;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return _AvatarPreviewPage(
+                imageUrl: imageUrl!.trim(),
+                heroTag: heroTag,
+                title: safeName,
+              );
+            },
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      },
+      child: banner,
+    );
+  }
+}
+
+class _MediaFallback extends StatelessWidget {
+  final String initial;
+
+  const _MediaFallback({required this.initial});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1c2b1b), Color(0xFF0f141e)],
+        ),
+      ),
+      child: Center(
+        child: Opacity(
+          opacity: 0.20,
+          child: Text(
+            initial,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 120,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  final double size;
+  final String initial;
+
+  const _AvatarFallback({
+    required this.size,
+    required this.initial,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2b2f3a), Color(0xFF15161c)],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initial,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.9),
+            fontWeight: FontWeight.w700,
+            fontSize: size * 0.42,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarPreviewPage extends StatelessWidget {
+  final String imageUrl;
+  final String heroTag;
+  final String title;
+
+  const _AvatarPreviewPage({
+    required this.imageUrl,
+    required this.heroTag,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.94),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                minScale: 1,
+                maxScale: 4,
+                child: Hero(
+                  tag: heroTag,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Text(
+                        "Image failed to load",
+                        style: TextStyle(color: Colors.white70),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 12,
+              top: 12,
+              right: 12,
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

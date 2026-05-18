@@ -1,4 +1,4 @@
-package com.solla.bonding_app
+package com.fenizo.twoofus
 
 import io.flutter.embedding.android.FlutterActivity
 

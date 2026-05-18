@@ -91,7 +91,11 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35),
+                    Image.asset(
+                      "assets/Images/appLogo.png",
+                      height: 35,
+                      fit: BoxFit.contain,
+                    ),
                     const SizedBox(height: 40),
                     Center(
                       child

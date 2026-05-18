@@ -299,7 +299,11 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          SvgPicture.asset("assets/Images/bonding.svg", height: 32),
+          Image.asset(
+            "assets/Images/appLogo.png",
+            height: 32,
+            fit: BoxFit.contain,
+          ),
           const Spacer(),
           const SizedBox(width: 12),
           GestureDetector(
@@ -965,7 +969,11 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          SvgPicture.asset("assets/Images/bonding.svg", height: 32),
+          Image.asset(
+            "assets/Images/appLogo.png",
+            height: 32,
+            fit: BoxFit.contain,
+          ),
           const Spacer(),
           // GestureDetector(
           //   onTap: () => bondNavigator.newPage(context, page: const StaffWalletScreen()),

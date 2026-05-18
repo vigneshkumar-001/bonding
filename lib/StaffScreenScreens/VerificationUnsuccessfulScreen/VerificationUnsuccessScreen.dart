@@ -42,9 +42,10 @@ class _VerificationUnsuccessScreenState extends State<VerificationUnsuccessScree
                 const SizedBox(height: 10),
 
                 /// 🔹 Logo
-                SvgPicture.asset(
-                  "assets/Images/bonding.svg",
+                Image.asset(
+                  "assets/Images/appLogo.png",
                   height: 35,
+                  fit: BoxFit.contain,
                 ),
 
                 SizedBox(height: 30,),

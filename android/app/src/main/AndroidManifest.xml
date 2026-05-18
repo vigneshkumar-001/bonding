@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:label="bonding_app"
+        android:label="TwoOfUs"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -78,7 +78,7 @@
         <uses-permission android:name="android.permission.INTERNET" />
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
         <application
-            android:label="bonding_app"
+            android:label="TwoOfUs"
             android:name="${applicationName}"
             android:icon="@mipmap/ic_launcher">
             <activity

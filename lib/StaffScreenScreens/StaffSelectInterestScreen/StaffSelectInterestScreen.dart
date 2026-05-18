@@ -60,7 +60,11 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                     const SizedBox(height: 20),
 
                     // Logo
-                    SvgPicture.asset("assets/Images/bonding.svg", height: 35),
+                    Image.asset(
+                      "assets/Images/appLogo.png",
+                      height: 35,
+                      fit: BoxFit.contain,
+                    ),
 
                     const SizedBox(height: 30),
 

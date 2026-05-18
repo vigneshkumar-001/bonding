@@ -9,6 +9,7 @@ import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavB
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawDetailPage.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -45,7 +46,7 @@ class _WithdrawHistoryState extends State<WithdrawHistory> {
             color: const Color(0xFF100a0a),
             child: SafeArea(
               child: vm.isLoadingWithdraw
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                  ? const Center(child: AppLoadingIndicator(color: Colors.white))
                   : vm.withdrawError != null
                   ? Center(
                 child: Column(

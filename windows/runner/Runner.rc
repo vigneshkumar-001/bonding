@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.solla" "\0"
-            VALUE "FileDescription", "bonding_app" "\0"
+            VALUE "FileDescription", "TwoOfUs" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "bonding_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.solla. All rights reserved." "\0"
             VALUE "OriginalFilename", "bonding_app.exe" "\0"
-            VALUE "ProductName", "bonding_app" "\0"
+            VALUE "ProductName", "TwoOfUs" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

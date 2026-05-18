@@ -67,10 +67,7 @@ void main() {
   //   appID: 467997506,
   //   appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
   // );
-  ZIMKit().init(
-    appID: _zegoAppId,
-    appSign: _zegoAppSign,
-  );
+  ZIMKit().init(appID: _zegoAppId, appSign: _zegoAppSign);
 
   runApp(const MyApp());
 }
@@ -80,14 +77,63 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const buttonGradientStart = Color(0xFFB86AF6);
+    const buttonGradientEnd = Color(0xFFFF6A6A);
+
     return MultiProvider(
       providers: getAllProviders(),
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        title: 'Flutter Demo',
+        title: 'TwoOfUs',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: buttonGradientStart)
+              .copyWith(
+                primary: buttonGradientStart,
+                secondary: buttonGradientEnd,
+              ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: buttonGradientStart,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+              disabledForegroundColor: Colors.white.withOpacity(0.75),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              backgroundColor: buttonGradientStart,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: buttonGradientStart.withOpacity(0.45),
+              disabledForegroundColor: Colors.white.withOpacity(0.75),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: buttonGradientStart,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              textStyle: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: buttonGradientStart,
+              side: BorderSide(color: buttonGradientStart.withOpacity(0.9)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
         ),
         home: const Splashscreen(),
       ),
@@ -129,9 +175,8 @@ List<SingleChildWidget> getAllProviders() {
       create: (_) => TicketHistoryVM(SettingsRepository()),
     ),
     ChangeNotifierProvider(
-      create: (context) => BlockUserVM(
-        repo: ChatRepository(context.read<NetworkApiService>()),
-      ),
+      create: (context) =>
+          BlockUserVM(repo: ChatRepository(context.read<NetworkApiService>())),
     ),
     ChangeNotifierProvider(
       create: (context) => DeleteAccountReasonsVM(
@@ -162,6 +207,7 @@ List<SingleChildWidget> getAllProviders() {
         repo: ChatRepository(context.read<NetworkApiService>()),
       ),
     ),
+
     ChangeNotifierProvider(
       create: (context) => BlockedUsersListVm(
         repo: ChatRepository(context.read<NetworkApiService>()),
@@ -178,9 +224,7 @@ List<SingleChildWidget> getAllProviders() {
       create: (context) => UserRepository(context.read<NetworkApiService>()),
     ),
 
-    ChangeNotifierProvider<CallController>(
-      create: (_) => CallController(),
-    ),
+    ChangeNotifierProvider<CallController>(create: (_) => CallController()),
     ChangeNotifierProvider<UserViewModel>(
       create: (context) => UserViewModel(context.read<UserRepository>()),
       lazy: true,

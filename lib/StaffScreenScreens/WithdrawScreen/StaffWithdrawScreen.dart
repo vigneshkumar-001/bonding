@@ -6,6 +6,7 @@ import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 class WithdrawAddBank extends StatefulWidget {
@@ -244,7 +245,7 @@ class _WithdrawAddBankState extends State<WithdrawAddBank> {
                               ? const SizedBox(
                             height: 24,
                             width: 24,
-                            child: CircularProgressIndicator(
+                            child: const AppLoadingIndicator(
                               color: Colors.white,
                               strokeWidth: 3,
                             ),

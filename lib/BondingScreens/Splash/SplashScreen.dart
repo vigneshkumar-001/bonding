@@ -17,6 +17,7 @@ import 'package:bonding_app/StaffScreenScreens/StaffSelectInterestScreen/StaffSe
 import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/VerificationApprovedScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationInprogressScreen/VerificationInprogressScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
+import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -203,7 +204,11 @@ class _SplashscreenState extends State<Splashscreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset("assets/Images/bonding.svg", height: 80),
+              Image.asset(
+                "assets/Images/appLogo.png",
+                height: 80,
+                fit: BoxFit.contain,
+              ),
               const SizedBox(height: 16),
               Container(
                 width: 140,
@@ -214,10 +219,7 @@ class _SplashscreenState extends State<Splashscreen>
                 ),
               ),
               const SizedBox(height: 20),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
-                strokeWidth: 3,
-              ),
+              const AppLoadingIndicator(radius: 14, color: Colors.white70),
             ],
           ),
         ),
