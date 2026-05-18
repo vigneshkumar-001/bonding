@@ -94,6 +94,10 @@ class StaffDataProfile {
   final DateTime? lastSeen;
   final String? socketId;
 
+  /// API-controlled permission: whether user can start calls with this staff.
+  /// If backend doesn't send it, stays null and client may fallback to local rules.
+  final bool? callEnabled;
+
   /// Rates (present on each staff item)
   final int audioCallAmount;
   final int videoCallAmount;
@@ -112,6 +116,7 @@ class StaffDataProfile {
     required this.isApproved,
     required this.areaOfInterest,
     required this.isOnline,
+    this.callEnabled,
     required this.audioCallAmount,
     required this.videoCallAmount,
     required this.audioCallRatePerMinute,
@@ -137,7 +142,7 @@ class StaffDataProfile {
   });
 
   factory StaffDataProfile.fromJson(Map<String, dynamic> json) {
-    DateTime? _dt(dynamic v) =>
+    DateTime? parseDt(dynamic v) =>
         v == null ? null : DateTime.tryParse(v.toString());
 
     return StaffDataProfile(
@@ -167,8 +172,8 @@ class StaffDataProfile {
               .toList() ??
           const <InterestItem>[],
 
-      createdAt: _dt(json['createdAt']),
-      updatedAt: _dt(json['updatedAt']),
+      createdAt: parseDt(json['createdAt']),
+      updatedAt: parseDt(json['updatedAt']),
 
       idNumber: json['IDnumber']?.toString(),
       idType: json['IDtype']?.toString(),
@@ -177,8 +182,9 @@ class StaffDataProfile {
       bio: json['bio']?.toString(),
 
       isOnline: json['isOnline'] == true,
-      lastSeen: _dt(json['lastSeen']),
+      lastSeen: parseDt(json['lastSeen']),
       socketId: json['socketId']?.toString(),
+      callEnabled: _parseOptionalBool(json['callEnabled'] ?? json['canCall']),
 
       audioCallAmount: (json['audio_call_amount'] as num?)?.toInt() ?? 0,
       videoCallAmount: (json['video_call_amount'] as num?)?.toInt() ?? 0,
@@ -190,11 +196,21 @@ class StaffDataProfile {
     );
   }
 
+  static bool? _parseOptionalBool(dynamic v) {
+    if (v == null) return null;
+    if (v is bool) return v;
+    final s = v.toString().trim().toLowerCase();
+    if (s == "true" || s == "1" || s == "yes") return true;
+    if (s == "false" || s == "0" || s == "no") return false;
+    return null;
+  }
+
   /// Safe presence update
   StaffDataProfile copyWith({
     bool? isOnline,
     DateTime? lastSeen,
     String? socketId,
+    bool? callEnabled,
   }) {
     return StaffDataProfile(
       id: id,
@@ -223,6 +239,7 @@ class StaffDataProfile {
       isOnline: isOnline ?? this.isOnline,
       lastSeen: lastSeen ?? this.lastSeen,
       socketId: socketId ?? this.socketId,
+      callEnabled: callEnabled ?? this.callEnabled,
       audioCallAmount: audioCallAmount,
       videoCallAmount: videoCallAmount,
       audioCallRatePerMinute: audioCallRatePerMinute,

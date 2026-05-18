@@ -524,147 +524,23 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
               child: Column(
                 children: [
                   // ---------------- TOP BAR ----------------
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => bondNavigator.backPage(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // CircleAvatar(
-                        //   radius: 24,
-                        //   backgroundColor: const Color(
-                        //     0xFF8e51d2,
-                        //   ).withOpacity(0.3),
-                        //   child: const Icon(
-                        //     Icons.person,
-                        //     color: Colors.white,
-                        //     size: 28,
-                        //   ),
-                        // ),
-                        CachedNetworkImage(
-                          imageUrl: widget.staffImage,
-                          imageBuilder: (context, imageProvider) => CircleAvatar(
-                            radius: 22,
-                            backgroundImage: imageProvider,
-                          ),
-                          placeholder: (context, url) =>
-                          const AppLoadingIndicator(),
-                          errorWidget: (context, url, error) =>
-                          const Icon(Icons.person, color: Colors.white),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.userName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                      color: connected
-                                          ? const Color(0xFF00ed1c)
-                                          : Colors.orange,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  AppText(
-                                    connected ? "Connected" : "Connecting...",
-                                    color: connected
-                                        ? const Color(0xFF00ed1c)
-                                        : Colors.orange,
-                                    fontSize: 13,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  if (_isBlocked)
-                                    const Text(
-                                      "• Blocked",
-                                      style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.white,
-                          ),
-                          color: const Color(0xFF35272d),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'restrict',
-                              child: Text(
-                                "Restrict",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: _isBlocked ? 'unblock' : 'block',
-                              child: Text(
-                                _isBlocked ? "Unblock" : "Block",
-                                style: TextStyle(
-                                  color: _isBlocked
-                                      ? const Color(0xFF00ed1c)
-                                      : Colors.red,
-                                ),
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'report',
-                              child: Text(
-                                "Report",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                          onSelected: (value) async {
-                            if (value == 'block') {
-                              await _showBlockDialog(context);
-                            } else if (value == 'unblock') {
-                              await _showBlockedUnblockDialog();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Selected: $value")),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+                  _StaffChatTopBar(
+                    userImage: widget.staffImage,
+                    userName: widget.userName,
+                    connected: connected,
+                    isBlocked: _isBlocked,
+                    onBack: () => bondNavigator.backPage(context),
+                    onMenuSelected: (value) async {
+                      if (value == 'block') {
+                        await _showBlockDialog(context);
+                      } else if (value == 'unblock') {
+                        await _showBlockedUnblockDialog();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Selected: $value")),
+                        );
+                      }
+                    },
                   ),
 
                   // ✅ Error Banner
@@ -739,6 +615,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                       return _Bubble(
                                         text: m.message ?? "",
                                         isMine: isMine,
+                                        createdAt: m.createdAt,
                                         status: m.status,
                                         onRetry:
                                             (m.status == ChatMsgStatus.failed)
@@ -791,37 +668,42 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                               child: Opacity(
                                 opacity: inputDisabled ? 0.55 : 1,
                                 child: Container(
+                                  height: 56,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
+                                    horizontal: 18,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF231d1d),
-                                    borderRadius: BorderRadius.circular(30),
+                                    color: const Color(0xFF2D2E36),
+                                    borderRadius: BorderRadius.circular(28),
                                   ),
-                                  child: TextField(
-                                    controller: _text,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                    minLines: 1,
-                                    maxLines: 5,
-                                    textCapitalization:
-                                        TextCapitalization.sentences,
-                                    decoration: InputDecoration(
-                                      hintText: inputDisabled
-                                          ? "You blocked this user"
-                                          : "Message",
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey[500],
+                                  child: Center(
+                                    child: TextField(
+                                      controller: _text,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.zero,
+                                      minLines: 1,
+                                      maxLines: 5,
+                                      textCapitalization:
+                                          TextCapitalization.sentences,
+                                      decoration: InputDecoration(
+                                        hintText: inputDisabled
+                                            ? "You blocked this user"
+                                            : "Message",
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.55),
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                      onSubmitted: inputDisabled
+                                          ? null
+                                          : (_) => _send(vm),
                                     ),
-                                    onSubmitted: inputDisabled
-                                        ? null
-                                        : (_) => _send(vm),
                                   ),
                                 ),
                               ),
@@ -836,15 +718,30 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                           child: Opacity(
                             opacity: inputDisabled ? 0.55 : 1,
                             child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFcc529f),
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF7B2FF7),
+                                    Color(0xFFF107A3),
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.22),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
                               ),
                               child: const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                                size: 24,
+                                Icons.send_rounded,
+                                color: Colors.black87,
+                                size: 26,
                               ),
                             ),
                           ),
@@ -882,19 +779,36 @@ class _CenterMiniLoader extends StatelessWidget {
 class _Bubble extends StatelessWidget {
   final String text;
   final bool isMine;
+  final DateTime? createdAt;
   final ChatMsgStatus? status;
   final VoidCallback? onRetry;
 
   const _Bubble({
     required this.text,
     required this.isMine,
+    this.createdAt,
     this.status,
     this.onRetry,
   });
 
+  String _formatTime(DateTime? dt) {
+    if (dt == null) return "";
+    final local = dt.toLocal();
+    final hour24 = local.hour;
+    final hour12 = (hour24 % 12 == 0) ? 12 : (hour24 % 12);
+    final minute = local.minute.toString().padLeft(2, "0");
+    final ampm = hour24 >= 12 ? "PM" : "AM";
+    return "$hour12:$minute $ampm";
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bg = isMine ? const Color(0xFF2A1F2E) : const Color(0xFF23171B);
+    final incomingBg = const Color(0xFF2D2E36);
+    final outgoingGradient = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0xFF7B2FF7), Color(0xFFF107A3)],
+    );
 
     Widget statusWidget() {
       if (!isMine) return const SizedBox.shrink();
@@ -918,42 +832,71 @@ class _Bubble extends StatelessWidget {
           );
         case ChatMsgStatus.sent:
         default:
-          return const SizedBox.shrink();
+          return const Padding(
+            padding: EdgeInsets.only(left: 6),
+            child: Icon(Icons.done_all, size: 16, color: Colors.black54),
+          );
       }
     }
+
+    final timeText = _formatTime(createdAt);
 
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.78,
         ),
         decoration: BoxDecoration(
-          color: bg,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(15),
-            topRight: const Radius.circular(15),
-            bottomLeft: isMine ? const Radius.circular(15) : Radius.zero,
-            bottomRight: isMine ? Radius.zero : const Radius.circular(15),
+            topLeft: const Radius.circular(22),
+            topRight: const Radius.circular(22),
+            bottomLeft: const Radius.circular(22),
+            bottomRight: const Radius.circular(22),
           ),
-          border: Border.all(color: Colors.white.withOpacity(0.06)),
+          color: isMine ? null : incomingBg,
+          gradient: isMine ? outgoingGradient : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: isMine
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Flexible(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  height: 1.25,
-                ),
+            Text(
+              text,
+              style: TextStyle(
+                color: isMine ? Colors.black87 : Colors.white,
+                fontSize: 16,
+                height: 1.25,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            statusWidget(),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (timeText.isNotEmpty)
+                  Text(
+                    timeText,
+                    style: TextStyle(
+                      color: isMine ? Colors.black54 : Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                statusWidget(),
+              ],
+            ),
           ],
         ),
       ),
@@ -1559,6 +1502,7 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                                       return _Bubble(
                                         text: m.message ?? "",
                                         isMine: isMine,
+                                        createdAt: m.createdAt,
                                         status: m.status,
                                         onRetry:
                                             (m.status == ChatMsgStatus.failed)
@@ -1577,30 +1521,36 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                       children: [
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            height: 56,
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF231d1d),
-                              borderRadius: BorderRadius.circular(30),
+                              color: const Color(0xFF2D2E36),
+                              borderRadius: BorderRadius.circular(28),
                             ),
-                            child: TextField(
-                              controller: _text,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                            child: Center(
+                              child: TextField(
+                                controller: _text,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                minLines: 1,
+                                maxLines: 5,
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                decoration: InputDecoration(
+                                  hintText: "Message",
+                                  hintStyle: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onSubmitted: (_) => _send(vm),
                               ),
-                              minLines: 1,
-                              maxLines: 5,
-                              textCapitalization: TextCapitalization.sentences,
-                              decoration: InputDecoration(
-                                hintText: "Message",
-                                hintStyle: TextStyle(color: Colors.grey[500]),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                              onSubmitted: (_) => _send(vm),
                             ),
                           ),
                         ),
@@ -1608,15 +1558,27 @@ class _StaffChatDetailScreenState extends State<StaffChatDetailScreen> {
                         GestureDetector(
                           onTap: () => _send(vm),
                           child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFcc529f),
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFF7B2FF7), Color(0xFFF107A3)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 12,
+                                  offset: Offset(0, 8),
+                                ),
+                              ],
                             ),
                             child: const Icon(
-                              Icons.send,
-                              color: Colors.white,
-                              size: 24,
+                              Icons.send_rounded,
+                              color: Colors.black87,
+                              size: 26,
                             ),
                           ),
                         ),
@@ -1816,6 +1778,161 @@ class _ErrorBanner extends StatelessWidget {
 //   @override
 //   State<staffChatDetailScreen> createState() => _staffChatDetailScreenState();
 // }
+
+class _StaffChatTopBar extends StatelessWidget {
+  final String userImage;
+  final String userName;
+  final bool connected;
+  final bool isBlocked;
+  final VoidCallback onBack;
+  final Future<void> Function(String value) onMenuSelected;
+
+  const _StaffChatTopBar({
+    required this.userImage,
+    required this.userName,
+    required this.connected,
+    required this.isBlocked,
+    required this.onBack,
+    required this.onMenuSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = const Color(0xFF2D2E36).withOpacity(0.7);
+    const ringGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0xFF7B2FF7), Color(0xFFF107A3)],
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: onBack,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(2.5),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: ringGradient,
+            ),
+            child: CachedNetworkImage(
+              imageUrl: userImage,
+              imageBuilder: (context, imageProvider) =>
+                  CircleAvatar(radius: 22, backgroundImage: imageProvider),
+              placeholder: (context, url) => const CircleAvatar(
+                radius: 22,
+                backgroundColor: Color(0xFF2D2E36),
+                child: AppLoadingIndicator(radius: 10),
+              ),
+              errorWidget: (context, url, error) => const CircleAvatar(
+                radius: 22,
+                backgroundColor: Color(0xFF2D2E36),
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: connected
+                            ? const Color(0xFF00ED1C)
+                            : Colors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    AppText(
+                      connected ? "Online now" : "Connecting...",
+                      color: connected
+                          ? const Color(0xFF00ED1C)
+                          : Colors.orangeAccent,
+                      fontSize: 13,
+                    ),
+                    const SizedBox(width: 10),
+                    if (isBlocked)
+                      const Text(
+                        "• Blocked",
+                        style: TextStyle(color: Colors.redAccent, fontSize: 13),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            icon: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Icon(Icons.more_vert, color: Colors.white),
+            ),
+            padding: EdgeInsets.zero,
+            color: const Color(0xFF35272d),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'restrict',
+                child: Text("Restrict", style: TextStyle(color: Colors.white)),
+              ),
+              PopupMenuItem(
+                value: isBlocked ? 'unblock' : 'block',
+                child: Text(
+                  isBlocked ? "Unblock" : "Block",
+                  style: TextStyle(
+                    color: isBlocked ? const Color(0xFF00ED1C) : Colors.red,
+                  ),
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'report',
+                child: Text("Report", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+            onSelected: (value) => onMenuSelected(value),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 //
 // class _staffChatDetailScreenState extends State<staffChatDetailScreen> {
 //   final ScrollController _scrollController = ScrollController();

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bonding_app/BondingScreens/Chat/Model/chat_message_model.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
+import 'package:bonding_app/Bonding_Utils/Call/ios_call_approval_store.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
 import 'package:flutter/foundation.dart';
 
@@ -106,6 +107,13 @@ class ChatProviderVm extends ChangeNotifier {
 
       _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
+      // If staff has replied in history, unlock call/video for this staff in HomeScreen.
+      if (_staffId != null &&
+          _staffId!.trim().isNotEmpty &&
+          _messages.any((m) => (m.senderRole ?? "").toLowerCase() == "staff")) {
+        await IosCallApprovalStore.markApproved(_staffId!);
+      }
+
       final totalPages =
           int.tryParse((pagination["totalPages"] ?? "1").toString()) ?? 1;
 
@@ -162,7 +170,6 @@ class ChatProviderVm extends ChangeNotifier {
     // send to backend
     _socket.sendMessage(staffId: _staffId!, userId: _userId!, message: msg);
     debugPrint("📡 SEND(socket emitted): $msg");
-
   }
 
   void retrySend(ChatMessageModel m) {
@@ -225,6 +232,12 @@ class ChatProviderVm extends ChangeNotifier {
 
       final msg = ChatMessageModel.fromSocket(m);
 
+      // If staff replies (socket), unlock call/video for this staff in HomeScreen.
+      if ((msg.senderRole ?? "").toLowerCase() == "staff" &&
+          (msg.staffId ?? "").trim().isNotEmpty) {
+        IosCallApprovalStore.markApproved(msg.staffId!.trim());
+      }
+
       // ✅ dedupe by server _id
       if (msg.id.isNotEmpty && _seenIds.contains(msg.id)) return;
       if (msg.id.isNotEmpty) _seenIds.add(msg.id);
@@ -256,7 +269,10 @@ class ChatProviderVm extends ChangeNotifier {
     });
 
     _subError ??= _socket.chatErrorStream.listen((e) {
-      error = e.toString();
+      final next = (e ?? "").toString().trim();
+      if (next.isEmpty) return;
+      if (error == next) return;
+      error = next;
       debugPrint("❌ SOCKET ERROR: $error");
       notifyListeners();
     });

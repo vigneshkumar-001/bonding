@@ -258,6 +258,7 @@ class _UserChatListScreenState extends State<UserChatListScreen> {
                                             isBlocked: isBlocked,
                                             staffName: staffName,
                                             userId: uId,
+                                            staffMemberId: c.staff?.memberId,
                                           ),
                                         ),
                                       ),

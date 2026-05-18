@@ -1,8 +1,10 @@
 // lib/BondingScreens/HomeScreen/HomeScreen.dart
 
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/Chat/ChatDetailScreen.dart';
 import 'package:bonding_app/BondingScreens/Chat/Repository/chat_repository.dart';
@@ -20,6 +22,9 @@ import 'package:bonding_app/Socket/socket_service.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
+import 'package:bonding_app/BondingScreens/HomeScreen/PlatformViews/home_android_body.dart';
+import 'package:bonding_app/BondingScreens/HomeScreen/PlatformViews/home_ios_body.dart';
+import 'package:bonding_app/Bonding_Utils/Call/ios_call_approval_store.dart';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,9 +37,9 @@ import 'package:zego_zimkit/zego_zimkit.dart';
 
 import 'package:logger/logger.dart';
 
-const int _zegoAppId = 725765612;
+const int _zegoAppId = 2073142303;
 const String _zegoAppSign =
-    '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
+    'cb2e20977165308bab891c28a97e12100ed429d9469846955090e008435ad3b1';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,9 +49,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // ───────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Logger
-  // ───────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   final Logger _log = Logger(
     printer: PrettyPrinter(
       methodCount: 0,
@@ -63,16 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void logE(String tag, String msg, [Object? e, StackTrace? st]) =>
       _log.e("[$tag] $msg", error: e, stackTrace: st);
 
-  // ───────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   bool _zegoInitialized = false;
   bool _zegoInitializing = false;
   bool _isZimConnected = false;
 
-  // ✅ NEW: local ready flag (prevents package crash)
+  // âœ… NEW: local ready flag (prevents package crash)
   bool _zegoLocalReady = false;
   String _zegoLocalId = "";
 
-  // ─── Call Tracking ──────────────────────────────────────────────────────
+  // â”€â”€â”€ Call Tracking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   bool _pendingCall = false;
   DateTime? _callStartTime;
   String? _staffId;
@@ -87,12 +92,166 @@ class _HomeScreenState extends State<HomeScreen> {
   int _notInRoomCount = 0;
 
   final socketService = SocketService();
+  StreamSubscription? _homeReceiveSub;
+
+  Set<String> _callApprovedStaffIds = <String>{};
+
+  Future<void> _showInfoPopup({
+    required BuildContext context,
+    required String title,
+    required String message,
+  }) async {
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.12),
+                      Colors.white.withOpacity(0.05),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.18),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          height: 42,
+                          width: 42,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF9251D0), Color(0xFFF56463)],
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(Icons.close, color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        // keep dialog from becoming too tall, but allow full text via scroll
+                        maxHeight: MediaQuery.of(ctx).size.height * 0.65,
+                      ),
+                      child: SingleChildScrollView(
+                        child: Text(
+                          message,
+                          softWrap: true,
+                          maxLines: null,
+                          overflow: TextOverflow.visible,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            height: 1.35,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.white.withOpacity(0.12),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: BorderSide(
+                              color: Colors.white.withOpacity(0.18),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          "OK",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _refreshCallApprovals() async {
+    try {
+      final set = await IosCallApprovalStore.load();
+      if (!mounted) return;
+      setState(() => _callApprovedStaffIds = set);
+    } catch (_) {}
+  }
 
   @override
   void initState() {
     super.initState();
 
+    // Listen globally so when staff replies (socket) we can unlock call/video on HomeScreen.
+    _homeReceiveSub ??= socketService.receiveMessageStream.listen((data) async {
+      if (data is! Map) return;
+      final m = Map<String, dynamic>.from(data);
+      final senderRole = (m["senderRole"] ?? "").toString().toLowerCase().trim();
+      if (senderRole != "staff") return;
+
+      final staffMongoId = (m["staffId"] ?? "").toString().trim();
+      if (staffMongoId.isEmpty) return;
+
+      await IosCallApprovalStore.markApproved(staffMongoId);
+      await _refreshCallApprovals();
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _refreshCallApprovals();
       final userVM = context.read<UserViewModel>();
       await userVM.fetchUserDetails();
 
@@ -105,6 +264,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
         await _connectZimUser(user);
         await _initZegoCallInvitation(user);
+
+        // ✅ Ensure socket connects on HomeScreen itself (not only when opening chat)
+        try {
+          logI("SOCKET", "HomeScreen -> connectUserRegister()");
+          await socketService.connectUserRegister();
+          logI(
+            "SOCKET",
+            "HomeScreen socket connected=${socketService.isConnected} snapshot=${socketService.debugSnapshot()}",
+          );
+        } catch (e) {
+          logW("SOCKET", "HomeScreen socket connect failed: $e");
+        }
       } else {
         logW("INIT", "No valid user after fetchUserDetails()");
       }
@@ -120,6 +291,9 @@ class _HomeScreenState extends State<HomeScreen> {
         socketService.listenStaffList((data) {
           staffVM.updateStaffPresence(data);
         });
+
+        // Ask for initial list once socket is up (if not connected, it will no-op)
+        socketService.requestStaffList();
       }
     });
 
@@ -143,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // ✅ Your version supports getLocalUser()
+  // âœ… Your version supports getLocalUser()
   String _getZegoLocalUserIDSafe() {
     try {
       return ZegoUIKit().getLocalUser().id.trim();
@@ -158,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (id.isNotEmpty) {
         _zegoLocalId = id;
         if (mounted) setState(() => _zegoLocalReady = true);
-        logI("ZEGO_LOCAL", "✅ local user ready -> $_zegoLocalId");
+        logI("ZEGO_LOCAL", "âœ… local user ready -> $_zegoLocalId");
         return;
       }
       await Future.delayed(const Duration(milliseconds: 200));
@@ -168,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() => _zegoLocalReady = false);
     logW(
       "ZEGO_LOCAL",
-      "⚠️ local user NOT ready yet. Will block send() until ready.",
+      "âš ï¸ local user NOT ready yet. Will block send() until ready.",
     );
   }
 
@@ -284,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       );
 
-      // ✅ CRITICAL: wait for local user id ready (prevents _loginUser null crash)
+      // âœ… CRITICAL: wait for local user id ready (prevents _loginUser null crash)
       await _waitForZegoLocalReady();
 
       if (!mounted) return;
@@ -292,10 +466,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
       logI(
         "ZEGO_INIT",
-        "✅ init SUCCESS (localReady=$_zegoLocalReady localId=$_zegoLocalId)",
+        "âœ… init SUCCESS (localReady=$_zegoLocalReady localId=$_zegoLocalId)",
       );
     } catch (e, st) {
-      logE("ZEGO_INIT", "❌ init FAILED", e, st);
+      logE("ZEGO_INIT", "âŒ init FAILED", e, st);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -346,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return false;
     }
 
-    // ✅ THIS is the important guard to avoid package crash
+    // âœ… THIS is the important guard to avoid package crash
     if (_zegoLocalId.isEmpty) {
       logW(
         "SEND",
@@ -481,6 +655,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _callLimitTimer?.cancel();
     _inviteTimeoutTimer?.cancel();
     _periodicCheckTimer?.cancel();
+    _homeReceiveSub?.cancel();
     // socketService.removeStaffListListener();
 
     if (_zegoInitialized) {
@@ -495,6 +670,23 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, userVM, staffVM, child) {
         final currentUser = userVM.currentUser;
         final ready = _zegoInitialized && _zegoLocalId.isNotEmpty;
+        final isIOS = !kIsWeb && Platform.isIOS;
+
+        final homeBody = isIOS
+            ? HomeIosBody(
+                userVM: userVM,
+                staffVM: staffVM,
+                buildCard: (ctx, staff) =>
+                    _profileCard(ctx, staff, ready, isIOS: true),
+              )
+            : HomeAndroidBody(
+                userVM: userVM,
+                staffVM: staffVM,
+                ready: ready,
+                zegoInitializing: _zegoInitializing,
+                buildCard: (ctx, staff) =>
+                    _profileCard(ctx, staff, ready, isIOS: false),
+              );
 
         return Scaffold(
           body: Container(
@@ -503,227 +695,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: const BoxDecoration(
               gradient: Apptheme.backgroundGradient,
             ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Image(
-                              image: AssetImage("assets/Images/appLogo.png"),
-                              height: 32,
-                            ),
-                            // SizedBox(width: 10),
-                            // Text(
-                            //   "TwoOfUs",
-                            //   style: TextStyle(
-                            //     color: Colors.white,
-                            //     fontSize: 18,
-                            //     fontWeight: FontWeight.w700,
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () => bondNavigator.newPage(
-                            context,
-                            page: const WalletScreen(),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              gradient: Apptheme.buttonGradient,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  "assets/Images/goldcoin1.png",
-                                  height: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "${currentUser?.coinBalance ?? 0}.00",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () => bondNavigator.newPage(
-                            context,
-                            page: const ProfileScreen(backPage: true),
-                          ),
-                          child: _TappableAvatar(
-                            radius: 18,
-                            name: currentUser?.name ?? "User",
-                            imageUrl: currentUser?.image,
-                            heroTag: "user-avatar",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Status
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Icon(
-                          ready ? Icons.check_circle : Icons.info,
-                          color: ready ? Colors.green : Colors.white70,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            ready
-                                ? "Call service ready"
-                                : (_zegoInitializing
-                                      ? "Connecting call service..."
-                                      : "Call service not ready"),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: staffVM.isFetchingStaff
-                        ? const Center(
-                            child: AppLoadingIndicator(color: Colors.white),
-                          )
-                        : staffVM.staffFetchError != null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  staffVM.staffFetchError!,
-                                  style: const TextStyle(
-                                    color: Colors.redAccent,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: staffVM.fetchStaffDetails,
-                                  child: const Text("Retry"),
-                                ),
-                              ],
-                            ),
-                          )
-                        : staffVM.staffList.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No women available",
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          )
-                        : RefreshIndicator(
-                            color: Colors.white,
-                            onRefresh: () async {
-                              final userVM2 = context.read<UserViewModel>();
-                              await Future.wait([
-                                staffVM.fetchStaffDetails(),
-                                userVM2.fetchUserDetails(),
-                              ]);
-                            },
-                            child: ListView.builder(
-                              physics:
-                                  const AlwaysScrollableScrollPhysics(), // ✅ important
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              itemCount: staffVM.staffList.length,
-                              itemBuilder: (context, index) {
-                                final staff = staffVM.staffList[index];
-                                return _profileCard(
-                                  context,
-                                  staff,
-                                  _zegoInitialized && _zegoLocalId.isNotEmpty,
-                                );
-                              },
-                            ),
-                          ),
-                  ),
-
-                  // Expanded(
-                  //   child: staffVM.isFetchingStaff
-                  //       ? const Center(
-                  //           child: CircularProgressIndicator(
-                  //             color: Colors.white,
-                  //           ),
-                  //         )
-                  //       : staffVM.staffFetchError != null
-                  //       ? Center(
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: [
-                  //               Text(
-                  //                 staffVM.staffFetchError!,
-                  //                 style: const TextStyle(
-                  //                   color: Colors.redAccent,
-                  //                 ),
-                  //               ),
-                  //               const SizedBox(height: 16),
-                  //               ElevatedButton(
-                  //                 onPressed: staffVM.fetchStaffDetails,
-                  //                 child: const Text("Retry"),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         )
-                  //       : staffVM.staffList.isEmpty
-                  //       ? const Center(
-                  //           child: Text(
-                  //             "No staff available",
-                  //             style: TextStyle(color: Colors.white70),
-                  //           ),
-                  //         )
-                  //       : ListView.builder(
-                  //           padding: const EdgeInsets.symmetric(horizontal: 16),
-                  //           itemCount: staffVM.staffList.length,
-                  //           itemBuilder: (context, index) {
-                  //             final staff = staffVM.staffList[index];
-                  //             return _staffProfileCard(staff, ready);
-                  //           },
-                  //         ),
-                  // ),
-                ],
-              ),
-            ),
+            child: SafeArea(child: homeBody),
           ),
         );
       },
@@ -837,10 +809,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _profileCard(
     BuildContext context,
     StaffDataProfile staff,
-    bool ready,
-  ) {
+    bool ready, {
+    bool isIOS = false,
+  }) {
     final age = _calculateAgeFromDOB(staff.dob ?? '');
     final isOnline = staff.isOnline;
+    final callApproved =
+        (staff.callEnabled ?? _callApprovedStaffIds.contains(staff.id));
     final staffHeroTag =
         "staff-media-${staff.id.isNotEmpty ? staff.id : staff.name}";
     return ClipRRect(
@@ -955,102 +930,117 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 14),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _customCallButton(
-                      enabled: ready,
-                      text: "${staff.audioCallRatePerMinute}/min",
-                      pricePerMin: staff.audioCallRatePerMinute,
-                      isVideoCall: false,
-                      targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Women",
-                      targetStaffId: staff.id,
-                      isTargetOnline: staff.isOnline,
+              if (isIOS)
+                _iosChatRow(context, staff)
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: _customCallButton(
+                        enabled: ready && callApproved,
+                        disabledMessage: !ready
+                            ? "Call service still connecting, try again."
+                            : "Chat reply needed to enable call.",
+                        text: "${staff.audioCallRatePerMinute}/min",
+                        pricePerMin: staff.audioCallRatePerMinute,
+                        isVideoCall: false,
+                        targetUserID: staff.memberID,
+                        targetUserName: staff.name ?? "Women",
+                        targetStaffId: staff.id,
+                        isTargetOnline: staff.isOnline,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _customCallButton(
-                      enabled: ready,
-                      text: "${staff.videoCallRatePerMinute}/min",
-                      pricePerMin: staff.videoCallRatePerMinute,
-                      isVideoCall: true,
-                      targetUserID: staff.memberID,
-                      targetUserName: staff.name ?? "Women",
-                      targetStaffId: staff.id,
-                      isTargetOnline: staff.isOnline,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _customCallButton(
+                        enabled: ready && callApproved,
+                        disabledMessage: !ready
+                            ? "Call service still connecting, try again."
+                            : "Chat reply needed to enable call.",
+                        text: "${staff.videoCallRatePerMinute}/min",
+                        pricePerMin: staff.videoCallRatePerMinute,
+                        isVideoCall: true,
+                        targetUserID: staff.memberID,
+                        targetUserName: staff.name ?? "Women",
+                        targetStaffId: staff.id,
+                        isTargetOnline: staff.isOnline,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: () async {
-                      final userVM = Provider.of<UserViewModel>(
-                        context,
-                        listen: false,
-                      );
-                      final currentUser = userVM.currentUser;
-                      if (currentUser == null) return;
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () async {
+                        final userVM = Provider.of<UserViewModel>(
+                          context,
+                          listen: false,
+                        );
+                        final currentUser = userVM.currentUser;
+                        if (currentUser == null) return;
 
-                      // (Your Zego check can stay if needed)
-                      final connected =
-                          await ZimConnectionService.ensureConnected(
-                            context,
-                            userId: currentUser.memberID,
-                            userName: currentUser.name ?? "User",
-                          );
-                      if (!connected) return;
+                        final connected =
+                            await ZimConnectionService.ensureConnected(
+                              context,
+                              userId: currentUser.memberID,
+                              userName: currentUser.name ?? "User",
+                            );
+                        if (!connected) return;
 
-                      final staffId = staff.id; // staff mongo _id
-                      final userId = currentUser.id; // user mongo _id
-                      final staffName = staff.name ?? "Women";
+                        final staffId = staff.id; // staff mongo _id
+                        final userId = currentUser.id; // user mongo _id
+                        final staffName = staff.name ?? "Women";
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              ChangeNotifierProvider<ChatProviderVm>(
-                                create: (_) =>
-                                    ChatProviderVm(
-                                      repo: ChatRepository(NetworkApiService()),
-                                    )..initChat(
-                                      staffId: staffId,
-                                      userId: userId,
-                                      isStaff: false,
-                                    ), // ✅ history + socket init
-                                child: ChatDetailScreen(
-                                  isBlocked: false,
-                                  staffImage: staff.image ?? '',
-                                  staffId: staffId,
-                                  staffName: staffName,
-                                  userId: userId,
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ChangeNotifierProvider<ChatProviderVm>(
+                                  create: (_) =>
+                                      ChatProviderVm(
+                                        repo: ChatRepository(
+                                          NetworkApiService(),
+                                        ),
+                                      )..initChat(
+                                        staffId: staffId,
+                                        userId: userId,
+                                        isStaff: false,
+                                      ), // ✅ history + socket init
+                                  child: ChatDetailScreen(
+                                    isBlocked: false,
+                                    staffImage: staff.image ?? '',
+                                    staffId: staffId,
+                                    staffName: staffName,
+                                    userId: userId,
+                                    staffMemberId: staff.memberID,
+                                    audioRatePerMin:
+                                        staff.audioCallRatePerMinute,
+                                    videoRatePerMin:
+                                        staff.videoCallRatePerMinute,
+                                  ),
                                 ),
-                              ),
+                          ),
+                        );
+                        await _refreshCallApprovals();
+                      },
+                      child: Container(
+                        height: 44,
+                        width: 44,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: Colors.white.withOpacity(0.06),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.14),
+                          ),
                         ),
-                      );
-                    },
-
-                    child: Container(
-                      height: 44,
-                      width: 44,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: Colors.white.withOpacity(0.06),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.14),
-                        ),
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          "assets/Images/chaticon.png",
-                          height: 20,
-                          width: 20,
+                        child: Center(
+                          child: Image.asset(
+                            "assets/Images/chaticon.png",
+                            height: 20,
+                            width: 20,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               // Row(
               //   children: [
               //     Expanded(
@@ -1072,7 +1062,7 @@ class _HomeScreenState extends State<HomeScreen> {
               //     ),
               //     const SizedBox(width: 12),
               //
-              //     // Inside _profileCard → the Chat button GestureDetector
+              //     // Inside _profileCard â†’ the Chat button GestureDetector
               //     Expanded(
               //       child: GestureDetector(
               //         onTap: () async {
@@ -1098,7 +1088,7 @@ class _HomeScreenState extends State<HomeScreen> {
               //               builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
               //                 create: (_) => ChatProviderVm(
               //                   repo: ChatRepository(NetworkApiService()),
-              //                 )..initChat(staffId: staffId, userId: userId,isStaff: false), // ✅ history + socket init
+              //                 )..initChat(staffId: staffId, userId: userId,isStaff: false), // âœ… history + socket init
               //                 child: ChatDetailScreen(
               //                   isBlocked: false,
               //                   staffImage: staff.image ?? '',
@@ -1126,8 +1116,199 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _iosChatRow(BuildContext context, StaffDataProfile staff) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              final userVM = Provider.of<UserViewModel>(context, listen: false);
+              final currentUser = userVM.currentUser;
+              if (currentUser == null) return;
+
+              final connected = await ZimConnectionService.ensureConnected(
+                context,
+                userId: currentUser.memberID,
+                userName: currentUser.name ?? "User",
+              );
+              if (!connected) return;
+
+              final staffId = staff.id;
+              final userId = currentUser.id;
+              final staffName = staff.name ?? "Women";
+
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
+                    create: (_) =>
+                        ChatProviderVm(
+                          repo: ChatRepository(NetworkApiService()),
+                        )..initChat(
+                          staffId: staffId,
+                          userId: userId,
+                          isStaff: false,
+                        ),
+                    child: ChatDetailScreen(
+                      isBlocked: false,
+                      staffImage: staff.image ?? '',
+                      staffId: staffId,
+                      staffName: staffName,
+                      userId: userId,
+                      staffMemberId: staff.memberID,
+                      audioRatePerMin: staff.audioCallRatePerMinute,
+                      videoRatePerMin: staff.videoCallRatePerMinute,
+                    ),
+                  ),
+                ),
+              );
+              // Refresh staff list so backend-driven flags (like callEnabled)
+              // reflect immediately after chat reply.
+              try {
+                await context.read<StaffViewModel>().fetchStaffDetails();
+              } catch (_) {}
+              await _refreshCallApprovals();
+            },
+            child: Container(
+              height: 46,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: Apptheme.buttonGradient,
+              ),
+              child: const Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Chat",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _androidActionRow(
+    BuildContext context,
+    StaffDataProfile staff, {
+    required bool ready,
+    required bool callApproved,
+  }) {
+    final disabledMessage = !ready
+        ? "Call service still connecting, try again."
+        : "Chat reply needed to enable call.";
+
+    return Row(
+      children: [
+        Expanded(
+          child: _customCallButton(
+            enabled: ready && callApproved,
+            disabledMessage: disabledMessage,
+            text: "${staff.audioCallRatePerMinute}/min",
+            pricePerMin: staff.audioCallRatePerMinute,
+            isVideoCall: false,
+            targetUserID: staff.memberID,
+            targetUserName: staff.name ?? "Women",
+            targetStaffId: staff.id,
+            isTargetOnline: staff.isOnline,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _customCallButton(
+            enabled: ready && callApproved,
+            disabledMessage: disabledMessage,
+            text: "${staff.videoCallRatePerMinute}/min",
+            pricePerMin: staff.videoCallRatePerMinute,
+            isVideoCall: true,
+            targetUserID: staff.memberID,
+            targetUserName: staff.name ?? "Women",
+            targetStaffId: staff.id,
+            isTargetOnline: staff.isOnline,
+          ),
+        ),
+        const SizedBox(width: 12),
+        GestureDetector(
+          onTap: () async {
+            final userVM = Provider.of<UserViewModel>(context, listen: false);
+            final currentUser = userVM.currentUser;
+            if (currentUser == null) return;
+
+            final connected = await ZimConnectionService.ensureConnected(
+              context,
+              userId: currentUser.memberID,
+              userName: currentUser.name ?? "User",
+            );
+            if (!connected) return;
+
+            final staffId = staff.id; // staff mongo _id
+            final userId = currentUser.id; // user mongo _id
+            final staffName = staff.name ?? "Women";
+
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
+                  create: (_) =>
+                      ChatProviderVm(repo: ChatRepository(NetworkApiService()))
+                        ..initChat(
+                          staffId: staffId,
+                          userId: userId,
+                          isStaff: false,
+                        ), // ✅ history + socket init
+                  child: ChatDetailScreen(
+                    isBlocked: false,
+                    staffImage: staff.image ?? '',
+                    staffId: staffId,
+                    staffName: staffName,
+                    userId: userId,
+                    staffMemberId: staff.memberID,
+                    audioRatePerMin: staff.audioCallRatePerMinute,
+                    videoRatePerMin: staff.videoCallRatePerMinute,
+                  ),
+                ),
+              ),
+            );
+            await _refreshCallApprovals();
+          },
+          child: Container(
+            height: 44,
+            width: 44,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Colors.white.withOpacity(0.06),
+              border: Border.all(color: Colors.white.withOpacity(0.14)),
+            ),
+            child: Center(
+              child: Image.asset(
+                "assets/Images/chaticon.png",
+                height: 20,
+                width: 20,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _customCallButton({
     required bool enabled,
+    String? disabledMessage,
     required String text,
     required int pricePerMin,
     required bool isVideoCall,
@@ -1143,10 +1324,17 @@ class _HomeScreenState extends State<HomeScreen> {
         return GestureDetector(
           onTap: () async {
             if (!enabled) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Call service still connecting, try again."),
-                ),
+              final msg = (disabledMessage ??
+                      "Call service still connecting, try again.")
+                  .trim();
+
+              final isChatLock = msg.toLowerCase().contains("chat reply");
+              await _showInfoPopup(
+                context: context,
+                title: isChatLock ? "Call is locked" : "Please wait",
+                message: isChatLock
+                    ? "To enable audio or video calls, please send a chat message first and wait for her reply.\n\nOnce she replies, the call buttons will unlock automatically on this screen."
+                    : msg,
               );
               return;
             }
@@ -1672,7 +1860,7 @@ class _Tag extends StatelessWidget {
 // import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 // import 'package:zego_zimkit/zego_zimkit.dart';
 //
-// // ✅ logger
+// // âœ… logger
 // import 'package:logger/logger.dart';
 //
 // class HomeScreen extends StatefulWidget {
@@ -1683,9 +1871,9 @@ class _Tag extends StatelessWidget {
 // }
 //
 // class _HomeScreenState extends State<HomeScreen> {
-//   // ───────────────────────────────────────────────────────────────────────
+//   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //   // Logger
-//   // ───────────────────────────────────────────────────────────────────────
+//   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //   final Logger _log = Logger(
 //     printer: PrettyPrinter(
 //       methodCount: 0,
@@ -1702,14 +1890,14 @@ class _Tag extends StatelessWidget {
 //   void logE(String tag, String msg, [Object? e, StackTrace? st]) =>
 //       _log.e("[$tag] $msg", error: e, stackTrace: st);
 //
-//   // ───────────────────────────────────────────────────────────────────────
+//   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //   bool _zegoInitialized = false;
 //   bool _zegoInitializing = false;
 //   bool _isZimConnected = false;
 //
-//   // ─── Call Tracking ──────────────────────────────────────────────────────
-//   bool _pendingCall = false; // ✅ NEW: send() happened, waiting for room login
-//   DateTime? _callStartTime; // ✅ now set only when room is logged-in
+//   // â”€â”€â”€ Call Tracking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//   bool _pendingCall = false; // âœ… NEW: send() happened, waiting for room login
+//   DateTime? _callStartTime; // âœ… now set only when room is logged-in
 //   String? _staffId;
 //   int? _currentCallPricePerMin;
 //   bool _isCurrentCallVideo = false;
@@ -1763,7 +1951,7 @@ class _Tag extends StatelessWidget {
 //       }
 //     });
 //
-//     // ✅ Safety net: if call was connected and we suddenly leave room, end call after 5 checks
+//     // âœ… Safety net: if call was connected and we suddenly leave room, end call after 5 checks
 //     _periodicCheckTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
 //       if (!_wasCallReallyConnected) return;
 //
@@ -1812,7 +2000,7 @@ class _Tag extends StatelessWidget {
 //     }
 //   }
 //
-//   /// ✅ init call invitation service once
+//   /// âœ… init call invitation service once
 //   /// Compatible with: zego_uikit_prebuilt_call ^4.22.2
 //   Future<void> _initZegoCallInvitation(UserProfile user) async {
 //     final ZegoUIKitSignalingPlugin _signalingPlugin =
@@ -1831,7 +2019,7 @@ class _Tag extends StatelessWidget {
 //             "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
 //         userID: user.memberID.trim(),
 //         userName: (user.name ?? "User").trim(),
-//         // ✅ DO NOT pass signaling plugin (not needed for your setup + avoids mismatches)
+//         // âœ… DO NOT pass signaling plugin (not needed for your setup + avoids mismatches)
 //         // plugins: [ZegoUIKitSignalingPlugin()],  // <-- remove in your versions
 //         notificationConfig: ZegoCallInvitationNotificationConfig(
 //           androidNotificationConfig: ZegoAndroidNotificationConfig(
@@ -1868,13 +2056,13 @@ class _Tag extends StatelessWidget {
 //           ),
 //           room: ZegoCallRoomEvents(
 //             onStateChanged: (ZegoUIKitRoomState state) {
-//               // ✅ No getRoomID() in your version, so only log reason + isRoomLogin
+//               // âœ… No getRoomID() in your version, so only log reason + isRoomLogin
 //               logI(
 //                 "ROOM_STATE",
 //                 "reason=${state.reason} isRoomLogin=${ZegoUIKit().isRoomLogin}",
 //               );
 //
-//               // ✅ We mark "really connected" ONLY when room login succeeds
+//               // âœ… We mark "really connected" ONLY when room login succeeds
 //               if (state.reason == ZegoRoomStateChangedReason.Logined &&
 //                   _pendingCall) {
 //                 _pendingCall = false;
@@ -1908,9 +2096,9 @@ class _Tag extends StatelessWidget {
 //       if (!mounted) return;
 //       setState(() => _zegoInitialized = true);
 //
-//       logI("ZEGO_INIT", "✅ init SUCCESS");
+//       logI("ZEGO_INIT", "âœ… init SUCCESS");
 //     } catch (e, st) {
-//       logE("ZEGO_INIT", "❌ init FAILED", e, st);
+//       logE("ZEGO_INIT", "âŒ init FAILED", e, st);
 //       if (mounted) {
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(
@@ -1925,7 +2113,7 @@ class _Tag extends StatelessWidget {
 //     }
 //   }
 //
-//   // ✅ SEND wrapper with logs
+//   // âœ… SEND wrapper with logs
 //   Future<bool> _sendInviteWithLogs({
 //     required String targetUserID,
 //     required String targetUserName,
@@ -1944,19 +2132,19 @@ class _Tag extends StatelessWidget {
 //       "myId=$myId -> inviteeId=$inviteeId name=$inviteeName type=${isVideoCall ? "video" : "voice"} price=$pricePerMin",
 //     );
 //
-//     // ✅ Guard 1: empty
+//     // âœ… Guard 1: empty
 //     if (inviteeId.isEmpty) {
 //       logW("SEND", "BLOCKED: inviteeId is empty");
 //       return false;
 //     }
 //
-//     // ✅ Guard 2: self call (this is YOUR current error)
+//     // âœ… Guard 2: self call (this is YOUR current error)
 //     if (myId.isNotEmpty && inviteeId == myId) {
 //       logE("SEND", "BLOCKED: trying to call yourself (inviteeId == myId)");
 //       return false;
 //     }
 //
-//     // ✅ Guard 3: service ready
+//     // âœ… Guard 3: service ready
 //     if (!_zegoInitialized) {
 //       logW("SEND", "BLOCKED: zego not initialized");
 //       return false;
@@ -2435,7 +2623,7 @@ class _Tag extends StatelessWidget {
 //               return;
 //             }
 //
-//             // ✅ prevent sending to offline to avoid failures
+//             // âœ… prevent sending to offline to avoid failures
 //             if (!isTargetOnline) {
 //               ScaffoldMessenger.of(
 //                 context,
@@ -2466,7 +2654,7 @@ class _Tag extends StatelessWidget {
 //             // Max duration based on balance
 //             _maxAllowedSeconds = (balance ~/ pricePerMin) * 60;
 //
-//             // ✅ send with logs
+//             // âœ… send with logs
 //             final success = await _sendInviteWithLogs(
 //               targetUserID: targetUserID,
 //               targetUserName: targetUserName,
@@ -2481,7 +2669,7 @@ class _Tag extends StatelessWidget {
 //               return;
 //             }
 //
-//             // ✅ mark as pending (DO NOT start billing yet)
+//             // âœ… mark as pending (DO NOT start billing yet)
 //             setState(() {
 //               _pendingCall = true;
 //               _staffId = targetStaffId;
@@ -2613,7 +2801,7 @@ class _Tag extends StatelessWidget {
 //   bool _zegoInitialized = false;
 //   bool _isZimConnected = false;
 //
-//   // ─── Call Tracking ──────────────────────────────────────────────────────
+//   // â”€â”€â”€ Call Tracking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //   DateTime? _callStartTime;
 //   String? _currentCallTargetID;
 //   String? _staffId;
@@ -2638,7 +2826,7 @@ class _Tag extends StatelessWidget {
 //
 //       if (user != null && user.memberID.isNotEmpty) {
 //         debugPrint(
-//           "User fetched → memberID: ${user.memberID}, name: ${user.name}",
+//           "User fetched â†’ memberID: ${user.memberID}, name: ${user.name}",
 //         );
 //         await _connectZimUser(user);
 //       } else {
@@ -2652,11 +2840,11 @@ class _Tag extends StatelessWidget {
 //
 //       await staffVM.fetchStaffDetails();
 //
-//       // 🔥 connect socket using first staff (example)
+//       // ðŸ”¥ connect socket using first staff (example)
 //       if (staffVM.staffList.isNotEmpty) {
 //         final staffID = staffVM.staffList.first.memberID;
 //
-//         print("Connecting socket as staff → $staffID");
+//         print("Connecting socket as staff â†’ $staffID");
 //
 //         socketService.connectStaff(staffID);
 //
@@ -2674,7 +2862,7 @@ class _Tag extends StatelessWidget {
 //         _notInRoomCount++;
 //         debugPrint("Not in room detected ($_notInRoomCount / 5)");
 //         if (_notInRoomCount >= 5 && _wasCallReallyConnected) {
-//           debugPrint("Consecutive not-in-room after connected → end call");
+//           debugPrint("Consecutive not-in-room after connected â†’ end call");
 //           _handleCallEnd(_staffId ?? '', _isCurrentCallVideo);
 //         }
 //       } else {
@@ -2687,7 +2875,7 @@ class _Tag extends StatelessWidget {
 //     if (user == null || _isZimConnected) return;
 //
 //     try {
-//       debugPrint("→ Starting ZIM connect for ID: ${user.memberID}");
+//       debugPrint("â†’ Starting ZIM connect for ID: ${user.memberID}");
 //
 //       await ZIMKit().connectUser(
 //         id: user.memberID,
@@ -2695,9 +2883,9 @@ class _Tag extends StatelessWidget {
 //         avatarUrl: user.image ?? "",
 //       );
 //       setState(() => _isZimConnected = true);
-//       debugPrint("→ ZIMKit login SUCCESS for ${user.memberID}");
+//       debugPrint("â†’ ZIMKit login SUCCESS for ${user.memberID}");
 //     } catch (e, stackTrace) {
-//       debugPrint("→ ZIMKit login FAILED: $e");
+//       debugPrint("â†’ ZIMKit login FAILED: $e");
 //       debugPrint("Stack trace: $stackTrace");
 //       if (mounted) {
 //         ScaffoldMessenger.of(context).showSnackBar(
@@ -2717,22 +2905,22 @@ class _Tag extends StatelessWidget {
 //     final now = DateTime.now();
 //     final durationSeconds = now.difference(_callStartTime!).inSeconds;
 //
-//     // ─── Guards: skip billing if call was never really connected or too short ───────
+//     // â”€â”€â”€ Guards: skip billing if call was never really connected or too short â”€â”€â”€â”€â”€â”€â”€
 //     if (!_wasCallReallyConnected) {
-//       debugPrint("Call ended without real connection → no deduction");
+//       debugPrint("Call ended without real connection â†’ no deduction");
 //       _resetCallTracking();
 //       return;
 //     }
 //
 //     if (durationSeconds < 15) {
 //       debugPrint(
-//         "Call too short ($durationSeconds s) → likely no meaningful conversation → no billing",
+//         "Call too short ($durationSeconds s) â†’ likely no meaningful conversation â†’ no billing",
 //       );
 //       _resetCallTracking();
 //       return;
 //     }
 //
-//     // ─── Real attended call ───────────────────────────────────────
+//     // â”€â”€â”€ Real attended call â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //     _callTimer?.cancel();
 //
 //     // Pro-rated calculation
@@ -2818,7 +3006,7 @@ class _Tag extends StatelessWidget {
 //             events: ZegoUIKitPrebuiltCallEvents(
 //               // Called when call ends (local/remote hang up, timeout, kick out, etc.)
 //               onCallEnd: (ZegoCallEndEvent event, VoidCallback defaultAction) {
-//                 debugPrint("Call ended → reason: ${event.reason.name}");
+//                 debugPrint("Call ended â†’ reason: ${event.reason.name}");
 //                 if (_callStartTime != null) {
 //                   _handleCallEnd(_staffId ?? '', _isCurrentCallVideo);
 //                   print("sdcs");
@@ -2830,7 +3018,7 @@ class _Tag extends StatelessWidget {
 //               // Detect remote user leave (alternative way to trigger end)
 //               user: ZegoCallUserEvents(
 //                 onLeave: (user) {
-//                   debugPrint("Remote user left: ${user.id} → ending call");
+//                   debugPrint("Remote user left: ${user.id} â†’ ending call");
 //                   if (_callStartTime != null) {
 //                     _handleCallEnd(_staffId ?? '', _isCurrentCallVideo);
 //                   }
@@ -2840,11 +3028,11 @@ class _Tag extends StatelessWidget {
 //               // Room state change (this replaces your old onCallStateChanged)
 //               room: ZegoCallRoomEvents(
 //                 onStateChanged: (ZegoUIKitRoomState state) {
-//                   debugPrint("Room state changed → reason: ${state.reason}");
+//                   debugPrint("Room state changed â†’ reason: ${state.reason}");
 //                   if (state.reason == ZegoRoomStateChangedReason.Logined &&
 //                       _callStartTime != null) {
-//                     // Assuming "connected" ≈ logged in successfully after join
-//                     debugPrint("Room connected → real conversation started");
+//                     // Assuming "connected" â‰ˆ logged in successfully after join
+//                     debugPrint("Room connected â†’ real conversation started");
 //                     setState(() => _wasCallReallyConnected = true);
 //                   }
 //                 },
@@ -2976,7 +3164,7 @@ class _Tag extends StatelessWidget {
 //                           child: TextField(
 //                             style: const TextStyle(color: Colors.white),
 //                             decoration: InputDecoration(
-//                               hintText: 'Search by “name, call topics”',
+//                               hintText: 'Search by â€œname, call topicsâ€',
 //                               hintStyle: const TextStyle(
 //                                 color: Color(0xFFc7c7cc),
 //                                 fontSize: 16,
@@ -3282,7 +3470,7 @@ class _Tag extends StatelessWidget {
 //             });
 //
 //             debugPrint(
-//               "Call invitation sent → tracking started | Target: $targetUserID | Staff ID: $targetStaffId | Price: $pricePerMin/min | Max: $maxSeconds sec",
+//               "Call invitation sent â†’ tracking started | Target: $targetUserID | Staff ID: $targetStaffId | Price: $pricePerMin/min | Max: $maxSeconds sec",
 //             );
 //
 //             // Force end after max time (safety)

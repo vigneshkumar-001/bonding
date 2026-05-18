@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../BondingScreens/AuthService.dart';
 import '../../BondingScreens/Splash/SplashScreen2.dart';
@@ -28,6 +29,20 @@ class StaffProfileScreen extends StatefulWidget {
 }
 
 class _StaffProfileScreenState extends State<StaffProfileScreen> {
+  Future<void> _openSupportEmail(String email) async {
+    final cleaned = email.trim();
+    if (cleaned.isEmpty) return;
+
+    // Using explicit query to avoid some clients showing "+" instead of space.
+    final subject = Uri.encodeComponent("TwoOfus Support");
+    final uri = Uri.parse("mailto:$cleaned?subject=$subject");
+
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && mounted) {
+      Utils.snackBar("Unable to open email app");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
@@ -328,23 +343,35 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Row(
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const Text(
+                                "Need Help? please contact ",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
                               ),
-                              children: [
-                                TextSpan(text: "Need Help? please contact "),
-                                TextSpan(
-                                  text: staffData?.supportEmail ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                              GestureDetector(
+                                onTap: () => _openSupportEmail(
+                                  (staffData?.supportEmail ??
+                                          "support@bonding.com")
+                                      .toString(),
+                                ),
+                                child: Text(
+                                  (staffData?.supportEmail ??
+                                          "support@bonding.com")
+                                      .toString(),
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

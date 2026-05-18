@@ -51,6 +51,24 @@ class SocketService {
 
   Stream<dynamic> get chatErrorStream => _chatErrorCtrl.stream;
 
+  String? _lastSocketError;
+  String? get lastSocketError => _lastSocketError;
+
+  Map<String, dynamic> debugSnapshot() {
+    return {
+      "url": _baseUrl,
+      "connected": isConnected,
+      "socketId": _socket?.id,
+      "registeredOk": _registeredOk,
+      "attempt": _attempt,
+      "manualDisconnect": _manualDisconnect,
+      "lastRegisterEvent": _lastRegisterEvent,
+      "pendingStaffMemberId": _pendingStaffMemberId,
+      "registeredStaffMongoId": registeredStaffMongoId,
+      "lastSocketError": _lastSocketError,
+    };
+  }
+
   Stream<dynamic> get staffStatusChangedStream => _statusChangedCtrl.stream;
 
   Stream<bool> get connectionStream => _connectionCtrl.stream;
@@ -252,11 +270,32 @@ class SocketService {
       return;
     }
 
-    socket.emitWithAck("send_message", {
-      "staffId": fixedStaffId,
-      "userId": userId,
-      "message": message,
-    }, ack: (data) => onAck(data));
+    socket.emitWithAck(
+      "send_message",
+      {"staffId": fixedStaffId, "userId": userId, "message": message},
+      ack: (data) {
+        try {
+          final asMap = (data is Map)
+              ? Map<String, dynamic>.from(data)
+              : <String, dynamic>{};
+          if (asMap.isNotEmpty) {
+            final ok = asMap["ok"];
+            final status = asMap["status"];
+            final seemsFailed = ok == false || status == false;
+            if (seemsFailed) {
+              _emitSocketError(source: "send_message_ack", err: asMap);
+            } else {
+              AppLogger.log.i("SOCKET[send_message_ack] $asMap");
+            }
+          } else {
+            AppLogger.log.i(
+              "SOCKET[send_message_ack] ${data?.toString() ?? ""}",
+            );
+          }
+        } catch (_) {}
+        onAck(data);
+      },
+    );
   }
 
   void sendMessage({
@@ -312,8 +351,6 @@ class SocketService {
   Future<void> _connectBase() async {
     _manualDisconnect = false;
 
-    _attempt = 0;
-
     _registeredOk = false;
 
     _reconnectTimer?.cancel();
@@ -329,8 +366,10 @@ class SocketService {
     final bearer = t.isEmpty ? "" : (t.startsWith("Bearer ") ? t : "Bearer $t");
 
     if (bearer.isEmpty) {
-      AppLogger.log.e("Socket token missing, skip connect");
-
+      _emitSocketError(
+        source: "auth",
+        err: "Socket token missing (AuthService.getToken returned empty)",
+      );
       return;
     }
 
@@ -341,12 +380,16 @@ class SocketService {
 
       IO.OptionBuilder()
           .setPath('/socket.io')
-          .setTransports(['polling', 'websocket'])
+          // Backend uses auth token middleware; prefer websocket to avoid proxy/polling issues.
+          .setTransports(['websocket'])
           .disableAutoConnect()
           .enableForceNew()
           .disableReconnection() // using manual reconnect below
-          .setTimeout(12000)
-          .setAuth({"token": bearer})
+          // Home screen may attempt connection on slower networks; keep it a bit higher.
+          .setTimeout(60000)
+          // Many Socket.IO backends expect the raw token in `handshake.auth.token`.
+          // Keep `Authorization: Bearer ...` header as well for compatibility.
+          .setAuth({"token": t})
           .setExtraHeaders({"Authorization": bearer})
           .build(),
     );
@@ -380,10 +423,20 @@ class SocketService {
       }
     });
 
-    _socket!.onDisconnect((_) {
+    _socket!.on('connect_timeout', (data) {
+      _connectionCtrl.add(false);
+      _registeredOk = false;
+      _emitSocketError(source: 'connect_timeout', err: data ?? 'timeout');
+      if (!_manualDisconnect) _scheduleReconnect();
+    });
+
+    _socket!.onDisconnect((reason) {
       _connectionCtrl.add(false);
 
       _registeredOk = false;
+
+      final detail = _formatSocketError(source: "disconnect", err: reason);
+      AppLogger.log.w(detail);
 
       if (!_manualDisconnect) _scheduleReconnect();
     });
@@ -393,7 +446,7 @@ class SocketService {
 
       _registeredOk = false;
 
-      _chatErrorCtrl.add(err);
+      _emitSocketError(source: "connect_error", err: err);
 
       if (!_manualDisconnect) _scheduleReconnect();
     });
@@ -403,7 +456,7 @@ class SocketService {
 
       _registeredOk = false;
 
-      _chatErrorCtrl.add(err);
+      _emitSocketError(source: "error", err: err);
 
       if (!_manualDisconnect) _scheduleReconnect();
     });
@@ -439,10 +492,30 @@ class SocketService {
     _socket!.on("get_staff_list", (data) => _staffListCtrl.add(data));
   }
 
-  void _scheduleReconnect() {
-    _reconnectTimer?.cancel();
+  void _emitSocketError({required String source, required dynamic err}) {
+    final msg = _formatSocketError(source: source, err: err);
+    _lastSocketError = msg;
+    _chatErrorCtrl.add(msg);
+    AppLogger.log.e(msg);
+  }
 
+  String _formatSocketError({required String source, required dynamic err}) {
+    final detail = (err is Map)
+        ? Map<String, dynamic>.from(err).toString()
+        : (err ?? "").toString();
+
+    final id = _socket?.id?.toString() ?? "";
+    final connected = isConnected;
+    final attempt = _attempt;
+    return "SOCKET[$source] url=$_baseUrl connected=$connected id=$id attempt=$attempt detail=$detail";
+  }
+
+  void _scheduleReconnect() {
     if (_manualDisconnect) return;
+
+    // Avoid spamming retries when both `connect_error` and `error` fire for the
+    // same attempt. If a retry is already scheduled, keep it.
+    if (_reconnectTimer?.isActive == true) return;
 
     _attempt += 1;
 
@@ -456,7 +529,7 @@ class SocketService {
       if (isConnected) return;
 
       try {
-        await _connectBase();
+        await _ensureConnected();
       } catch (e) {
         _chatErrorCtrl.add(e);
 
@@ -472,6 +545,9 @@ class SocketService {
   }
 
   void disconnect() {
+    AppLogger.log.i(
+      "Socket manual disconnect requested. Snapshot=${debugSnapshot()}",
+    );
     _manualDisconnect = true;
 
     _reconnectTimer?.cancel();
@@ -485,6 +561,22 @@ class SocketService {
     _disposeSocketOnly();
 
     _connectionCtrl.add(false);
+  }
+
+  /// Full cleanup for logout: disconnect socket and clear any cached runtime state.
+  void resetForLogout() {
+    AppLogger.log.i(
+      "Socket resetForLogout called. lastSocketError=$_lastSocketError snapshot=${debugSnapshot()}",
+    );
+    try {
+      disconnect();
+    } catch (_) {}
+    registeredStaffMongoId = null;
+    _pendingStaffMemberId = null;
+    _lastRegisterEvent = null;
+    _registeredOk = false;
+    _attempt = 0;
+    _lastSocketError = null;
   }
 
   void _disposeSocketOnly() {
