@@ -24,5 +24,10 @@ class StaffRegisterResponse {
     );
   }
 
-  bool get isSuccess => status && otp != null && otpExpiresTime != null;
+  /// Some endpoints only return `{status, message}` (no OTP). In those cases,
+  /// `status=true` should still be treated as success and allow navigation.
+  bool get isSuccess => status;
+
+  /// For OTP flows, check this when you actually need OTP metadata.
+  bool get hasOtp => otp != null && otp!.trim().isNotEmpty && otpExpiresTime != null;
 }

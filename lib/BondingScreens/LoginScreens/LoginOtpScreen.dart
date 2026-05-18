@@ -6,7 +6,6 @@ import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../BottomNavBar/BottomNavBar.dart';
@@ -45,8 +44,6 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
     _focusNode.dispose();
     super.dispose();
   }
-
-  bool _isValidOtp(String otp) => RegExp(r'^\d{4}$').hasMatch(otp);
 
   @override
   Widget build(BuildContext context) {
@@ -108,36 +105,38 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         ),
 
                         // Transparent TextField for input
-                      //   Positioned(
-                      //     top: 0,
-                      //     left: 0,
-                      //     right: 0,
-                      //     child: GestureDetector(
-                      //       onTap: () => _focusNode.requestFocus(),
-                      //       child: Container(
-                      //         height: 70, // Match heart height
-                      //         color: Colors.transparent,
-                      //         child: TextField(
-                      //           controller: _otpController,
-                      //           focusNode: _focusNode,
-                      //           keyboardType: TextInputType.number,
-                      //           maxLength: 4,
-                      //           style: const TextStyle(
-                      //             fontSize: 1, // Very small text (invisible)
-                      //             color: Colors.transparent,
-                      //           ),
-                      //           cursorColor: Colors.transparent,
-                      //           decoration: const InputDecoration(
-                      //             border: InputBorder.none,
-                      //             counterText: '',
-                      //             contentPadding: EdgeInsets.zero,
-                      //           ),
-                      //           onChanged: (_) => setState(() {}),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // 
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () => _focusNode.requestFocus(),
+                            child: SizedBox(
+                              height: 70, // match heart height
+                              child: TextField(
+                                controller: _otpController,
+                                focusNode: _focusNode,
+                                keyboardType: TextInputType.number,
+                                maxLength: 4,
+                                autofillHints: const [AutofillHints.oneTimeCode],
+                                enableSuggestions: false,
+                                autocorrect: false,
+                                style: const TextStyle(
+                                  fontSize: 1, // invisible
+                                  color: Colors.transparent,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                cursorColor: Colors.transparent,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  counterText: '',
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
 

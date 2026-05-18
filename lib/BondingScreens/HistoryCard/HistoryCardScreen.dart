@@ -19,6 +19,7 @@ import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:zego_uikit/zego_uikit.dart';
 
 class HistoryCard extends StatefulWidget {
   const HistoryCard({super.key});
@@ -30,6 +31,14 @@ class HistoryCard extends StatefulWidget {
 class _HistoryCardState extends State<HistoryCard> {
   final TextEditingController _searchCtrl = TextEditingController();
   String _query = '';
+
+  bool _isCallServiceReady() {
+    try {
+      return ZegoUIKit().getLocalUser().id.trim().isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
 
   Future<void> _showAvatarPreview({
     required BuildContext context,
@@ -360,13 +369,13 @@ class _HistoryCardState extends State<HistoryCard> {
                           ),
                           child: TextField(
                             controller: _searchCtrl,
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white, fontSize: 15),
                             onChanged: (v) => setState(() => _query = v),
                             decoration: const InputDecoration(
                               hintText: "Search by name or type",
                               hintStyle: TextStyle(
                                 color: Color(0xFFc7c7cc),
-                                fontSize: 16,
+                                fontSize: 15,
                               ),
                               prefixIcon: Icon(
                                 Icons.search,
@@ -458,7 +467,12 @@ class _HistoryCardState extends State<HistoryCard> {
                                   ),
                                 );
 
-                                return _historyCard(context, staff, item);
+                                return _historyCard(
+                                  context,
+                                  staff,
+                                  item,
+                                  callReady: _isCallServiceReady(),
+                                );
                               },
                             ),
                           ),
@@ -475,7 +489,9 @@ class _HistoryCardState extends State<HistoryCard> {
   Widget _historyCard(
     BuildContext context,
     StaffDataProfile staff,
-    UserCallHistoryItem history,
+    UserCallHistoryItem history, {
+    required bool callReady,
+  }
   ) {
     final age = staff.age; // uses your getter
     final typeLabel = history.callType.name.toUpperCase();
@@ -624,7 +640,7 @@ class _HistoryCardState extends State<HistoryCard> {
                 children: [
                   Expanded(
                     child: _GlassCallButton(
-                      enabled: staff.audioCallRatePerMinute > 0,
+                      enabled: callReady && staff.audioCallRatePerMinute > 0,
                       text: "${staff.audioCallRatePerMinute}/min",
                       pricePerMin: staff.audioCallRatePerMinute,
                       isVideoCall: false,
@@ -638,7 +654,7 @@ class _HistoryCardState extends State<HistoryCard> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _GlassCallButton(
-                      enabled: staff.videoCallRatePerMinute > 0,
+                      enabled: callReady && staff.videoCallRatePerMinute > 0,
                       text: "${staff.videoCallRatePerMinute}/min",
                       pricePerMin: staff.videoCallRatePerMinute,
                       isVideoCall: true,

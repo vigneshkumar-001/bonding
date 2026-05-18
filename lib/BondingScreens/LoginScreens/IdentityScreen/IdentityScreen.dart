@@ -151,10 +151,18 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: nameController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Enter your name",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
                         border: OutlineInputBorder(
@@ -179,10 +187,18 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       onTap: () => _selectDate(context),
                       controller: dobController,
                       readOnly: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                       decoration: InputDecoration(
                         hintText: "DD/MM/YYYY",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
                         suffixIcon: Padding(
@@ -212,11 +228,19 @@ class _IdentityScreenState extends State<IdentityScreen> {
                     TextField(
                       controller: bioController,
                       maxLines: 4,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                       decoration: InputDecoration(
                         hintText:
                             "Ex: A coffee lover who enjoys late-night conversations.",
-                        hintStyle: const TextStyle(color: Colors.white70),
+                        hintStyle: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
                         border: OutlineInputBorder(
@@ -269,7 +293,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
 
                               final success = await vm.updateBioData(
                                 name: name,
-                                gender: '',
+                                gender: gender,
                                 dob: dob,
                                 bio: bio,
                               );

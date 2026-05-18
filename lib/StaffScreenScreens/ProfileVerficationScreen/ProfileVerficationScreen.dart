@@ -31,8 +31,9 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
   @override
   void initState() {
     super.initState();
-    idTypeController.text = "Aadhar Card"; // Default selection
-    _selectedIdType = "Aadhar Card";
+    // Optional step: keep empty by default; user may skip verification.
+    idTypeController.text = "";
+    _selectedIdType = null;
     idNumberController.addListener(_validateIdNumber);
   }
 
@@ -48,6 +49,13 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
     final value = idNumberController.text.trim();
     String? error;
 
+    // Optional: if user hasn't selected type and hasn't entered number, no error.
+    if ((_selectedIdType == null || _selectedIdType!.trim().isEmpty) &&
+        value.isEmpty) {
+      setState(() => _idNumberError = null);
+      return;
+    }
+
     if (_selectedIdType == "Aadhar Card") {
       if (value.isEmpty) {
         error = "Please enter Aadhaar number";
@@ -60,6 +68,10 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
       } else if (value.length != 10 ) {
         error = "Invalid PAN format (e.g., ABCDE1234F)";
       }
+    } else {
+      if (value.isNotEmpty) {
+        error = "Please select ID type";
+      }
     }
 
     setState(() {
@@ -71,8 +83,11 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
     final idType = idTypeController.text.trim();
     final idNumber = idNumberController.text.trim();
 
-    if (idType.isEmpty) return false;
-    if (idNumber.isEmpty) return false;
+    // Optional flow:
+    // - If both empty => allow continue (skip verification)
+    // - If one is filled => require the other and validate
+    if (idType.isEmpty && idNumber.isEmpty) return true;
+    if (idType.isEmpty || idNumber.isEmpty) return false;
 
     if (idType == "Aadhar Card") {
       return idNumber.length == 12 && RegExp(r'^\d{12}$').hasMatch(idNumber);
@@ -198,7 +213,7 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
                     const SizedBox(height: 32),
 
                     // ─── ID Type Dropdown ──────────────────────────────────────
-                    AppText("ID Type:", color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                    AppText("ID Type (Optional):", color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => _showIDTypeDropdown(context),
@@ -206,10 +221,18 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
                         child: TextField(
                           controller: idTypeController,
                           readOnly: true,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
                           decoration: InputDecoration(
-                            hintText: "Select ID Type",
-                            hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                            hintText: "Select ID Type (optional)",
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFc7c7cc),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
                             filled: true,
                             fillColor: const Color(0xFF231d1d),
                             suffixIcon: Padding(
@@ -232,17 +255,29 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
                     const SizedBox(height: 24),
 
                     // ─── ID Number with Real-time Validation ──────────────────
-                    AppText("ID Number:", color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                    AppText("ID Number (Optional):", color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
                       controller: idNumberController,
                       keyboardType: _selectedIdType == "Aadhar Card" ? TextInputType.text : TextInputType.text,
                       textCapitalization: _selectedIdType == "Pan Card" ? TextCapitalization.characters : TextCapitalization.none,
                       maxLength: _selectedIdType == "Aadhar Card" ? 12 : 10,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                       decoration: InputDecoration(
-                        hintText: _selectedIdType == "Aadhar Card" ? "Enter 12-digit Aadhaar" : "Enter PAN (e.g., ABCDE1234F)",
-                        hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                        hintText: _selectedIdType == "Aadhar Card"
+                            ? "Enter 12-digit Aadhaar"
+                            : (_selectedIdType == "Pan Card"
+                                ? "Enter PAN (e.g., ABCDE1234F)"
+                                : "Enter ID Number (optional)"),
+                        hintStyle: const TextStyle(
+                          color: Color(0xFFc7c7cc),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
                         errorText: _idNumberError,
@@ -301,29 +336,61 @@ class _ProfileVerficationScreenState extends State<ProfileVerficationScreen> {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: GestureDetector(
-                onTap: vm.isVerifyingId || !_isFormValid
+                onTap: vm.isVerifyingId
                     ? null
                     : () async {
-                  final success = await vm.verifyStaffId(
-                    idType: idTypeController.text.trim(),
-                    idNumber: idNumberController.text.trim(),
-                  );
+                        final idType = idTypeController.text.trim();
+                        final idNumber = idNumberController.text.trim();
 
-                  if (success) {
-                    bondNavigator.newPage(
-                      context,
-                      page: const LiveVerificationScreen(),
-                    );
-                  } else {
-                    Utils.snackBarErrorMessage("ID verification failed. Please try again.");
-                  }
-                },
+                        // Skip verification completely if user leaves both empty.
+                        if (idType.isEmpty && idNumber.isEmpty) {
+                          bondNavigator.newPage(
+                            context,
+                            page: const LiveVerificationScreen(),
+                          );
+                          return;
+                        }
+
+                        // If user started filling, require both.
+                        if (idType.isEmpty || idNumber.isEmpty) {
+                          Utils.snackBarErrorMessage(
+                            "Please select ID type and enter ID number (or leave both empty to skip).",
+                          );
+                          return;
+                        }
+
+                        // Validate locally before calling API
+                        if (!_isFormValid) {
+                          Utils.snackBarErrorMessage(
+                            _idNumberError ?? "Please enter a valid ID number",
+                          );
+                          return;
+                        }
+
+                        final success = await vm.verifyStaffId(
+                          idType: idType,
+                          idNumber: idNumber,
+                        );
+
+                        if (success) {
+                          bondNavigator.newPage(
+                            context,
+                            page: const LiveVerificationScreen(),
+                          );
+                        } else {
+                          Utils.snackBarErrorMessage(
+                            vm.idVerifyError?.trim().isNotEmpty == true
+                                ? vm.idVerifyError!.trim()
+                                : "ID verification failed. Please try again.",
+                          );
+                        }
+                      },
                 child: Container(
                   height: 52,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    gradient: (vm.isVerifyingId || !_isFormValid)
+                    gradient: (vm.isVerifyingId)
                         ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
                         : const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)]),
                   ),

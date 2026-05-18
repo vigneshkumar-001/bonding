@@ -127,6 +127,54 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
     return true;
   }
 
+  void _showPrettySnack(BuildContext context, {required String message, bool isError = false}) {
+    final bg = isError
+        ? const LinearGradient(colors: [Color(0xFFB00020), Color(0xFFFF6A6A)])
+        : Apptheme.buttonGradient;
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: bg,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isError ? Icons.error_outline : Icons.check_circle_outline,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StaffViewModel>(
@@ -187,10 +235,18 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: nameController,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         decoration: InputDecoration(
                           hintText: "Enter your name",
-                          hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                          hintStyle: const TextStyle(
+                            color: Color(0xFFc7c7cc),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
                           filled: true,
                           fillColor: const Color(0xFF231d1d),
                           border: OutlineInputBorder(
@@ -215,10 +271,18 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                         onTap: () => _selectDate(context),
                         controller: dobController,
                         readOnly: true,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         decoration: InputDecoration(
                           hintText: "DD/MM/YYYY",
-                          hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                          hintStyle: const TextStyle(
+                            color: Color(0xFFc7c7cc),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
                           filled: true,
                           fillColor: const Color(0xFF231d1d),
                           suffixIcon: Padding(
@@ -253,12 +317,24 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       readOnly:
                           widget.prefillPhone != null &&
                           widget.prefillPhone!.trim().isNotEmpty,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Enter 10-digit number",
-                        hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                        hintStyle: const TextStyle(
+                          color: Color(0xFFc7c7cc),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         prefixText: "+91 ",
-                        prefixStyle: const TextStyle(color: Colors.white),
+                        prefixStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF231d1d),
                         border: OutlineInputBorder(
@@ -281,10 +357,18 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         decoration: InputDecoration(
                           hintText: "xyz@gmail.com",
-                          hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                          hintStyle: const TextStyle(
+                            color: Color(0xFFc7c7cc),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
                           filled: true,
                           fillColor: const Color(0xFF231d1d),
                           border: OutlineInputBorder(
@@ -307,10 +391,18 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: cityController,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                         decoration: InputDecoration(
                           hintText: "Enter your city",
-                          hintStyle: const TextStyle(color: Color(0xFFc7c7cc)),
+                          hintStyle: const TextStyle(
+                            color: Color(0xFFc7c7cc),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
                           filled: true,
                           fillColor: const Color(0xFF231d1d),
                           border: OutlineInputBorder(
@@ -379,11 +471,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
                                   );
                                 }
                               } else {
-                                Utils.snackBarErrorMessage(
-                                  isLoginMode
-                                      ? "OTP request failed. Please try again."
-                                      : "Registration failed. Please try again.",
-                                );
+                                final msg = vm.errorMessage?.trim().isNotEmpty == true
+                                    ? vm.errorMessage!.trim()
+                                    : (vm.registerResponse?.message.trim().isNotEmpty == true
+                                        ? vm.registerResponse!.message.trim()
+                                        : (isLoginMode
+                                            ? "OTP request failed. Please try again."
+                                            : "Registration failed. Please try again."));
+                                _showPrettySnack(context, message: msg, isError: true);
                               }
 
                               // if (success) {
