@@ -85,7 +85,7 @@ class _SplashScreen2State extends State<SplashScreen2> {
                                     ),
                                   ),
                               child: const Text(
-                                "TwoOfUs",
+                                "Twoofus",
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,

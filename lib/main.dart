@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
       providers: getAllProviders(),
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        title: 'TwoOfUs',
+        title: 'Twoofus',
         debugShowCheckedModeBanner: false,
         theme: Apptheme.lightThemeData,
         darkTheme: Apptheme.darkThemeData,
