@@ -1,11 +1,9 @@
-import 'package:bonding_app/BondingScreens/BottomNavBar/BottomNavBar.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/LoginScreen.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/StaffRegistrationScreens.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AccountSelectScreen extends StatefulWidget {
   const AccountSelectScreen({super.key});
@@ -58,38 +56,44 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
               const SizedBox(height: 50),
 
               // Account Type Cards
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // User Card
-                  _buildAccountCard(
-                    height: 120,
-                    imagePath: "assets/Images/men.png",
-                    label: "Men",
-                    isSelected: selectedAccount == 1,
-                    onTap: () {
-                      setState(() {
-                        selectedAccount = 1;
-                      });
-                    },
-                  ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final useCompactCards = constraints.maxWidth < 360;
+                  final cardHeight = useCompactCards ? 96.0 : 120.0;
 
-                  const SizedBox(width: 30),
+                  return Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: useCompactCards ? 16 : 30,
+                    runSpacing: 16,
+                    children: [
+                      // User Card
+                      _buildAccountCard(
+                        height: cardHeight,
+                        imagePath: "assets/Images/men.png",
+                        label: "Men",
+                        isSelected: selectedAccount == 1,
+                        onTap: () {
+                          setState(() {
+                            selectedAccount = 1;
+                          });
+                        },
+                      ),
 
-                  // Staff Card
-                  _buildAccountCard(
-                    height: 120,
-                    imagePath:
-                        "assets/Images/women.png", // Replace with your actual asset
-                    label: "Women",
-                    isSelected: selectedAccount == 2,
-                    onTap: () {
-                      setState(() {
-                        selectedAccount = 2;
-                      });
-                    },
-                  ),
-                ],
+                      // Staff Card
+                      _buildAccountCard(
+                        height: cardHeight,
+                        imagePath: "assets/Images/women.png",
+                        label: "Women",
+                        isSelected: selectedAccount == 2,
+                        onTap: () {
+                          setState(() {
+                            selectedAccount = 2;
+                          });
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
 
               const Spacer(),

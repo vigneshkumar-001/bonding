@@ -33,7 +33,7 @@ class Apptheme {
   /// light theme Color
   static final lightThemeData = ThemeData(
     useMaterial3: true,
-    bottomAppBarTheme: const BottomAppBarTheme(
+    bottomAppBarTheme: const BottomAppBarThemeData(
       color: Color(0xFFD4D4D4),
     ), // Set bottom app bar color to gray
     // Force the app to look consistent even if light theme is used somewhere.
@@ -298,7 +298,7 @@ class Apptheme {
     hoverColor: appColors.userTextDark,
     chipTheme: ChipThemeData(backgroundColor: appColors.SwapArrowRoundDark),
     disabledColor: appColors.hintdark,
-    bottomAppBarTheme: const BottomAppBarTheme(
+    bottomAppBarTheme: const BottomAppBarThemeData(
       color: Color(0xFF141018),
     ), // Set bottom app bar color to black
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(

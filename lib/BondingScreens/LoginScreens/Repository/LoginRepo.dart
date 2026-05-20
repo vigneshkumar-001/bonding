@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:bonding_app/APIService/Remote/network/ApiEndPoints.dart';
 import 'package:bonding_app/APIService/Remote/network/NetworkApiService.dart';
 import 'package:bonding_app/BondingScreens/AuthService.dart';
-import 'package:bonding_app/BondingScreens/HomeScreen/Model/StaffDataModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/Model/ProfileModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/IdentityScreen/Model/IdentifyModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestLanguage/Model/LanguageModel.dart';
@@ -13,7 +12,6 @@ import 'package:bonding_app/BondingScreens/LoginScreens/Model/LoginModel.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/Model/VerifyOtpModel.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
 
 class AuthRepository {
   final NetworkApiService _apiService = NetworkApiService();
@@ -30,11 +28,11 @@ class AuthRepository {
         body: body,
       );
 
-      if (kDebugMode) {
-        print("Send OTP Response: $response");
-      }
-
       final signupResp = SignupResponse.fromJson(response);
+
+      if (kDebugMode) {
+        AppLogger.log.i("Send OTP response received");
+      }
 
       if (signupResp.status == true) {
         return signupResp;
@@ -67,12 +65,11 @@ class AuthRepository {
         body: body,
       );
 
-      if (kDebugMode) {
-        print("Verify OTP Response: $response");
-        AppLogger.log.i("Verify OTP Response: ${response.toString()}");
-      }
-
       final verifyResp = VerifyOtpResponse.fromJson(response);
+
+      if (kDebugMode) {
+        AppLogger.log.i("Verify OTP response received");
+      }
 
       if (verifyResp.isSuccess) {
         // Optional: save token & user data here (shared_preferences / secure storage)
@@ -102,11 +99,11 @@ class AuthRepository {
         body: body,
       );
 
-      if (kDebugMode) {
-        print("Verify OTP Response: $response");
-      }
-
       final verifyResp = VerifyOtpResponse.fromJson(response);
+
+      if (kDebugMode) {
+        AppLogger.log.i("Staff verify OTP response received");
+      }
 
       if (verifyResp.isSuccess) {
         // Optional: save token & user data here (shared_preferences / secure storage)
@@ -132,22 +129,22 @@ class AuthRepository {
 
         AppLogger.log.i(
           'updateProfileImage() -> '
-              'endpoint: $endpoint, '
-              'fieldName: image, '
-              'token: ${token == null ? "null" : "len=${token.length}"}, '
-              'filePath: ${imageFile.path}, '
-              'fileName: $fileName, '
-              'fileSizeBytes: ${imageFile.lengthSync()}',
+          'endpoint: $endpoint, '
+          'fieldName: image, '
+          'token: ${token == null ? "null" : "len=${token.length}"}, '
+          'filePath: ${imageFile.path}, '
+          'fileName: $fileName, '
+          'fileSizeBytes: ${imageFile.lengthSync()}',
         );
 
         print(
           'updateProfileImage() ->\n'
-              'endpoint: $endpoint\n'
-              'fieldName: image\n'
-              'token: ${token == null ? "null" : "len=${token.length}"}\n'
-              'filePath: ${imageFile.path}\n'
-              'fileName: $fileName\n'
-              'fileSizeBytes: ${imageFile.lengthSync()}\n',
+          'endpoint: $endpoint\n'
+          'fieldName: image\n'
+          'token: ${token == null ? "null" : "len=${token.length}"}\n'
+          'filePath: ${imageFile.path}\n'
+          'fileName: $fileName\n'
+          'fileSizeBytes: ${imageFile.lengthSync()}\n',
         );
       }
 

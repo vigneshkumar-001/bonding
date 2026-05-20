@@ -9,16 +9,24 @@ class AuthService {
   static const String _keyToken = 'auth_token';
   static const String _keyUserId = 'user_id';
   static const String _keyPhone = 'user_phone';
+  static const String _keyAccountType = 'account_type';
+
+  static const String accountTypeUser = 'user';
+  static const String accountTypeStaff = 'staff';
 
   static Future<void> saveLoginData({
     required String token,
     String? userId,
     String? phone,
+    String? accountType,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyToken, token);
     if (userId != null) await prefs.setString(_keyUserId, userId);
     if (phone != null) await prefs.setString(_keyPhone, phone);
+    if (accountType != null && accountType.trim().isNotEmpty) {
+      await prefs.setString(_keyAccountType, accountType.trim().toLowerCase());
+    }
   }
 
   static Future<String?> getToken() async {
@@ -30,6 +38,11 @@ class AuthService {
     final token = await getToken();
     print("Token ::::::: $token");
     return token != null && token.isNotEmpty;
+  }
+
+  static Future<String?> getAccountType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyAccountType);
   }
 
   // ✅ Logout / clear + disconnect services
@@ -76,6 +89,7 @@ class AuthService {
     await prefs.remove(_keyToken);
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyPhone);
+    await prefs.remove(_keyAccountType);
 
     print("✅ Auth cleared");
   }

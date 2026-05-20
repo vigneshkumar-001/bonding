@@ -1,8 +1,3 @@
-import 'dart:ui';
-
-import 'package:bonding_app/BondingScreens/Chat/ChatListScreen.dart';
-import 'package:bonding_app/BondingScreens/HomeScreen/Socket.dart';
-import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
@@ -11,23 +6,18 @@ import 'package:bonding_app/StaffScreenScreens/StaffDashBoardScreen/Model/StaffS
 import 'package:bonding_app/StaffScreenScreens/StaffProfileScreen/staffProfileScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
 import 'package:bonding_app/StaffScreenScreens/WalletFlow/WalletScreen/WalletScreen.dart';
-import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/StaffWithdrawScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.dart';
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawRequestScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
 import '../../BondingScreens/SupportScreen/support_screen.dart';
-import '../SupportScreen/support_screen.dart';
 
 class BondingDashboardPage extends StatefulWidget {
   const BondingDashboardPage({super.key});
@@ -191,7 +181,11 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
     final staffVM = context.read<StaffViewModel>();
 
     try {
-      await Future.wait([staffVM.fetchStaffSingleData()]);
+      await Future.wait([
+        staffVM.fetchStaffSingleData(),
+        staffVM.fetchStaffCallStats(),
+        staffVM.fetchWeeklyCallGraph(),
+      ]);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -467,7 +461,12 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
           }
 
           final dayOrder = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          final callMap = {for (var d in vm.weeklyCallGraph) d.day: d.calls};
+          final callMap = <String, int>{};
+          for (final d in vm.weeklyCallGraph) {
+            final day = _normalizeDay(d.day);
+            if (day == null) continue;
+            callMap[day] = (callMap[day] ?? 0) + d.calls;
+          }
           final orderedCalls = dayOrder
               .map((day) => callMap[day] ?? 0)
               .toList();
@@ -698,6 +697,37 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
         ),
       ),
     );
+  }
+}
+
+String? _normalizeDay(String value) {
+  switch (value.trim().toLowerCase()) {
+    case 'sun':
+    case 'sunday':
+      return 'Sun';
+    case 'mon':
+    case 'monday':
+      return 'Mon';
+    case 'tue':
+    case 'tues':
+    case 'tuesday':
+      return 'Tue';
+    case 'wed':
+    case 'wednesday':
+      return 'Wed';
+    case 'thu':
+    case 'thur':
+    case 'thurs':
+    case 'thursday':
+      return 'Thu';
+    case 'fri':
+    case 'friday':
+      return 'Fri';
+    case 'sat':
+    case 'saturday':
+      return 'Sat';
+    default:
+      return null;
   }
 }
 

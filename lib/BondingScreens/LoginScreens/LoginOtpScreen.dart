@@ -26,14 +26,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
   @override
   void initState() {
     super.initState();
-    // Delay to ensure context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vm = Provider.of<LoginViewModel>(context, listen: false);
-
-      if (vm.autoOtp != null) {
-        _otpController.text = vm.autoOtp!;
-        setState(() {}); // refresh hearts
-      }
       _focusNode.requestFocus();
     });
   }
@@ -54,7 +47,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
+            decoration: const BoxDecoration(
+              gradient: Apptheme.backgroundGradient,
+            ),
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -118,7 +113,9 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                                 focusNode: _focusNode,
                                 keyboardType: TextInputType.number,
                                 maxLength: 4,
-                                autofillHints: const [AutofillHints.oneTimeCode],
+                                autofillHints: const [
+                                  AutofillHints.oneTimeCode,
+                                ],
                                 enableSuggestions: false,
                                 autocorrect: false,
                                 style: const TextStyle(

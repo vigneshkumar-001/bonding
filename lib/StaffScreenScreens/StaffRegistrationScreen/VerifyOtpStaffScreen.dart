@@ -1,13 +1,10 @@
-import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
-import 'package:bonding_app/StaffScreenScreens/ProfileVerficationScreen/ProfileVerficationScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../StaffBottomNavBar/StaffBottomNavBar.dart';
@@ -25,7 +22,6 @@ class LoginOtpStaffScreen extends StatefulWidget {
 class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  bool _keyboardVisible = false;
 
   @override
   void initState() {
@@ -43,20 +39,8 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
     // });
   }
 
-  void _handleOtpFill() {
-    final vm = Provider.of<LoginViewModel>(context, listen: false);
-
-    if (vm.autoOtp != null && _otpController.text != vm.autoOtp) {
-      _otpController.text = vm.autoOtp!;
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
-    final vm = Provider.of<LoginViewModel>(context, listen: false);
-    vm.removeListener(_handleOtpFill);
-
     _otpController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -141,6 +125,9 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                             autofocus: true,
                             keyboardType: TextInputType.number,
                             maxLength: 4,
+                            autofillHints: const [AutofillHints.oneTimeCode],
+                            enableSuggestions: false,
+                            autocorrect: false,
                             style: const TextStyle(
                               fontSize: 1,
                               color: Colors.transparent,

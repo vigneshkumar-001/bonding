@@ -25,10 +25,9 @@ class LoginViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   SignupResponse? get signupResponse => _signupResponse;
-  String? get autoOtp => _signupResponse?.otp?.toString(); // 👈 ADD
+  String? get autoOtp => null;
 
-  String? _autoOtp;
-  String? get autoOtp1 => _autoOtp;
+  String? get autoOtp1 => null;
   // ─── New fields for verify OTP ─────────────────────────────────
   VerifyOtpResponse? _verifyResponse;
   bool _isVerifying = false;
@@ -48,7 +47,6 @@ class LoginViewModel extends ChangeNotifier {
 
     try {
       _signupResponse = await _authRepo.sendOtp(phone);
-      _autoOtp = _signupResponse?.otp?.toString(); // ⭐ ADD
 
       _isLoading = false;
       notifyListeners();
@@ -61,7 +59,7 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-/*  Future<bool> verifyOtp(String phone, String otp) async {
+  /*  Future<bool> verifyOtp(String phone, String otp) async {
     _isVerifying = true;
     _verifyError = null;
     notifyListeners();
@@ -76,6 +74,7 @@ class LoginViewModel extends ChangeNotifier {
           token: _verifyResponse!.token!,
           userId: _verifyResponse!.user?.id,
           phone: phone,
+          accountType: AuthService.accountTypeUser,
         );
       }
 
@@ -90,7 +89,7 @@ class LoginViewModel extends ChangeNotifier {
     }
   }*/
 
-/*  Future<bool> staffVerifyOtp(String phone, String otp) async {
+  /*  Future<bool> staffVerifyOtp(String phone, String otp) async {
     _isVerifying = true;
     _verifyError = null;
 
@@ -106,6 +105,7 @@ class LoginViewModel extends ChangeNotifier {
           token: _verifyResponse!.token!,
           userId: _verifyResponse!.user?.id,
           phone: phone,
+          accountType: AuthService.accountTypeStaff,
         );
       }
 
@@ -153,6 +153,7 @@ class LoginViewModel extends ChangeNotifier {
       return false;
     }
   }
+
   Future<bool> staffVerifyOtp(String phone, String otp) async {
     _isVerifying = true;
     _verifyError = null;
@@ -276,7 +277,7 @@ class LoginViewModel extends ChangeNotifier {
         Utils.snackBar("Selfie uploaded successfully!");
         return true;
       } else {
-        _uploadError = response.message ?? "Upload failed";
+        _uploadError = response.message;
         return false;
       }
     } catch (e) {
