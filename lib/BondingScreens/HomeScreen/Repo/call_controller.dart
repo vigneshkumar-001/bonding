@@ -54,6 +54,17 @@ class CallController extends ChangeNotifier {
     }
   }
 
+  void _safeSnack(BuildContext context, String message) {
+    if (!context.mounted) return;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    try {
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    } catch (_) {
+      // Ignore: context could be deactivated while async work completes.
+    }
+  }
+
   // ─────────────────────────────────────────────
   // Public: Common START CALL (Audio/Video)
   // ─────────────────────────────────────────────
@@ -67,27 +78,23 @@ class CallController extends ChangeNotifier {
     required String targetUserName,
     required String targetStaffMongoId, // staff._id (mongo)
   }) async {
+    if (!context.mounted) return;
+
     final userVM = context.read<UserViewModel>();
     final balance = userVM.currentUser?.coinBalance ?? 0;
 
     if (!enabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Call service still connecting, try again.")),
-      );
+      _safeSnack(context, "Call service still connecting, try again.");
       return;
     }
 
     if (!isTargetOnline) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User is offline")),
-      );
+      _safeSnack(context, "User is offline");
       return;
     }
 
     if (balance < pricePerMin) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Insufficient balance")),
-      );
+      _safeSnack(context, "Insufficient balance");
       return;
     }
 
@@ -97,11 +104,11 @@ class CallController extends ChangeNotifier {
       if (isVideoCall) Permission.camera,
     ].request();
 
+    if (!context.mounted) return;
+
     if (!statuses[Permission.microphone]!.isGranted ||
         (isVideoCall && !statuses[Permission.camera]!.isGranted)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Permissions required")),
-      );
+      _safeSnack(context, "Permissions required");
       return;
     }
 
@@ -118,9 +125,8 @@ class CallController extends ChangeNotifier {
     );
 
     if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to send invitation")),
-      );
+      if (!context.mounted) return;
+      _safeSnack(context, "Failed to send invitation");
       return;
     }
 
@@ -135,6 +141,7 @@ class CallController extends ChangeNotifier {
 
     notifyListeners();
 
+    if (!context.mounted) return;
     _startInviteTimeoutTimer(context);
   }
 
@@ -148,6 +155,8 @@ class CallController extends ChangeNotifier {
     required bool isVideoCall,
     required int pricePerMin,
   }) async {
+    if (!context.mounted) return false;
+
     final userVM = context.read<UserViewModel>();
     final myVmId = (userVM.currentUser?.memberID ?? '').trim();
 
@@ -166,9 +175,7 @@ class CallController extends ChangeNotifier {
 
     // important guard
     if (_zegoLocalId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Call service still connecting. Try again.")),
-      );
+      _safeSnack(context, "Call service still connecting. Try again.");
       return false;
     }
 
@@ -232,9 +239,7 @@ class CallController extends ChangeNotifier {
       ZegoUIKit().leaveRoom();
       handleCallEnd(context, staffMongoId: _staffMongoId, isVideoCall: _isCurrentCallVideo);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Call ended: Time limit reached")),
-      );
+      _safeSnack(context, "Call ended: Time limit reached");
     });
   }
 
