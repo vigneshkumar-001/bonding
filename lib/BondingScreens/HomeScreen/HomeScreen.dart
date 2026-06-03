@@ -126,9 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Colors.white.withOpacity(0.05),
                     ],
                   ),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.18),
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.18)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -240,7 +238,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _homeReceiveSub ??= socketService.receiveMessageStream.listen((data) async {
       if (data is! Map) return;
       final m = Map<String, dynamic>.from(data);
-      final senderRole = (m["senderRole"] ?? "").toString().toLowerCase().trim();
+      final senderRole = (m["senderRole"] ?? "")
+          .toString()
+          .toLowerCase()
+          .trim();
       if (senderRole != "staff") return;
 
       final staffMongoId = (m["staffId"] ?? "").toString().trim();
@@ -968,58 +969,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () async {
-                        final userVM = Provider.of<UserViewModel>(
-                          context,
-                          listen: false,
-                        );
-                        final currentUser = userVM.currentUser;
-                        if (currentUser == null) return;
-
-                        final connected =
-                            await ZimConnectionService.ensureConnected(
-                              context,
-                              userId: currentUser.memberID,
-                              userName: currentUser.name ?? "User",
-                            );
-                        if (!connected) return;
-
-                        final staffId = staff.id; // staff mongo _id
-                        final userId = currentUser.id; // user mongo _id
-                        final staffName = staff.name ?? "Women";
-
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                ChangeNotifierProvider<ChatProviderVm>(
-                                  create: (_) =>
-                                      ChatProviderVm(
-                                        repo: ChatRepository(
-                                          NetworkApiService(),
-                                        ),
-                                      )..initChat(
-                                        staffId: staffId,
-                                        userId: userId,
-                                        isStaff: false,
-                                      ), // ✅ history + socket init
-                                  child: ChatDetailScreen(
-                                    isBlocked: false,
-                                    staffImage: staff.image ?? '',
-                                    staffId: staffId,
-                                    staffName: staffName,
-                                    userId: userId,
-                                    staffMemberId: staff.memberID,
-                                    audioRatePerMin:
-                                        staff.audioCallRatePerMinute,
-                                    videoRatePerMin:
-                                        staff.videoCallRatePerMinute,
-                                  ),
-                                ),
-                          ),
-                        );
-                        await _refreshCallApprovals();
-                      },
+                      onTap: () => _openStaffChat(context, staff),
                       child: Container(
                         height: 44,
                         width: 44,
@@ -1116,59 +1066,270 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<bool> _showConnectionPreview(
+    BuildContext context,
+    StaffDataProfile staff,
+  ) async {
+    final age = _calculateAgeFromDOB(staff.dob ?? '');
+    final name = staff.name.trim().isNotEmpty ? staff.name.trim() : "Profile";
+    final bio = (staff.bio ?? '').trim().isNotEmpty
+        ? staff.bio!.trim()
+        : "This profile is available for a moderated one-to-one chat.";
+    final interests = staff.areaOfInterest
+        .map((item) => (item.title ?? '').trim())
+        .where((title) => title.isNotEmpty)
+        .take(4)
+        .toList();
+
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF21131B),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Colors.white.withOpacity(0.14)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.35),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 34,
+                      backgroundImage:
+                          (staff.image != null && staff.image!.isNotEmpty)
+                          ? NetworkImage(staff.image!)
+                          : const AssetImage(
+                                  "assets/Images/videocallprofile.png",
+                                )
+                                as ImageProvider,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            age == null ? name : "$name, $age",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.circle,
+                                size: 10,
+                                color: staff.isOnline
+                                    ? Colors.green
+                                    : Colors.redAccent,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                staff.isOnline ? "Online" : "Offline",
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  "Review this profile before connecting. You can start the chat, decline, or skip this profile.",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  bio,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.35,
+                  ),
+                ),
+                if (interests.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: interests
+                        .map(
+                          (title) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.12),
+                              ),
+                            ),
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(sheetContext, "skip"),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.22),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text("Skip"),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(sheetContext, "decline"),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.redAccent),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text("Decline"),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(sheetContext, "accept"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE95BA8),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      "Start Chat",
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    return choice == "accept";
+  }
+
+  Future<void> _openStaffChat(
+    BuildContext context,
+    StaffDataProfile staff,
+  ) async {
+    final accepted = await _showConnectionPreview(context, staff);
+    if (!accepted || !mounted || !context.mounted) return;
+
+    final userVM = Provider.of<UserViewModel>(context, listen: false);
+    final currentUser = userVM.currentUser;
+    if (currentUser == null) return;
+
+    final connected = await ZimConnectionService.ensureConnected(
+      context,
+      userId: currentUser.memberID,
+      userName: currentUser.name ?? "User",
+    );
+    if (!connected || !mounted || !context.mounted) return;
+
+    final staffId = staff.id;
+    final userId = currentUser.id;
+    final staffName = staff.name.trim().isNotEmpty ? staff.name : "Profile";
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
+          create: (_) =>
+              ChatProviderVm(repo: ChatRepository(NetworkApiService()))
+                ..initChat(staffId: staffId, userId: userId, isStaff: false),
+          child: ChatDetailScreen(
+            isBlocked: false,
+            staffImage: staff.image ?? '',
+            staffId: staffId,
+            staffName: staffName,
+            userId: userId,
+            staffMemberId: staff.memberID,
+            audioRatePerMin: staff.audioCallRatePerMinute,
+            videoRatePerMin: staff.videoCallRatePerMinute,
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || !context.mounted) return;
+
+    try {
+      await context.read<StaffViewModel>().fetchStaffDetails();
+    } catch (_) {}
+    await _refreshCallApprovals();
+  }
+
   Widget _iosChatRow(BuildContext context, StaffDataProfile staff) {
     return Row(
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () async {
-              final userVM = Provider.of<UserViewModel>(context, listen: false);
-              final currentUser = userVM.currentUser;
-              if (currentUser == null) return;
-
-              final connected = await ZimConnectionService.ensureConnected(
-                context,
-                userId: currentUser.memberID,
-                userName: currentUser.name ?? "User",
-              );
-              if (!connected) return;
-
-              final staffId = staff.id;
-              final userId = currentUser.id;
-              final staffName = staff.name ?? "Women";
-
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
-                    create: (_) =>
-                        ChatProviderVm(
-                          repo: ChatRepository(NetworkApiService()),
-                        )..initChat(
-                          staffId: staffId,
-                          userId: userId,
-                          isStaff: false,
-                        ),
-                    child: ChatDetailScreen(
-                      isBlocked: false,
-                      staffImage: staff.image ?? '',
-                      staffId: staffId,
-                      staffName: staffName,
-                      userId: userId,
-                      staffMemberId: staff.memberID,
-                      audioRatePerMin: staff.audioCallRatePerMinute,
-                      videoRatePerMin: staff.videoCallRatePerMinute,
-                    ),
-                  ),
-                ),
-              );
-              // Refresh staff list so backend-driven flags (like callEnabled)
-              // reflect immediately after chat reply.
-              try {
-                await context.read<StaffViewModel>().fetchStaffDetails();
-              } catch (_) {}
-              await _refreshCallApprovals();
-            },
+            onTap: () => _openStaffChat(context, staff),
             child: Container(
               height: 46,
               decoration: BoxDecoration(
@@ -1243,48 +1404,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(width: 12),
         GestureDetector(
-          onTap: () async {
-            final userVM = Provider.of<UserViewModel>(context, listen: false);
-            final currentUser = userVM.currentUser;
-            if (currentUser == null) return;
-
-            final connected = await ZimConnectionService.ensureConnected(
-              context,
-              userId: currentUser.memberID,
-              userName: currentUser.name ?? "User",
-            );
-            if (!connected) return;
-
-            final staffId = staff.id; // staff mongo _id
-            final userId = currentUser.id; // user mongo _id
-            final staffName = staff.name ?? "Women";
-
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider<ChatProviderVm>(
-                  create: (_) =>
-                      ChatProviderVm(repo: ChatRepository(NetworkApiService()))
-                        ..initChat(
-                          staffId: staffId,
-                          userId: userId,
-                          isStaff: false,
-                        ), // ✅ history + socket init
-                  child: ChatDetailScreen(
-                    isBlocked: false,
-                    staffImage: staff.image ?? '',
-                    staffId: staffId,
-                    staffName: staffName,
-                    userId: userId,
-                    staffMemberId: staff.memberID,
-                    audioRatePerMin: staff.audioCallRatePerMinute,
-                    videoRatePerMin: staff.videoCallRatePerMinute,
-                  ),
-                ),
-              ),
-            );
-            await _refreshCallApprovals();
-          },
+          onTap: () => _openStaffChat(context, staff),
           child: Container(
             height: 44,
             width: 44,
@@ -1324,9 +1444,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return GestureDetector(
           onTap: () async {
             if (!enabled) {
-              final msg = (disabledMessage ??
-                      "Call service still connecting, try again.")
-                  .trim();
+              final msg =
+                  (disabledMessage ??
+                          "Call service still connecting, try again.")
+                      .trim();
 
               final isChatLock = msg.toLowerCase().contains("chat reply");
               await _showInfoPopup(

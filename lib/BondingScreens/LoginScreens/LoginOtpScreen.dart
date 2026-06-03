@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:bonding_app/BondingScreens/LoginScreens/AddProfile/AddProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
@@ -5,6 +7,7 @@ import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -86,55 +89,58 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // This is the key part: A transparent TextField positioned over the hearts
-                    Stack(
-                      children: [
-                        // Heart display (non-interactive)
-                        Row(
-                          children: [
-                            HeartOtpDisplay(
-                              length: 4,
-                              controller: _otpController,
-                            ),
-                          ],
+                    TextField(
+                      controller: _otpController,
+                      focusNode: _focusNode,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [AutofillHints.oneTimeCode],
+                      maxLength: 4,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(4),
+                      ],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 14,
+                      ),
+                      cursorColor: Color(0xFFB86AF6),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        hintText: '----',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 14,
                         ),
-
-                        // Transparent TextField for input
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () => _focusNode.requestFocus(),
-                            child: SizedBox(
-                              height: 70, // match heart height
-                              child: TextField(
-                                controller: _otpController,
-                                focusNode: _focusNode,
-                                keyboardType: TextInputType.number,
-                                maxLength: 4,
-                                autofillHints: const [
-                                  AutofillHints.oneTimeCode,
-                                ],
-                                enableSuggestions: false,
-                                autocorrect: false,
-                                style: const TextStyle(
-                                  fontSize: 1, // invisible
-                                  color: Colors.transparent,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                cursorColor: Colors.transparent,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  counterText: '',
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                onChanged: (_) => setState(() {}),
-                              ),
-                            ),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.04),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 20,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFB86AF6),
+                            width: 1.5,
                           ),
                         ),
-                      ],
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFB86AF6),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      onTap: () => _focusNode.requestFocus(),
+                      onChanged: (_) => setState(() {}),
                     ),
 
                     // if (vm.verifyError != null) ...[
@@ -162,7 +168,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
 
                               await vm.verifyOtp(widget.phoneNumber, otp);
 
-                              if (!mounted) return;
+                              if (!mounted || !context.mounted) return;
 
                               final response = vm.verifyResponse;
 
@@ -257,7 +263,7 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                               ? const SizedBox(
                                   height: 24,
                                   width: 24,
-                                  child: const AppLoadingIndicator(
+                                  child: AppLoadingIndicator(
                                     color: Colors.white,
                                     strokeWidth: 2.5,
                                   ),
