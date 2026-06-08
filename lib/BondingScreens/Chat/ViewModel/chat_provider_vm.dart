@@ -86,6 +86,7 @@ class ChatProviderVm extends ChangeNotifier {
       final jsonBody = await repo.getChatHistory(
         isStaff: isStaff,
         staffId: _staffId!,
+        userId: _userId!,
         page: page,
         limit: limit,
       );

@@ -47,10 +47,10 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
+                  Color(0xFF17131F),
+                  Color(0xFF241024),
+                  Color(0xFF120C18),
+                  Color(0xFF120C18),
                 ],
               ),
             ),
@@ -204,8 +204,8 @@ class _StaffInterestScreenState extends State<StaffInterestScreen> {
                             gradient: canProceed && !vm.isUpdatingInterests
                                 ? const LinearGradient(
                                     colors: [
-                                      Color(0xFFB86AF6),
-                                      Color(0xFFFF6A6A),
+                                      Color(0xFF7A5CFF),
+                                      Color(0xFFFF5CA8),
                                     ],
                                   )
                                 : const LinearGradient(

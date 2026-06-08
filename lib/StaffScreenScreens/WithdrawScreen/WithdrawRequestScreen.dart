@@ -10,6 +10,7 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/StaffWithdrawScree
 
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -80,6 +81,11 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
 
     final amount = int.parse(_amountController.text);
 
+    if (amount <= 0) {
+      Utils.snackBarErrorMessage("Withdrawal amount must be greater than 0");
+      return;
+    }
+
     // Use first saved detail (you can add selection later)
     if (vm.bankDetails.isEmpty) {
       Utils.snackBarErrorMessage("No saved bank/UPI details. Please add one first.");
@@ -115,7 +121,7 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFF140810), Color(0xFF3A152A), Color(0xFF140810), Color(0xFF140810)],
+                  colors: [Color(0xFF120C18), Color(0xFF241024), Color(0xFF120C18), Color(0xFF120C18)],
                 ),
               ),
               child: SafeArea(
@@ -319,6 +325,7 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
         child: TextField(
         controller: _amountController,
         keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         textAlign: TextAlign.left,
         style: const TextStyle(
         color: Colors.white,
@@ -418,7 +425,7 @@ class _WithdrawalRequestScreenState extends State<WithdrawalRequestScreen> {
         child: Center(
         child: ShaderMask(
         shaderCallback: (bounds) => const LinearGradient(
-        colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+        colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
         ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
         child: AppText(
         "Withdrawal history",

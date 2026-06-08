@@ -26,11 +26,16 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
+  void _openKeyboard() {
+    _focusNode.requestFocus();
+    SystemChannels.textInput.invokeMethod('TextInput.show');
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
+      _openKeyboard();
     });
   }
 
@@ -89,58 +94,47 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    TextField(
-                      controller: _otpController,
-                      focusNode: _focusNode,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      autofillHints: const [AutofillHints.oneTimeCode],
-                      maxLength: 4,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(4),
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: 1,
+                          child: TextField(
+                            cursorColor: Colors.transparent,
+                            controller: _otpController,
+                            focusNode: _focusNode,
+                            autofocus: true,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            autofillHints: const [AutofillHints.oneTimeCode],
+                            maxLength: 4,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                            style: const TextStyle(
+                              fontSize: 1,
+                              color: Colors.transparent,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              counterText: '',
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            onChanged: (_) => setState(() {}),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _openKeyboard,
+                          child: HeartOtpDisplay(
+                            length: 4,
+                            controller: _otpController,
+                          ),
+                        ),
                       ],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 14,
-                      ),
-                      cursorColor: Color(0xFFB86AF6),
-                      decoration: InputDecoration(
-                        counterText: '',
-                        hintText: '----',
-                        hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 14,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.04),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 20,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFB86AF6),
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFB86AF6),
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                      onTap: () => _focusNode.requestFocus(),
-                      onChanged: (_) => setState(() {}),
                     ),
 
                     // if (vm.verifyError != null) ...[
@@ -248,15 +242,8 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isVerifying
-                              ? const LinearGradient(
-                                  colors: [Colors.grey, Colors.blueGrey],
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
-                                  ],
-                                ),
+                              ? Apptheme.buttonDisabledGradient
+                              : Apptheme.buttonGradient,
                         ),
                         child: Center(
                           child: vm.isVerifying
@@ -281,6 +268,20 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                     ),
 
                     const SizedBox(height: 30),
+                    Center(
+                      child: TextButton(
+                        onPressed: _openKeyboard,
+                        child: const Text(
+                          "Tap to open keyboard",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -311,7 +312,7 @@ class HeartOtpDisplay extends StatelessWidget {
         final char = index < text.length ? text[index] : "-";
 
         return Padding(
-          padding: const EdgeInsets.only(right: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Stack(
             alignment: Alignment.center,
             children: [

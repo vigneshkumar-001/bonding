@@ -53,7 +53,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
 
         if (staff == null) {
           return const Scaffold(
-            backgroundColor: Color(0xFF140810),
+            backgroundColor: Color(0xFF120C18),
             body: const Center(child: AppLoadingIndicator(color: Colors.white)),
           );
         }
@@ -74,7 +74,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
         });
 
         return Scaffold(
-          backgroundColor: const Color(0xFF140810),
+          backgroundColor: const Color(0xFF120C18),
           body: Container(
             width: double.infinity,
             height: double.infinity,
@@ -82,7 +82,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [Color(0xFF5A1F3F), Color(0xFF3A152A), Color(0xFF140810)],
+                colors: [Color(0xFF17131F), Color(0xFF241024), Color(0xFF120C18)],
               ),
             ),
             child: SafeArea(
@@ -146,7 +146,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                      colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
                     ),
                   ),
                   child: const Center(
@@ -176,7 +176,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
-            colors: [Color(0xFFFF6A6A), Color(0xFFB86AF6)],
+            colors: [Color(0xFFFF5CA8), Color(0xFF7A5CFF)],
           ),
         ),
         child: const Center(

@@ -444,7 +444,7 @@
 //                                 Colors.grey.shade700,
 //                                 Colors.grey.shade600,
 //                               ] // ✅ muted while loading
-//                             : const [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+//                             : const [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
 //                       ),
 //                     ),
 //                     child: Center(
@@ -486,7 +486,7 @@
 //               //       decoration: BoxDecoration(
 //               //         borderRadius: BorderRadius.circular(8),
 //               //         gradient: const LinearGradient(
-//               //           colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+//               //           colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
 //               //         ),
 //               //       ),
 //               //       child: Center(

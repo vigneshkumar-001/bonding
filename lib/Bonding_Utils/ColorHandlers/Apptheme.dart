@@ -2,22 +2,31 @@ import 'package:bonding_app/Bonding_Utils/ColorHandlers/AppColors.dart';
 import 'package:flutter/material.dart';
 
 class Apptheme {
-  static const Color buttonGradientStart = Color(0xFFB86AF6);
-  static const Color buttonGradientEnd = Color(0xFFFF6A6A);
+  static const Color buttonGradientStart = Color(0xFF7A5CFF);
+  static const Color buttonGradientEnd = Color(0xFFFF5CA8);
   static const List<Color> buttonGradientColors = [
     buttonGradientStart,
     buttonGradientEnd,
+  ];
+  static const List<Color> buttonDisabledGradientColors = [
+    Color(0xFF5B5562),
+    Color(0xFF34303A),
   ];
   static const LinearGradient buttonGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
     colors: buttonGradientColors,
   );
+  static const LinearGradient buttonDisabledGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: buttonDisabledGradientColors,
+  );
 
   // App dark palette (matches current UI direction)
-  static const Color bg0 = Color(0xFF140810);
-  static const Color bg1 = Color(0xFF3A152A);
-  static const Color bg2 = Color(0xFF5A1F3F);
+  static const Color bg0 = Color(0xFF120C18);
+  static const Color bg1 = Color(0xFF241024);
+  static const Color bg2 = Color(0xFF17131F);
   static const Color surface = Color(0xFF1E1325);
   static const Color surface2 = Color(0xFF24162C);
   static const Color outline = Color(0x33FFFFFF);
@@ -25,9 +34,9 @@ class Apptheme {
   static const Color textMuted = Color(0xB3FFFFFF);
 
   static const LinearGradient backgroundGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [bg0, bg1, bg0, bg0],
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [bg2, bg1, bg0, bg0],
   );
 
   /// light theme Color

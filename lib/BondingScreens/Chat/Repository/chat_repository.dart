@@ -9,6 +9,7 @@ class ChatRepository {
   /// ✅ GET: /api/v1/auth/user/chat/history/:staffId?page=1&limit=50
   Future<Map<String, dynamic>> getChatHistory({
     required String staffId,
+    required String userId,
     required bool isStaff,
     required int page,
     required int limit,
@@ -16,7 +17,7 @@ class ChatRepository {
     try {
       // ✅ IMPORTANT: send only endpoint path (NO baseUrl here)
       final endpoint = isStaff
-          ? "staff/chat/history/$staffId"
+          ? "staff/chat/history/$userId"
           : "auth/user/chat/history/$staffId";
 
       final response = await _apiService.getResponseV2(endpoint);

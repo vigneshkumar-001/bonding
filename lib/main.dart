@@ -42,22 +42,19 @@ import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel
 
 import 'package:provider/single_child_widget.dart';
 
+import 'package:bonding_app/Config/zego_config.dart';
 import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
-// const int _zegoAppId = 725765612;
-const int _zegoAppId = 2073142303;
-const String _zegoAppSign =
-    'cb2e20977165308bab891c28a97e12100ed429d9469846955090e008435ad3b1';
-// const String _zegoAppSign =
-//     '1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4';
 
 void main() {
+  //Fenizo Seo Zego cloud 
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (_zegoAppId == 0 || _zegoAppSign.isEmpty) {
+  if (zegoAppId == 0 || zegoAppSign.isEmpty) {
     throw StateError(
       'Missing ZEGO config. Provide --dart-define=ZEGO_APP_ID and --dart-define=ZEGO_APP_SIGN.',
     );
@@ -71,7 +68,7 @@ void main() {
   //   appID: 467997506,
   //   appSign: "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
   // );
-  ZIMKit().init(appID: _zegoAppId, appSign: _zegoAppSign);
+  ZIMKit().init(appID: zegoAppId, appSign: zegoAppSign);
 
   runApp(const MyApp());
 }

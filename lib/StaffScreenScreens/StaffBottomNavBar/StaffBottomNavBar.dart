@@ -158,7 +158,7 @@ class _ChatLoadingPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFF140810),
+      backgroundColor: Color(0xFF120C18),
       body: Center(child: AppLoadingIndicator(color: Colors.white)),
     );
   }
@@ -273,7 +273,7 @@ class _ChatLoadingPlaceholder extends StatelessWidget {
 //           shape: BoxShape.circle,
 //           gradient: isActive
 //               ? const LinearGradient(
-//                   colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+//                   colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
 //                 )
 //               : null,
 //         ),

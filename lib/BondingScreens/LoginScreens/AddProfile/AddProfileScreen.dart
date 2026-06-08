@@ -143,7 +143,7 @@ class _AddProfileState extends State<AddProfile> {
                           gradient: vm.isUploading
                               ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
                               : const LinearGradient(
-                            colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                            colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
                           ),
                         ),
                         child: Center(
@@ -184,7 +184,7 @@ class _AddProfileState extends State<AddProfile> {
                         child: Center(
                           child: ShaderMask(
                             shaderCallback: (bounds) => const LinearGradient(
-                              colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)],
+                              colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)],
                             ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
                             child:  AppText(
                               "Skip & Continue",

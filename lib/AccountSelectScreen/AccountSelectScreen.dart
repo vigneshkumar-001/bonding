@@ -58,38 +58,40 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
               // Account Type Cards
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final useCompactCards = constraints.maxWidth < 360;
-                  final cardHeight = useCompactCards ? 96.0 : 120.0;
+                  final useCompactCards = constraints.maxWidth < 390;
+                  final cardHeight = useCompactCards ? 90.0 : 112.0;
+                  final cardSpacing = useCompactCards ? 14.0 : 18.0;
 
-                  return Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: useCompactCards ? 16 : 30,
-                    runSpacing: 16,
+                  return Row(
                     children: [
-                      // User Card
-                      _buildAccountCard(
-                        height: cardHeight,
-                        imagePath: "assets/Images/men.png",
-                        label: "Men",
-                        isSelected: selectedAccount == 1,
-                        onTap: () {
-                          setState(() {
-                            selectedAccount = 1;
-                          });
-                        },
+                      Expanded(
+                        child: _buildAccountCard(
+                          height: cardHeight,
+                          imagePath: "assets/Images/men.png",
+                          label: "Men",
+                          isCompact: useCompactCards,
+                          isSelected: selectedAccount == 1,
+                          onTap: () {
+                            setState(() {
+                              selectedAccount = 1;
+                            });
+                          },
+                        ),
                       ),
-
-                      // Staff Card
-                      _buildAccountCard(
-                        height: cardHeight,
-                        imagePath: "assets/Images/women.png",
-                        label: "Women",
-                        isSelected: selectedAccount == 2,
-                        onTap: () {
-                          setState(() {
-                            selectedAccount = 2;
-                          });
-                        },
+                      SizedBox(width: cardSpacing),
+                      Expanded(
+                        child: _buildAccountCard(
+                          height: cardHeight,
+                          imagePath: "assets/Images/women.png",
+                          label: "Women",
+                          isCompact: useCompactCards,
+                          isSelected: selectedAccount == 2,
+                          onTap: () {
+                            setState(() {
+                              selectedAccount = 2;
+                            });
+                          },
+                        ),
                       ),
                     ],
                   );
@@ -130,9 +132,7 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       gradient: selectedAccount == 0
-                          ? const LinearGradient(
-                              colors: [Color(0xFF666666), Color(0xFF888888)],
-                            )
+                          ? Apptheme.buttonDisabledGradient
                           : Apptheme.buttonGradient,
                     ),
                     child: Center(
@@ -159,26 +159,66 @@ class _AccountSelectScreenState extends State<AccountSelectScreen> {
     required String imagePath,
     required String label,
     required double height,
+    required bool isCompact,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Color(0XFFf56464) : Color(0XFF5f3550),
-            width: 1,
-          ),
+        padding: EdgeInsets.symmetric(
+          horizontal: isCompact ? 10 : 15,
+          vertical: isCompact ? 14 : 20,
         ),
-        child: Column(
-          children: [
-            Image.asset(imagePath, height: height),
-            SizedBox(height: 7),
-            AppText(label, color: Colors.white, fontWeight: FontWeight.w600),
-          ],
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: isSelected ? Apptheme.surface2 : Apptheme.surface,
+          border: Border.all(
+            color: isSelected ? Apptheme.buttonGradientEnd : Apptheme.outline,
+            width: isSelected ? 1.4 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Apptheme.buttonGradientEnd.withOpacity(0.12),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
+        ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.symmetric(
+            horizontal: isCompact ? 8 : 12,
+            vertical: isCompact ? 10 : 12,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            gradient: isSelected
+                ? LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.white.withOpacity(0.03),
+                      Colors.white.withOpacity(0.01),
+                    ],
+                  )
+                : null,
+          ),
+          child: Column(
+            children: [
+              Image.asset(imagePath, height: height),
+              SizedBox(height: isCompact ? 6 : 7),
+              AppText(
+                label,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: isCompact ? 14 : 16,
+              ),
+            ],
+          ),
         ),
       ),
     );

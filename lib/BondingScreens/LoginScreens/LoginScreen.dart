@@ -162,14 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          gradient: LinearGradient(
-                            colors: vm.isLoading
-                                ? [Colors.grey.shade700, Colors.grey.shade800]
-                                : [
-                                    const Color(0xFFB86AF6),
-                                    const Color(0xFFf76461),
-                                  ],
-                          ),
+                          gradient: vm.isLoading
+                              ? Apptheme.buttonDisabledGradient
+                              : Apptheme.buttonGradient,
                         ),
                         child: Center(
                           child: vm.isLoading

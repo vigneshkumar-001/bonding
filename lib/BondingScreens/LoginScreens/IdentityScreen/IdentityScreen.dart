@@ -47,14 +47,14 @@ class _IdentityScreenState extends State<IdentityScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFB86AF6),
+              primary: Color(0xFF7A5CFF),
               onPrimary: Colors.white,
               surface: Color(0xFF2A1A2A),
               onSurface: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6A6A),
+                foregroundColor: const Color(0xFFFF5CA8),
               ),
             ),
           ),
@@ -320,8 +320,8 @@ class _IdentityScreenState extends State<IdentityScreen> {
                                 )
                               : const LinearGradient(
                                   colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
+                                    Color(0xFF7A5CFF),
+                                    Color(0xFFFF5CA8),
                                   ],
                                 ),
                         ),

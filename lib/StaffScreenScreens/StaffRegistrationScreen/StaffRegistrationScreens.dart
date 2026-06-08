@@ -66,14 +66,14 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFB86AF6),
+              primary: Color(0xFF7A5CFF),
               onPrimary: Colors.white,
               surface: Color(0xFF2A1A2A),
               onSurface: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF6A6A),
+                foregroundColor: const Color(0xFFFF5CA8),
               ),
             ),
           ),
@@ -129,7 +129,7 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
 
   void _showPrettySnack(BuildContext context, {required String message, bool isError = false}) {
     final bg = isError
-        ? const LinearGradient(colors: [Color(0xFFB00020), Color(0xFFFF6A6A)])
+        ? const LinearGradient(colors: [Color(0xFFB00020), Color(0xFFFF5CA8)])
         : Apptheme.buttonGradient;
 
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -593,13 +593,13 @@ class _StaffRegisterScreenState extends State<StaffRegisterScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFB86AF6),
+              primary: Color(0xFF7A5CFF),
               onPrimary: Colors.white,
               surface: Color(0xFF2A1A2A),
               onSurface: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF6A6A)),
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5CA8)),
             ),
           ),
           child: child!,

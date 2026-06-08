@@ -180,7 +180,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
 
         if (staff == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF140810),
+            backgroundColor: const Color(0xFF120C18),
             body: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -197,7 +197,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
         final isApproved = staff.isApproved?.toString() ?? '0';
 
         return Scaffold(
-          backgroundColor: const Color(0xFF140810),
+          backgroundColor: const Color(0xFF120C18),
           body: Container(
             width: double.infinity,
             height: double.infinity,
@@ -206,10 +206,10 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
+                  Color(0xFF17131F),
+                  Color(0xFF241024),
+                  Color(0xFF120C18),
+                  Color(0xFF120C18),
                 ],
               ),
             ),
@@ -346,7 +346,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                     borderRadius: BorderRadius.circular(12),
                     gradient: vm.isUploading || _selectedImage == null
                         ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
-                        : const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)]),
+                        : const LinearGradient(colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)]),
                   ),
                   child: Center(
                     child: vm.isUploading
@@ -577,7 +577,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
 
         if (staff == null) {
           return Scaffold(
-            backgroundColor: const Color(0xFF140810),
+            backgroundColor: const Color(0xFF120C18),
             body: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -596,7 +596,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
         print("????????? isApproved: $isApproved (raw: ${staff.isApproved})");
 
         return Scaffold(
-          backgroundColor: const Color(0xFF140810),
+          backgroundColor: const Color(0xFF120C18),
           body: Container(
             width: double.infinity,
             height: double.infinity,
@@ -605,10 +605,10 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
+                  Color(0xFF17131F),
+                  Color(0xFF241024),
+                  Color(0xFF120C18),
+                  Color(0xFF120C18),
                 ],
               ),
             ),
@@ -746,7 +746,7 @@ class _LiveVerificationScreenState extends State<LiveVerificationScreen> {
                     borderRadius: BorderRadius.circular(12),
                     gradient: vm.isUploading || _selectedImage == null
                         ? const LinearGradient(colors: [Colors.grey, Colors.blueGrey])
-                        : const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)]),
+                        : const LinearGradient(colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)]),
                   ),
                   child: Center(
                     child: vm.isUploading

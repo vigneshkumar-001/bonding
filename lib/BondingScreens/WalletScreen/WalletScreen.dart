@@ -45,6 +45,8 @@ class _WalletScreenState extends State<WalletScreen> {
 
   void _openCheckout(PaymentPackage package) {
     final vm = context.read<WalletViewModel>();
+    final userVM = context.read<UserViewModel>();
+    final currentUser = userVM.currentUser;
 
     final amountInRupees = int.parse(package.amount.toString());
     final coins = int.parse(package.coin);
@@ -57,16 +59,45 @@ class _WalletScreenState extends State<WalletScreen> {
         )
         .then((response) {
           if (response != null && response.data != null) {
-            final orderId = response.data?.deposit?.razorpayOrderId;
+            final checkout = response.data?.checkout;
+            final orderId =
+                checkout?.orderId.isNotEmpty == true
+                ? checkout!.orderId
+                : response.data?.deposit?.razorpayOrderId ?? '';
+            final checkoutKey =
+                checkout?.key.isNotEmpty == true
+                ? checkout!.key
+                : checkout?.keyId ?? '';
 
-            var options = {
-              // 'key': 'rzp_test_S8pViJJW5CVujd',
-              'key': 'rzp_test_SKfjxkHfwHHcrY',
-              'amount': amountInRupees * 100, // Razorpay expects paise
-              'name': 'Bonding App',
+            if (checkout == null || checkoutKey.isEmpty || orderId.isEmpty) {
+              Utils.snackBarErrorMessage(
+                'Payment setup failed. Please try again later.',
+              );
+              AppLogger.log.e(
+                'Razorpay checkout data missing. '
+                'key=$checkoutKey orderId=$orderId checkout=$checkout',
+              );
+              return;
+            }
+
+            final options = {
+              'key': checkoutKey,
+              'amount': checkout.amount > 0
+                  ? checkout.amount
+                  : amountInRupees * 100,
+              'currency': checkout.currency,
+              'name': checkout.name.isNotEmpty ? checkout.name : 'Bonding App',
               'description': '${package.coin} Coins Package',
               'order_id': orderId,
-              'prefill': {'contact': '9952225025', 'email': 'user@example.com'},
+              'prefill': {
+                'name': checkout.prefill?.name.isNotEmpty == true
+                    ? checkout.prefill!.name
+                    : (currentUser?.name ?? ''),
+                'contact': checkout.prefill?.contact.isNotEmpty == true
+                    ? checkout.prefill!.contact
+                    : (currentUser?.phone ?? ''),
+                'email': checkout.prefill?.email ?? '',
+              },
               'external': {
                 'wallets': ['phonepe'],
               },
@@ -125,9 +156,9 @@ class _WalletScreenState extends State<WalletScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF140810),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
+                  Color(0xFF120C18),
+                  Color(0xFF241024),
+                  Color(0xFF120C18),
                 ],
               ),
             ),

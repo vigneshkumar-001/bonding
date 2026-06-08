@@ -146,7 +146,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: selectedCount >= 3 && !vm.isUpdatingInterests
-                              ? const LinearGradient(colors: [Color(0xFFB86AF6), Color(0xFFFF6A6A)])
+                              ? const LinearGradient(colors: [Color(0xFF7A5CFF), Color(0xFFFF5CA8)])
                               : const LinearGradient(colors: [Color(0xFF353535), Color(0xFF353535)]),
                         ),
                         child: Center(

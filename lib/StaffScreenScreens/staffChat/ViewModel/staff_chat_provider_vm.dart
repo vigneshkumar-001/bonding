@@ -94,6 +94,7 @@ class StaffChatProviderVm extends ChangeNotifier {
       final jsonBody = await repo.getChatHistory(
         isStaff: isStaff,
         staffId: _staffMongoId!,
+        userId: _userId!,
         page: page,
         limit: limit,
       );

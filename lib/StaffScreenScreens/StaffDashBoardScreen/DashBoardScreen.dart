@@ -10,6 +10,7 @@ import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawHistory.da
 import 'package:bonding_app/StaffScreenScreens/WithdrawScreen/WithdrawRequestScreen.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/StaffScreenScreens/staffChat/staffChatListScreen.dart';
+import 'package:bonding_app/Config/zego_config.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -135,11 +136,8 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
         : "Staff_$userId";
 
     ZegoUIKitPrebuiltCallInvitationService().init(
-      appID: 725765612,
-      // appID: 467997506,
-      appSign:
-          "1bbf70eb5fe702d092821ca988dfa50fad3455539867a0a5f86eedef48bb5bc4",
-      // "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+      appID: zegoAppId,
+      appSign: zegoAppSign,
       userID: userId,
       userName: safeUserName, // ✅ NEVER EMPTY
       plugins: [ZegoUIKitSignalingPlugin()],
@@ -212,9 +210,9 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    Color(0xFF5A1F3F),
-                    Color(0xFF3A152A),
-                    Color(0xFF140810),
+                    Color(0xFF17131F),
+                    Color(0xFF241024),
+                    Color(0xFF120C18),
                   ],
                 ),
               ),
@@ -852,9 +850,8 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
     if (_zegoInitialized) return;
 
     ZegoUIKitPrebuiltCallInvitationService().init(
-      appID: 467997506,
-      appSign:
-          "ccc20b79b4824f0b6bff31c38a5cbd512cc98fb41bf4cca25d5c9df21bf0c252",
+      appID: zegoAppId,
+      appSign: zegoAppSign,
       userID: staff.memberID,
       userName: staff.name ?? "Women",
       plugins: [ZegoUIKitSignalingPlugin()],
@@ -920,9 +917,9 @@ class _BondingDashboardPageState extends State<BondingDashboardPage> {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    Color(0xFF5A1F3F),
-                    Color(0xFF3A152A),
-                    Color(0xFF140810),
+                    Color(0xFF17131F),
+                    Color(0xFF241024),
+                    Color(0xFF120C18),
                   ],
                 ),
               ),

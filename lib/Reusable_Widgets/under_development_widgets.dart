@@ -45,8 +45,8 @@ class UnderDevelopmentWidgets {
                       borderRadius: BorderRadius.circular(8),
                       gradient:   const LinearGradient(
                         colors: [
-                          Color(0xFFB86AF6),
-                          Color(0xFFFF6A6A),
+                          Color(0xFF7A5CFF),
+                          Color(0xFFFF5CA8),
                         ],
                       ),
                     ),

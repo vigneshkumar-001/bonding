@@ -1,4 +1,5 @@
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
+import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
@@ -64,18 +65,7 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF5A1F3F),
-                  Color(0xFF3A152A),
-                  Color(0xFF140810),
-                  Color(0xFF140810),
-                ],
-              ),
-            ),
+            decoration: const BoxDecoration(gradient: Apptheme.backgroundGradient),
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -235,15 +225,8 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: vm.isVerifying
-                              ? const LinearGradient(
-                                  colors: [Colors.grey, Colors.blueGrey],
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
-                                  ],
-                                ),
+                              ? Apptheme.buttonDisabledGradient
+                              : Apptheme.buttonGradient,
                         ),
                         child: Center(
                           child: vm.isVerifying
@@ -332,8 +315,8 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 )
                               : const LinearGradient(
                                   colors: [
-                                    Color(0xFFB86AF6),
-                                    Color(0xFFFF6A6A),
+                                    Color(0xFF7A5CFF),
+                                    Color(0xFFFF5CA8),
                                   ],
                                 ),
                         ),

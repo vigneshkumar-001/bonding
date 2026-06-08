@@ -24,7 +24,7 @@ import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel
 import 'package:bonding_app/StaffScreenScreens/staffChat/ZimkitService.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/PlatformViews/home_android_body.dart';
 import 'package:bonding_app/BondingScreens/HomeScreen/PlatformViews/home_ios_body.dart';
-import 'package:bonding_app/Bonding_Utils/Call/ios_call_approval_store.dart';
+import 'package:bonding_app/Config/zego_config.dart';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -36,10 +36,6 @@ import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
 import 'package:logger/logger.dart';
-
-const int _zegoAppId = 2073142303;
-const String _zegoAppSign =
-    'cb2e20977165308bab891c28a97e12100ed429d9469846955090e008435ad3b1';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -92,9 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _notInRoomCount = 0;
 
   final socketService = SocketService();
-  StreamSubscription? _homeReceiveSub;
-
-  Set<String> _callApprovedStaffIds = <String>{};
 
   Future<void> _showInfoPopup({
     required BuildContext context,
@@ -222,37 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _refreshCallApprovals() async {
-    try {
-      final set = await IosCallApprovalStore.load();
-      if (!mounted) return;
-      setState(() => _callApprovedStaffIds = set);
-    } catch (_) {}
-  }
-
   @override
   void initState() {
     super.initState();
 
-    // Listen globally so when staff replies (socket) we can unlock call/video on HomeScreen.
-    _homeReceiveSub ??= socketService.receiveMessageStream.listen((data) async {
-      if (data is! Map) return;
-      final m = Map<String, dynamic>.from(data);
-      final senderRole = (m["senderRole"] ?? "")
-          .toString()
-          .toLowerCase()
-          .trim();
-      if (senderRole != "staff") return;
-
-      final staffMongoId = (m["staffId"] ?? "").toString().trim();
-      if (staffMongoId.isEmpty) return;
-
-      await IosCallApprovalStore.markApproved(staffMongoId);
-      await _refreshCallApprovals();
-    });
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _refreshCallApprovals();
       final userVM = context.read<UserViewModel>();
       await userVM.fetchUserDetails();
 
@@ -387,8 +354,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       await ZegoUIKitPrebuiltCallInvitationService().init(
         plugins: [plugin],
-        appID: _zegoAppId,
-        appSign: _zegoAppSign,
+        appID: zegoAppId,
+        appSign: zegoAppSign,
         userID: user.memberID.trim(),
         userName: (user.name ?? "User").trim(),
         notificationConfig: ZegoCallInvitationNotificationConfig(
@@ -656,7 +623,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _callLimitTimer?.cancel();
     _inviteTimeoutTimer?.cancel();
     _periodicCheckTimer?.cancel();
-    _homeReceiveSub?.cancel();
     // socketService.removeStaffListListener();
 
     if (_zegoInitialized) {
@@ -815,8 +781,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     final age = _calculateAgeFromDOB(staff.dob ?? '');
     final isOnline = staff.isOnline;
-    final callApproved =
-        (staff.callEnabled ?? _callApprovedStaffIds.contains(staff.id));
     final staffHeroTag =
         "staff-media-${staff.id.isNotEmpty ? staff.id : staff.name}";
     return ClipRRect(
@@ -938,10 +902,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: _customCallButton(
-                        enabled: ready && callApproved,
-                        disabledMessage: !ready
-                            ? "Call service still connecting, try again."
-                            : "Chat reply needed to enable call.",
+                        // Android: direct calling — only requires the call
+                        // service to be ready (no chat-reply gate, that is
+                        // an iOS-only restriction).
+                        enabled: ready,
+                        disabledMessage:
+                            "Call service still connecting, try again.",
                         text: "${staff.audioCallRatePerMinute}/min",
                         pricePerMin: staff.audioCallRatePerMinute,
                         isVideoCall: false,
@@ -954,10 +920,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _customCallButton(
-                        enabled: ready && callApproved,
-                        disabledMessage: !ready
-                            ? "Call service still connecting, try again."
-                            : "Chat reply needed to enable call.",
+                        enabled: ready,
+                        disabledMessage:
+                            "Call service still connecting, try again.",
                         text: "${staff.videoCallRatePerMinute}/min",
                         pricePerMin: staff.videoCallRatePerMinute,
                         isVideoCall: true,
@@ -969,7 +934,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () => _openStaffChat(context, staff),
+                      // Android: open chat directly (no connection-preview
+                      // bottom sheet). The preview stays on iOS.
+                      onTap: () =>
+                          _openStaffChat(context, staff, showPreview: false),
                       child: Container(
                         height: 44,
                         width: 44,
@@ -1275,10 +1243,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openStaffChat(
     BuildContext context,
-    StaffDataProfile staff,
-  ) async {
-    final accepted = await _showConnectionPreview(context, staff);
-    if (!accepted || !mounted || !context.mounted) return;
+    StaffDataProfile staff, {
+    bool showPreview = true,
+  }) async {
+    if (showPreview) {
+      final accepted = await _showConnectionPreview(context, staff);
+      if (!accepted || !mounted || !context.mounted) return;
+    }
 
     final userVM = Provider.of<UserViewModel>(context, listen: false);
     final currentUser = userVM.currentUser;
@@ -1321,7 +1292,6 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await context.read<StaffViewModel>().fetchStaffDetails();
     } catch (_) {}
-    await _refreshCallApprovals();
   }
 
   Widget _iosChatRow(BuildContext context, StaffDataProfile staff) {
@@ -2405,10 +2375,10 @@ class _Tag extends StatelessWidget {
 //                 begin: Alignment.topCenter,
 //                 end: Alignment.bottomCenter,
 //                 colors: [
-//                   Color(0xFF140810),
-//                   Color(0xFF3A152A),
-//                   Color(0xFF140810),
-//                   Color(0xFF140810),
+//                   Color(0xFF120C18),
+//                   Color(0xFF241024),
+//                   Color(0xFF120C18),
+//                   Color(0xFF120C18),
 //                 ],
 //               ),
 //             ),
@@ -3180,10 +3150,10 @@ class _Tag extends StatelessWidget {
 //                 begin: Alignment.topCenter,
 //                 end: Alignment.bottomCenter,
 //                 colors: [
-//                   Color(0xFF140810),
-//                   Color(0xFF3A152A),
-//                   Color(0xFF140810),
-//                   Color(0xFF140810),
+//                   Color(0xFF120C18),
+//                   Color(0xFF241024),
+//                   Color(0xFF120C18),
+//                   Color(0xFF120C18),
 //                 ],
 //               ),
 //             ),
