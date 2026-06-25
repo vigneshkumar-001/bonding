@@ -43,6 +43,21 @@ class SocketService {
 
   final _chatJoinedCtrl = StreamController<dynamic>.broadcast();
 
+  // Admin -> Staff verification call (foreground delivery path).
+  final _incomingAdminCallCtrl = StreamController<dynamic>.broadcast();
+
+  Stream<dynamic> get incomingAdminCallStream => _incomingAdminCallCtrl.stream;
+
+  // Live staff presence snapshot (user/home side).
+  final _onlineStaffCtrl = StreamController<dynamic>.broadcast();
+
+  Stream<dynamic> get onlineStaffStream => _onlineStaffCtrl.stream;
+
+  // Admin block/delete -> instant kick while online.
+  final _forceLogoutCtrl = StreamController<dynamic>.broadcast();
+
+  Stream<dynamic> get forceLogoutStream => _forceLogoutCtrl.stream;
+
   Stream<dynamic> get staffListStream => _staffListCtrl.stream;
 
   Stream<dynamic> get receiveMessageStream => _receiveMessageCtrl.stream;
@@ -326,6 +341,13 @@ class SocketService {
     socket.emit(eventName, payload);
   }
 
+  /// Ask the server for the full online-staff snapshot. Safe no-op if the
+  /// socket isn't connected yet (the connection stream will trigger a re-sync).
+  void requestOnlineStaff() {
+    if (!isConnected) return;
+    socket.emit("get_online_staff");
+  }
+
   Future<void> _ensureConnected() async {
     if (isConnected && _socket != null) return;
 
@@ -490,6 +512,18 @@ class SocketService {
     _socket!.on("staff_status_changed", (data) => _statusChangedCtrl.add(data));
 
     _socket!.on("get_staff_list", (data) => _staffListCtrl.add(data));
+
+    // Admin -> Staff verification call ring (foreground path).
+    _socket!.on(
+      "incoming_admin_call",
+      (data) => _incomingAdminCallCtrl.add(data),
+    );
+
+    // Full online-staff snapshot (response to get_online_staff).
+    _socket!.on("online_staff", (data) => _onlineStaffCtrl.add(data));
+
+    // Admin blocked/deleted this account while it was online.
+    _socket!.on("force_logout", (data) => _forceLogoutCtrl.add(data));
   }
 
   void _emitSocketError({required String source, required dynamic err}) {
@@ -609,6 +643,12 @@ class SocketService {
     _registeredStaffCtrl.close();
 
     _chatJoinedCtrl.close();
+
+    _incomingAdminCallCtrl.close();
+
+    _onlineStaffCtrl.close();
+
+    _forceLogoutCtrl.close();
   }
 }
 

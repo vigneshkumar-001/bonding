@@ -19,19 +19,31 @@ class VerificationInprogressScreen extends StatefulWidget {
   State<VerificationInprogressScreen> createState() => _VerificationInprogressScreenState();
 }
 
-class _VerificationInprogressScreenState extends State<VerificationInprogressScreen> {
+class _VerificationInprogressScreenState extends State<VerificationInprogressScreen>
+    with WidgetsBindingObserver {
   Timer? _pollingTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _startPolling();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pollingTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-check approval the moment the staff returns to the app, so a
+    // just-approved staff unlocks without waiting for the next poll tick.
+    if (state == AppLifecycleState.resumed && mounted) {
+      context.read<StaffViewModel>().fetchStaffSingleData();
+    }
   }
 
   void _startPolling() {
@@ -117,7 +129,7 @@ class _VerificationInprogressScreenState extends State<VerificationInprogressScr
                     Center(
                       child: AppText(
 
-                             "Your documents have been submitted successfully.\nOur team is reviewing your profile.\nThis usually takes 24–48 hours.",
+                             "Verification pending.\nAn admin will video-call you to verify your account.\nPlease keep the app installed and notifications on.",
                         color: const Color(0xFFc7c7cc),
                         fontSize: 16,
                         textAlign: TextAlign.center,

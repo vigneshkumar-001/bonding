@@ -5,6 +5,7 @@ import 'package:bonding_app/APIService/Remote/network/BaseApiService.dart'
     show BaseApiService;
 import 'package:bonding_app/BondingScreens/AuthService.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/Services/Session/session_guard.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart' as http_parser;
 import 'package:mime/mime.dart';
@@ -68,11 +69,14 @@ class NetworkApiService extends BaseApiService {
     AppLogger.log.i(
       "HEADERS: {Authorization: Bearer $token, Accept: application/json}",
     );
+ 
     AppLogger.log.i("==================================");
     final response = await http.get(
       uri,
       headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
     );
+
+    SessionGuard().inspect(response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       return json.decode(response.body) as Map<String, dynamic>;
@@ -130,6 +134,8 @@ class NetworkApiService extends BaseApiService {
           'RESPONSE <- ${response.statusCode}\n'
               'BODY: ${response.body}\n'
       );
+
+      SessionGuard().inspect(response.statusCode, response.body);
 
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
@@ -278,6 +284,8 @@ class NetworkApiService extends BaseApiService {
     print("Status Code: ${response.statusCode}");
     print("Raw body: ${response.body}");
 
+    SessionGuard().inspect(response.statusCode, response.body);
+
     if (response.statusCode == 200) {
       try {
         // First decode — might be a stringified JSON
@@ -318,6 +326,8 @@ class NetworkApiService extends BaseApiService {
       uri,
       headers: {'Authorization': 'Bearer ', 'Accept': 'application/json'},
     );
+
+    SessionGuard().inspect(response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       return response.body;
@@ -406,6 +416,7 @@ class NetworkApiService extends BaseApiService {
       await http
           .post(Uri.parse(baseUrl + url), headers: headers, body: data)
           .then((value) {
+            SessionGuard().inspect(value.statusCode, value.body);
             responseJson = jsonDecode(value.body);
             print("${baseUrl + url}");
             print("///attend$responseJson");
@@ -466,6 +477,8 @@ class NetworkApiService extends BaseApiService {
             print('📥 Response Time: ${duration.inMilliseconds}ms');
             print('📥 Response Headers: ${response.headers}');
             print('📥 Response Body:');
+
+            SessionGuard().inspect(response.statusCode, response.body);
 
             try {
               responseJson = jsonDecode(response.body);
@@ -593,6 +606,8 @@ class NetworkApiService extends BaseApiService {
             print('📥 Response Headers: ${response.headers}');
             print('📥 Response Body:');
 
+            SessionGuard().inspect(response.statusCode, response.body);
+
             try {
               responseJson = jsonDecode(response.body);
 
@@ -680,6 +695,7 @@ class NetworkApiService extends BaseApiService {
       body: json.encode(body),
     );
     print("${response.body}");
+    SessionGuard().inspect(response.statusCode, response.body);
     return json.decode(response.body);
   }
 
@@ -843,6 +859,8 @@ class NetworkApiService extends BaseApiService {
       print("Upload Status: ${streamedResponse.statusCode}");
       print("Upload Response: ${response.body}");
 
+      SessionGuard().inspect(streamedResponse.statusCode, response.body);
+
       if (streamedResponse.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       } else {
@@ -912,6 +930,7 @@ class NetworkApiService extends BaseApiService {
   // }
 
   dynamic returnResponse(http.Response response) {
+    SessionGuard().inspect(response.statusCode, response.body);
     switch (response.statusCode) {
       case 200:
         dynamic responseJson = jsonDecode(response.body);

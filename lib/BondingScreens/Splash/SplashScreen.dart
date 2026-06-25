@@ -6,14 +6,10 @@ import 'package:bonding_app/BondingScreens/LoginScreens/InterestLanguage/Interes
 import 'package:bonding_app/BondingScreens/LoginScreens/InterestScreen/InterestScreen.dart';
 import 'package:bonding_app/BondingScreens/Splash/SplashScreen2.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
+import 'package:bonding_app/Services/AdminCall/admin_call_handler.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
-import 'package:bonding_app/StaffScreenScreens/LiveSeflieVerificationScreen/LiveVerificationScreen.dart';
-import 'package:bonding_app/StaffScreenScreens/StaffBottomNavBar/StaffBottomNavBar.dart';
-import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/StaffRegistrationScreens.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
-import 'package:bonding_app/StaffScreenScreens/VerificationApprovedScreen/VerificationApprovedScreen.dart';
-import 'package:bonding_app/StaffScreenScreens/VerificationInprogressScreen/VerificationInprogressScreen.dart';
-import 'package:bonding_app/StaffScreenScreens/VerificationUnsuccessfulScreen/VerificationUnsuccessScreen.dart';
+import 'package:bonding_app/StaffScreenScreens/staff_route_gate.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +66,9 @@ class _SplashscreenState extends State<Splashscreen>
 
     if (staffMemberId.isNotEmpty) {
       socketService.connectStaff(staffMemberId);
+      // Start receiving Admin -> Staff verification calls (FCM + socket).
+      // Covers ALL staff states incl. pending verification.
+      AdminCallHandler().startForStaffSession(staffMemberId: staffMemberId);
     }
 
     // No profile at all → back to onboarding / login flow
@@ -109,63 +108,13 @@ class _SplashscreenState extends State<Splashscreen>
     // STAFF FLOW (only isApproved matters here)
     // ────────────────────────────────────────────────
     if (role == 'staff') {
-      if (status <= 0) {
-        // Not even basic registration completed
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                const StaffRegisterScreen(mode: StaffAuthMode.register),
-          ),
-        );
-      } else if (status == 1) {
-        // Basic profile done → verification step
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LiveVerificationScreen()),
-        );
-      } else if (status == 2) {
-        // Documents submitted → now check approval status
-        final approval = staff!.isApproved?.toLowerCase().trim() ?? 'pending';
-
-        if (approval == '1') {
-          // Approved → go to dashboard
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const ApprovedScreen()),
-          );
-        } else if (approval.contains('2') ||
-            approval == 'declined' ||
-            approval == 'not approved') {
-          // Rejected
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const VerificationUnsuccessScreen(),
-            ),
-          );
-        } else {
-          // pending / under review / null / empty / anything else
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const VerificationInprogressScreen(),
-            ),
-          );
-        }
-      } else if (status >= 3) {
-        // Verification completed → main dashboard
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const StaffBottomBar()),
-        );
-      } else {
-        // Unknown / fallback
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const StaffBottomBar()),
-        );
-      }
+      // Single source of truth (staff_route_gate.dart): a PENDING ("0") or
+      // REJECTED ("2") staff is gated out of the dashboard even if the form is
+      // complete. They still receive the admin verification call separately.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => resolveStaffHome(staff!)),
+      );
     }
     // ────────────────────────────────────────────────
     // USER FLOW (no isApproved needed)

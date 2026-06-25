@@ -1,13 +1,13 @@
 // lib/screens/wallet_screen.dart
 
 import 'dart:ui';
+
 import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/Model/amountAdminCoinModel.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/razorPayFlow/ViewModel/PaymentVM.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
-import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:flutter/material.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +21,8 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+  static const String _rupee = '\u20B9';
+
   late Razorpay _razorpay;
 
   @override
@@ -31,7 +33,6 @@ class _WalletScreenState extends State<WalletScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
-    // Fetch real packages on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WalletViewModel>().fetchPaymentStructure();
     });
@@ -48,8 +49,8 @@ class _WalletScreenState extends State<WalletScreen> {
     final userVM = context.read<UserViewModel>();
     final currentUser = userVM.currentUser;
 
-    final amountInRupees = int.parse(package.amount.toString());
-    final coins = int.parse(package.coin);
+    final amountInRupees = package.amount;
+    final coins = int.tryParse(package.coin) ?? 0;
 
     vm
         .placeCoinOrder(
@@ -60,12 +61,10 @@ class _WalletScreenState extends State<WalletScreen> {
         .then((response) {
           if (response != null && response.data != null) {
             final checkout = response.data?.checkout;
-            final orderId =
-                checkout?.orderId.isNotEmpty == true
+            final orderId = checkout?.orderId.isNotEmpty == true
                 ? checkout!.orderId
                 : response.data?.deposit?.razorpayOrderId ?? '';
-            final checkoutKey =
-                checkout?.key.isNotEmpty == true
+            final checkoutKey = checkout?.key.isNotEmpty == true
                 ? checkout!.key
                 : checkout?.keyId ?? '';
 
@@ -141,12 +140,156 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
+  int _crossAxisCount(double width) {
+    if (width >= 1100) return 5;
+    if (width >= 820) return 4;
+    return 3;
+  }
+
+  double _gridAspectRatio(double width) {
+    if (width >= 820) return 1.02;
+    if (width >= 520) return 0.94;
+    return 0.78;
+  }
+
+  Widget _buildPackageCard({
+    required PaymentPackage package,
+    required bool hasDiscount,
+    required int displayPrice,
+    required int? originalPrice,
+    required bool isProcessing,
+  }) {
+    final offerLabel = originalPrice != null
+        ? 'FLAT $_rupee${originalPrice - displayPrice} OFF'
+        : '';
+
+    return GestureDetector(
+      onTap: isProcessing ? null : () => _openCheckout(package),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFF604B56)),
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.06),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (hasDiscount)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
+                    ),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF8E51D2), Color(0xFFC450A7)],
+                      ),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        offerLabel,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(height: 24),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(7, 7, 7, 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: Image.network(
+                                package.image,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => Image.asset(
+                                  'assets/Images/coinglow.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            package.coin,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                       
+                        const SizedBox(height: 3),
+                        if (originalPrice != null)
+                          Text(
+                            '$_rupee$originalPrice',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.45),
+                              fontSize: 10,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '$_rupee$displayPrice',
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: hasDiscount
+                                  ? const Color(0xFFFFE082)
+                                  : Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<WalletViewModel, UserViewModel>(
       builder: (context, vm, userVM, child) {
-        final currentUser = userVM.currentUser;
-
         return Scaffold(
           body: Container(
             width: double.infinity,
@@ -164,84 +307,53 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Stack(
                   children: [
                     Column(
                       children: [
-                        // Top bar
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => Navigator.pop(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF282323),
-                                      borderRadius: BorderRadius.circular(40),
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF282323),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                AppText(
-                                  "Wallet",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ],
+                              ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFcc529f),
-                                    Color(0xFFf86460),
-                                  ],
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/Images/goldcoin1.png",
-                                    height: 20,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    "${currentUser?.coinBalance ?? 0}.00",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            const SizedBox(width: 8),
+                            AppText(
+                              'Wallet',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
                             ),
                           ],
                         ),
-
+                        const SizedBox(height: 16),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: AspectRatio(
+                            aspectRatio: 3.1,
+                            child: Image.asset(
+                              'assets/Images/offer.png',
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 20),
-                        Image.asset("assets/Images/offer.png"),
-                        const SizedBox(height: 20),
-
                         if (vm.isLoadingPackages)
                           const Center(
-                            child: const AppLoadingIndicator(
-                              color: Colors.white,
-                            ),
+                            child: AppLoadingIndicator(color: Colors.white),
                           )
                         else if (vm.packagesError != null)
                           Center(
@@ -250,11 +362,12 @@ class _WalletScreenState extends State<WalletScreen> {
                                 Text(
                                   vm.packagesError!,
                                   style: const TextStyle(color: Colors.red),
+                                  textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: vm.fetchPaymentStructure,
-                                  child: const Text("Retry"),
+                                  child: const Text('Retry'),
                                 ),
                               ],
                             ),
@@ -262,185 +375,60 @@ class _WalletScreenState extends State<WalletScreen> {
                         else if (vm.paymentPackages.isEmpty)
                           const Center(
                             child: Text(
-                              "No packages available",
+                              'No packages available',
                               style: TextStyle(color: Colors.white70),
                             ),
                           )
                         else
                           Expanded(
-                            child: GridView.builder(
-                              padding: EdgeInsets.zero,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 10,
-                                  ),
-                              itemCount: vm.paymentPackages.length,
-                              itemBuilder: (context, index) {
-                                final package = vm.paymentPackages[index];
-                                final amount = int.parse(
-                                  package.amount.toString(),
-                                );
-                                final coins = int.parse(package.coin);
-                                final hasDiscount =
-                                    package.offerStatus == "true" &&
-                                    package.offerAmount != "0";
-                                final displayPrice = hasDiscount
-                                    ? int.parse(package.offerAmount)
-                                    : amount;
-                                final originalPrice = hasDiscount
-                                    ? amount
-                                    : null;
-
-                                return GestureDetector(
-                                  onTap: vm.isLoading
-                                      ? null
-                                      : () => _openCheckout(package),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(
-                                        sigmaX: 10,
-                                        sigmaY: 10,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final width = constraints.maxWidth;
+                                return GridView.builder(
+                                  padding: EdgeInsets.zero,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: _crossAxisCount(width),
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 12,
+                                        childAspectRatio: _gridAspectRatio(
+                                          width,
+                                        ),
                                       ),
-                                      child: Column(
-                                        children: [
-                                          if (hasDiscount)
-                                            Container(
-                                              width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 4,
-                                                  ),
-                                              decoration: const BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Color(0xFF8e51d2),
-                                                    Color(0xFFc450a7),
-                                                  ],
-                                                ),
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(12),
-                                                  topRight: Radius.circular(12),
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "FLAT ₹${displayPrice} OFF",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          else
-                                            const SizedBox(height: 25),
+                                  itemCount: vm.paymentPackages.length,
+                                  itemBuilder: (context, index) {
+                                    final package = vm.paymentPackages[index];
+                                    final amount = package.amount;
+                                    final hasDiscount =
+                                        package.offerStatus == 'true' &&
+                                        package.offerAmount != '0';
+                                    final displayPrice = hasDiscount
+                                        ? int.tryParse(package.offerAmount) ??
+                                              amount
+                                        : amount;
+                                    final originalPrice = hasDiscount
+                                        ? amount
+                                        : null;
 
-                                          Container(
-                                            padding: const EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: const Color(0xFF604b56),
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.white.withOpacity(0.1),
-                                                  Colors.white.withOpacity(
-                                                    0.05,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Image.network(
-                                                  package.image,
-                                                  height: 40,
-                                                  errorBuilder: (_, __, ___) =>
-                                                      Image.asset(
-                                                        "assets/Images/coinglow.png",
-                                                        height: 40,
-                                                      ),
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Expanded(
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        "${package.coin}",
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                      // if (originalPrice != null)
-                                                      //   Text(
-                                                      //     "₹$originalPrice",
-                                                      //     style: const TextStyle(
-                                                      //       color:
-                                                      //           Colors.white54,
-                                                      //       fontSize: 11,
-                                                      //       decoration:
-                                                      //           TextDecoration
-                                                      //               .lineThrough,
-                                                      //     ),
-                                                      //   ),
-                                                      Text(
-                                                        "₹$displayPrice",
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color: hasDiscount
-                                                              ? Colors.yellow
-                                                              : Colors.white,
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                    return _buildPackageCard(
+                                      package: package,
+                                      hasDiscount: hasDiscount,
+                                      displayPrice: displayPrice,
+                                      originalPrice: originalPrice,
+                                      isProcessing: vm.isLoading,
+                                    );
+                                  },
                                 );
                               },
                             ),
                           ),
                       ],
                     ),
-
-                    // Loading overlay
                     if (vm.isLoading)
                       Container(
                         color: Colors.black.withOpacity(0.4),
                         child: const Center(
-                          child: const AppLoadingIndicator(color: Colors.white),
+                          child: AppLoadingIndicator(color: Colors.white),
                         ),
                       ),
                   ],

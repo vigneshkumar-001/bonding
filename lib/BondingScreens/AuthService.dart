@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 import 'package:bonding_app/Socket/socket_service.dart';
+import 'package:bonding_app/Services/AdminCall/admin_call_handler.dart';
 import 'package:bonding_app/Bonding_Utils/AppLogger/app_logger.dart';
 
 class AuthService {
@@ -47,6 +48,13 @@ class AuthService {
 
   // ✅ Logout / clear + disconnect services
   static Future<void> logout() async {
+    // 0) ✅ Stop Admin -> Staff verification call handling (FCM + socket)
+    try {
+      AdminCallHandler().stopForLogout();
+    } catch (e) {
+      print("⚠️ AdminCallHandler stop failed: $e");
+    }
+
     // 1) ✅ Disconnect Zego Call Invitation Service
     try {
       await ZegoUIKitPrebuiltCallInvitationService().uninit();

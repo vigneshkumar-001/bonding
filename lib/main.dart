@@ -47,10 +47,19 @@ import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:bonding_app/firebase_options.dart';
+import 'package:bonding_app/Services/Notifications/fcm_service.dart';
+import 'package:bonding_app/Services/Notifications/local_notifications_service.dart';
+import 'package:bonding_app/Services/AdminCall/admin_call_handler.dart';
+import 'package:bonding_app/Services/Session/session_guard.dart';
+import 'package:bonding_app/Socket/socket_service.dart';
+
 final navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
-  //Fenizo Seo Zego cloud 
+Future<void> main() async {
+  //TempMail Zego cloud
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -58,6 +67,33 @@ void main() {
     throw StateError(
       'Missing ZEGO config. Provide --dart-define=ZEGO_APP_ID and --dart-define=ZEGO_APP_SIGN.',
     );
+  }
+
+  // ---- Admin -> Staff verification call wiring ----
+  // Attach the navigator key + callbacks FIRST and OUTSIDE the try/catch:
+  // these can't throw, and `accept()` needs the navigator even if Firebase
+  // init below fails (the socket path works without Firebase).
+  AdminCallHandler().attachNavigatorKey(navigatorKey);
+  AdminCallHandler().wireCallbacks();
+
+  // ---- Admin BLOCK / DELETE enforcement (force logout) ----
+  // Navigator key for the friendly dialog + redirect; socket gives the
+  // instant kick while online (HTTP 403 covers every other case).
+  SessionGuard().attachNavigatorKey(navigatorKey);
+  SocketService().forceLogoutStream.listen(
+    (data) => SessionGuard().onSocketForceLogout(data),
+  );
+
+  // Firebase + push. Guarded so a failure can never block app start.
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // Background / killed FCM handler (must be registered before runApp).
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await LocalNotificationsService().init();
+  } catch (e) {
+    debugPrint('Firebase/notifications init failed (non-fatal): $e');
   }
 
   ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);

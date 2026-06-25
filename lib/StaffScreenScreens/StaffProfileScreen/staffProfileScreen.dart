@@ -356,12 +356,12 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
                               GestureDetector(
                                 onTap: () => _openSupportEmail(
                                   (staffData?.supportEmail ??
-                                          "support@bonding.com")
+                                          "twoofusoff@gmail.com")
                                       .toString(),
                                 ),
                                 child: Text(
                                   (staffData?.supportEmail ??
-                                          "support@bonding.com")
+                                          "twoofusoff@gmail.com")
                                       .toString(),
                                   style: const TextStyle(
                                     color: Colors.blue,

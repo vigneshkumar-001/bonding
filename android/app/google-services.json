@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "226303495126",
-    "project_id": "bonding-bdf7a",
-    "storage_bucket": "bonding-bdf7a.firebasestorage.app"
+    "project_number": "1064330076877",
+    "project_id": "twoofus-e93a4",
+    "storage_bucket": "twoofus-e93a4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:226303495126:android:0cbca5b8f635013a7af277",
+        "mobilesdk_app_id": "1:1064330076877:android:aaa298e8f381056672bf84",
         "android_client_info": {
           "package_name": "com.fenizo.twoofus"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDvXJkJWq671ER6BhZDp0mrdPBugaI71o8"
+          "current_key": "AIzaSyCx3G7AQYdv_BZRlUa9ZmIMppb_I6_ts2M"
         }
       ],
       "services": {

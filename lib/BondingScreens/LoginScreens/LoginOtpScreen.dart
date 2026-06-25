@@ -176,8 +176,11 @@ class _LoginOtpScreenState extends State<LoginOtpScreen> {
                                       : const AddProfile(),
                                 );
                               } else {
+                                // Surfaces the real server message (incl. admin
+                                // block/delete "...blocked/removed by admin").
                                 Utils.snackBarErrorMessage(
-                                  "Invalid OTP. Please try again.",
+                                  vm.verifyError ??
+                                      "Invalid OTP. Please try again.",
                                 );
                               }
                             },

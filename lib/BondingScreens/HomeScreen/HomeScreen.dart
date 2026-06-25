@@ -15,6 +15,7 @@ import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/ProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
+import 'package:bonding_app/Bonding_Utils/image_url.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
@@ -86,6 +87,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _inviteTimeoutTimer;
   Timer? _periodicCheckTimer;
   int _notInRoomCount = 0;
+
+  // Live staff presence subscriptions.
+  StreamSubscription? _onlineStaffSub;
+  StreamSubscription? _staffStatusSub;
+  StreamSubscription? _presenceConnSub;
 
   final socketService = SocketService();
 
@@ -263,6 +269,22 @@ class _HomeScreenState extends State<HomeScreen> {
         // Ask for initial list once socket is up (if not connected, it will no-op)
         socketService.requestStaffList();
       }
+
+      // ───────── Live staff online status (no manual refresh) ─────────
+      // Full snapshot (response to get_online_staff): mark online/offline.
+      _onlineStaffSub ??= socketService.onlineStaffStream.listen((data) {
+        staffVM.applyOnlineSnapshot(data);
+      });
+      // Live delta for a single staff -> flip its dot instantly.
+      _staffStatusSub ??= socketService.staffStatusChangedStream.listen((data) {
+        staffVM.applyStaffStatusChange(data);
+      });
+      // On every (re)connect, re-sync the full snapshot (covers missed events).
+      _presenceConnSub ??= socketService.connectionStream.listen((connected) {
+        if (connected) socketService.requestOnlineStaff();
+      });
+      // Initial sync if the socket is already connected.
+      socketService.requestOnlineStaff();
     });
 
     // Safety net: if call connected but room drops, end after 5 checks
@@ -623,6 +645,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _callLimitTimer?.cancel();
     _inviteTimeoutTimer?.cancel();
     _periodicCheckTimer?.cancel();
+    _onlineStaffSub?.cancel();
+    _staffStatusSub?.cancel();
+    _presenceConnSub?.cancel();
     // socketService.removeStaffListListener();
 
     if (_zegoInitialized) {
@@ -1569,20 +1594,10 @@ class _TappableAvatar extends StatelessWidget {
     return trimmed.substring(0, 1).toUpperCase();
   }
 
-  static bool _isValidNetworkImageUrl(String? url) {
-    if (url == null) return false;
-    final trimmed = url.trim();
-    if (trimmed.isEmpty) return false;
-    final uri = Uri.tryParse(trimmed);
-    if (uri == null) return false;
-    if (!uri.isAbsolute) return false;
-    if (uri.scheme != "http" && uri.scheme != "https") return false;
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final hasImage = _isValidNetworkImageUrl(imageUrl);
+    final resolvedUrl = resolveImageUrl(imageUrl);
+    final hasImage = resolvedUrl != null;
     final size = radius * 2;
     final fallback = _AvatarFallback(size: size, initial: _initial(name));
 
@@ -1592,7 +1607,7 @@ class _TappableAvatar extends StatelessWidget {
         height: size,
         child: hasImage
             ? Image.network(
-                imageUrl!.trim(),
+                resolvedUrl,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.medium,
                 loadingBuilder: (context, child, progress) {
@@ -1671,20 +1686,10 @@ class _TappableMediaBanner extends StatelessWidget {
     return trimmed.substring(0, 1).toUpperCase();
   }
 
-  static bool _isValidNetworkImageUrl(String? url) {
-    if (url == null) return false;
-    final trimmed = url.trim();
-    if (trimmed.isEmpty) return false;
-    final uri = Uri.tryParse(trimmed);
-    if (uri == null) return false;
-    if (!uri.isAbsolute) return false;
-    if (uri.scheme != "http" && uri.scheme != "https") return false;
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final hasImage = _isValidNetworkImageUrl(imageUrl);
+    final resolvedUrl = resolveImageUrl(imageUrl);
+    final hasImage = resolvedUrl != null;
     final rawName = (name ?? "").trim();
     final safeName = rawName.isEmpty ? "User" : rawName;
     final initial = _initial(safeName);
@@ -1699,7 +1704,7 @@ class _TappableMediaBanner extends StatelessWidget {
             Hero(
               tag: heroTag,
               child: Image.network(
-                imageUrl!.trim(),
+                resolvedUrl,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.medium,
                 errorBuilder: (context, error, stackTrace) {

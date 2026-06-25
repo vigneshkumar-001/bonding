@@ -1,5 +1,8 @@
 import 'package:bonding_app/BondingScreens/LoginScreens/ViewModel/LoginVM.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
+import 'package:bonding_app/Services/AdminCall/admin_call_handler.dart';
+import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
+import 'package:bonding_app/StaffScreenScreens/staff_route_gate.dart';
 import 'package:bonding_app/Bonding_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:bonding_app/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
@@ -202,12 +205,26 @@ class _LoginOtpStaffScreenState extends State<LoginOtpStaffScreen> {
                                 return;
                               }
 
+                              // ✅ Staff session started: register FCM device
+                              // token + listen for admin verification calls.
+                              AdminCallHandler().startForStaffSession();
+
                               final isLogin = response.user?.isLogin ?? false;
 
                               if (isLogin) {
+                                // Gate by approval/formStatus: a pending ("0")
+                                // or rejected ("2") staff must NOT land on the
+                                // dashboard. Fetch fresh data, then route.
+                                if (!context.mounted) return;
+                                final staffVM = context.read<StaffViewModel>();
+                                await staffVM.fetchStaffSingleData();
+                                if (!context.mounted) return;
+                                final staff = staffVM.currentStaff;
                                 bondNavigator.newPageRemoveUntil(
                                   context,
-                                  page: const StaffBottomBar(),
+                                  page: staff != null
+                                      ? resolveStaffHome(staff)
+                                      : const StaffBottomBar(),
                                 );
                               } else {
                                 bondNavigator.newPage(

@@ -248,6 +248,78 @@ class StaffViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ───────── Live presence over socket (user/home side) ─────────
+
+  static bool _asBool(dynamic v) =>
+      v == true || v == 1 || v == '1' || v.toString().toLowerCase() == 'true';
+
+  /// Apply the full `online_staff` snapshot:
+  /// { staffIds: [..], staff: [{staffId, memberID}] }.
+  /// Any staff NOT in the snapshot is marked offline.
+  void applyOnlineSnapshot(dynamic data) {
+    if (_staffList.isEmpty) return;
+    if (data is! Map) return;
+
+    final online = <String>{};
+
+    final ids = data['staffIds'];
+    if (ids is List) {
+      for (final id in ids) {
+        final s = id?.toString().trim() ?? '';
+        if (s.isNotEmpty) online.add(s);
+      }
+    }
+
+    final staff = data['staff'];
+    if (staff is List) {
+      for (final item in staff) {
+        if (item is Map) {
+          final sid = item['staffId']?.toString().trim() ?? '';
+          final mid = item['memberID']?.toString().trim() ?? '';
+          if (sid.isNotEmpty) online.add(sid);
+          if (mid.isNotEmpty) online.add(mid);
+        }
+      }
+    }
+
+    var changed = false;
+    for (var i = 0; i < _staffList.length; i++) {
+      final s = _staffList[i];
+      final isOn = online.contains(s.id) || online.contains(s.memberID);
+      if (s.isOnline != isOn) {
+        _staffList[i] = s.copyWith(isOnline: isOn);
+        changed = true;
+      }
+    }
+    if (changed) notifyListeners();
+  }
+
+  /// Apply a single live delta:
+  /// { staffId, memberID, isOnline, lastSeen }.
+  void applyStaffStatusChange(dynamic data) {
+    if (_staffList.isEmpty) return;
+    if (data is! Map) return;
+
+    final sid = data['staffId']?.toString().trim() ?? '';
+    final mid = data['memberID']?.toString().trim() ?? '';
+    if (sid.isEmpty && mid.isEmpty) return;
+
+    final isOnline = _asBool(data['isOnline']);
+    final lastSeen = DateTime.tryParse(data['lastSeen']?.toString() ?? '');
+
+    final index = _staffList.indexWhere(
+      (s) => (sid.isNotEmpty && s.id == sid) ||
+          (mid.isNotEmpty && s.memberID == mid),
+    );
+    if (index == -1) return;
+
+    _staffList[index] = _staffList[index].copyWith(
+      isOnline: isOnline,
+      lastSeen: lastSeen,
+    );
+    notifyListeners();
+  }
+
   Future<void> fetchStaffDetails() async {
     _isFetchingStaff = true;
     _staffFetchError = null;

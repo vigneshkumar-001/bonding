@@ -3,6 +3,7 @@ import 'package:bonding_app/BondingScreens/HomeScreen/ViewModel/UserVM.dart';
 import 'package:bonding_app/BondingScreens/ProfileScreen/ProfileScreen.dart';
 import 'package:bonding_app/BondingScreens/WalletScreen/WalletScreen.dart';
 import 'package:bonding_app/Bonding_Utils/ColorHandlers/Apptheme.dart';
+import 'package:bonding_app/Bonding_Utils/image_url.dart';
 import 'package:bonding_app/Reusable_Widgets/BondingNavigator.dart';
 import 'package:bonding_app/Reusable_Widgets/Loading/app_loading_indicator.dart';
 import 'package:bonding_app/StaffScreenScreens/StaffRegistrationScreen/ViewModel/StaffRegisterVM.dart';
@@ -194,20 +195,31 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final first = name.trim().isNotEmpty ? name.trim()[0].toUpperCase() : "?";
-    if (imageUrl != null && imageUrl!.trim().isNotEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundImage: NetworkImage(imageUrl!),
-      );
-    }
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: Colors.white.withOpacity(0.10),
-      child: Text(
-        first,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
+    final resolved = resolveImageUrl(imageUrl);
+
+    Widget letter() => CircleAvatar(
+          radius: radius,
+          backgroundColor: Colors.white.withOpacity(0.10),
+          child: Text(
+            first,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+
+    if (resolved == null) return letter();
+
+    // Show the profile image; fall back to the letter if it fails to load.
+    return ClipOval(
+      child: SizedBox(
+        width: radius * 2,
+        height: radius * 2,
+        child: Image.network(
+          resolved,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => letter(),
         ),
       ),
     );

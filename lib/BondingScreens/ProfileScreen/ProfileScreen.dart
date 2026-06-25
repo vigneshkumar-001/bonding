@@ -387,12 +387,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               GestureDetector(
                                 onTap: () => _openSupportEmail(
                                   (userDetails?.supportEmail ??
-                                          "support@bonding.com")
+                                          "twoofusoff@gmail.com")
                                       .toString(),
                                 ),
                                 child: Text(
                                   (userDetails?.supportEmail ??
-                                          "support@bonding.com")
+                                          "twoofusoff@gmail.com")
                                       .toString(),
                                   style: const TextStyle(
                                     color: Colors.blue,
